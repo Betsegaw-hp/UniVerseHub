@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+ <%- include('../partials/head')  %> 
+<body>
+    <%- include('../partials/nav')  %> 
+    <div class="create-blog content">
+        <form action="/blogs" method="POST">
+          <label for="Author">Author :</label>
+          <input type="text" id="Author" name="author" required></input>
+          <label for="title">Blog title:</label>
+          <input type="text" id="title" name="title" required>
+          <label for="snippet">Blog snippet:</label>
+          <input type="text" id="snippet" name="snippet" required>
+          <label for="body">Blog body:</label>
+          <textarea id="body" name="body" required></textarea>
+          <label for="tags">Catagory:<pre>(*separate multiple Catagories by comma)</pre></label>
+          <input type="text" id="tag" name="tag">
+          <button class="submit-btn" type="submit">Submit</button>
+        </form>
+      </div>
+
+    <%- include('../partials/footer')  %> 
+
+</body>
+</html>
+

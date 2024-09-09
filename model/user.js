@@ -1,0 +1,46 @@
+const mongoose = require('mongoose');
+const  { isEmail } = require('validator');
+const bcrypt = require('bcrypt');
+const Schema = mongoose.Schema;
+
+const userSchema = new Schema({
+    email: {
+        type: String,
+        required: true,
+        unique: true,
+        lowercase: true,
+        validate: [ isEmail , "please enter valid email!"]
+    },
+    name: {
+        type: String,
+        required: true,
+        lowercase: true
+    },
+    username: {
+        type: String,
+        unique: true,
+    },
+    password: {
+        type: String,
+        required: true,
+        minlength: 6
+    }
+}, { timestamps: true});
+
+userSchema.pre('save', async function (next) {
+    // Pre-save hook to set default username
+    if (!this.username) {
+      // Create default username from name and email
+      this.username = `${this.name.replace(/\s+/g, '_').toLowerCase()}_${this.email.split('@')[0]}${new Date().getUTCSeconds().toString()}`;
+    }
+
+    // hashing
+    const salt = await bcrypt.genSalt();
+    this.password = await bcrypt.hash(this.password, salt);
+
+    next();
+  });
+
+const User = mongoose.model('User', userSchema);
+
+module.exports = User;

@@ -1,0 +1,13 @@
+app idea
+
+- blog advance it
+-- catagory
+-- author
+-- date
+-- comment
+
+- TODO
+-- update blog
+-- validate tag
+-- do filter
+-- do comment
