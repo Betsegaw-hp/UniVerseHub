@@ -1,14 +1,35 @@
 const { json } = require('express');
 const User = require('../model/user');
 const jwt = require('jsonwebtoken');
+const handleErrors = require('../utils/errorHandler');
+
+
+const maxAge = 1 * 24 * 60 * 60; // 1 day
+const createToken = (id) => {
+    return jwt.sign({id}, 'guada secret', {
+        expiresIn: maxAge // in sec
+    });
+}
 
 const auth_page_get = (req, res ) => {
     res.render('auth/index');
 };
 
 const login_post = async (req, res) => {
-    const email = req.body.email;
-    const password = req.body.password;
+    const {
+        email, password
+    } = req.body;
+
+    try {
+        const user = await User.login(email, password);
+        const token = createToken(user._id);
+        res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000, sameSite: true });
+        res.status(200).json(user);
+    } catch (err) {
+        const errors = handleErrors(err);
+        res.status(400).json({errors});
+        console.log(errors);
+    }
     
     
 };
@@ -20,20 +41,25 @@ const signup_post  = async (req, res) => {
 
     try {
         const user = await User.create({name, email, password});
-
+        const token = createToken(user._id);
+        res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000, sameSite: true });
         res.status(200).json(user);
     } catch (err) {
-        res.status(400).json({
-            message: "user not created",
-            error_type: err.name,
-            error: err.message
-        })
-        console.error(err)
+        const errors = handleErrors(err);
+        res.status(400).json({errors});
+        console.error(errors);
     }
 };
+
+const auth_logout = (req, res) => {
+    
+    res.cookie('jwt', '', {maxAge: 1});
+    res.redirect('/');
+}
 
 module.exports = {
     auth_page_get,
     login_post,
-    signup_post
+    signup_post,
+    auth_logout
 };

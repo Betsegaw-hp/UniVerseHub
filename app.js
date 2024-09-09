@@ -4,6 +4,7 @@ const morgan = require('morgan')
 const cookieParser = require('cookie-parser')
 const blogRoutes = require('./routes/blogRoutes')
 const authRoutes = require('./routes/authRoutes')
+const {requireAuth, checkUser} = require('./middleware/authMiddleware');
 
 const app = express()
 const port = 3000
@@ -20,23 +21,25 @@ mongoose.connect('mongodb://localhost:27017/test')
 app.set('view engine', 'ejs')
 app.use(express.static('public'))
 app.use(express.urlencoded({ extended : true }))
-app.use(express.json())
-app.use(cookieParser)
+app.use(express.json());
+app.use(cookieParser());
 
 app.use(morgan('dev'))
+
+app.use('*', checkUser);
 
 // auth routes
 app.use('/auth', authRoutes);
 
-app.get('/', (req, res ) => {
+app.get('/', requireAuth,  (req, res ) => {
     res.render('index', { title : 'Home'})
 })
 
-app.get('/about', (req, res) => {
+app.get('/about', requireAuth, (req, res) => {
     res.render('about', { title: 'About'})
 })
 // blog routes
-app.use('/blogs', blogRoutes)
+app.use('/blogs', requireAuth,  blogRoutes)
 
 
 app.use((req, res) => {

@@ -20,9 +20,12 @@
 				<a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
 			</div>
 			<span>or use your email for registration</span>
-			<input type="text" placeholder="Name" name="name" />
-			<input type="email" placeholder="Email" name="email" />
-			<input type="password" placeholder="Password" name="password" />
+			<input type="text" placeholder="Name" name="name" required/>
+			<div class="signup name error"></div>
+			<input type="email" placeholder="Email" name="email" required />
+			<div class="signup email error"></div>
+			<input type="password" placeholder="Password" name="password" required/>
+			<div class="signup password error"></div>
 			<button id="signupBtn" type="submit">Sign Up</button>
 		</form>
 	</div>
@@ -35,8 +38,10 @@
 				<a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
 			</div>
 			<span>or use your account</span>
-			<input type="email" placeholder="Email" name="email" />
-			<input type="password" placeholder="Password" name="password" />
+			<input type="email" placeholder="Email" name="email" required />
+			<div class="login email error"></div>
+			<input type="password" placeholder="Password" name="password" required />
+			<div class="login password error"></div>
 			<a href="#">Forgot your password?</a>
 			<button id="loginBtn" type="submit">Sign In</button>
 		</form>
@@ -65,9 +70,20 @@
 	const loginForm = document.querySelector('#loginForm');
 	const signupForm = document.querySelector('#signupForm');
 
+	const signupEmailError = document.querySelector('.signup.email.error');
+    const signupPasswordError = document.querySelector('.signup.password.error');
+	const signupNameError = document.querySelector('.signup.name.error');
+
+	const loginEmailError = document.querySelector('.login.email.error');
+	const loginPasswordError = document.querySelector('.login.password.error');
+
 	
 	loginForm.addEventListener("submit", (e) => {
 		e.preventDefault();
+
+		// reset errors
+		loginEmailError.textContent = '';
+    	loginPasswordError.textContent = '';
 		
 		const email = loginForm.email.value;
 		const password = loginForm.password.value;
@@ -79,11 +95,29 @@
 			headers: { 'Content-Type': 'application/json' },
 		};
 
-		fetcher(URI, others);
+		fetch(URI,others)
+		.then((res) => res.json())
+		.then(data => {
+			if (data.errors) {
+				loginEmailError.textContent = data.errors.email;
+				loginPasswordError.textContent = data.errors.password;
+			}
+
+			if (data.email) {
+				location.assign('/');
+			}
+		})
+		.catch(err => console.error(err))
+		.finally(e => console.log("finished"));
 	});
 
 	signupForm.addEventListener("submit", (e) => {
 		e.preventDefault();
+
+		// reset errors
+		signupEmailError.textContent = '';
+    	signupPasswordError.textContent = '';
+		signupNameError.textContent = '';
 		
 		const email = signupForm.email.value;
 		const password = signupForm.password.value;
@@ -97,16 +131,22 @@
 			headers: { 'Content-Type': 'application/json' },
 		};
 
-		fetcher(URI, others);
-	})
-
-	function fetcher(URI, others) {
 		fetch(URI,others)
 		.then((res) => res.json())
-		.then(data => console.log(data))
+		.then(data => {
+
+			if (data.errors) {
+				signupEmailError.textContent = data.errors.email;
+				signupPasswordError.textContent = data.errors.password;
+				signupNameError.textContent = data.errors.name;
+			}
+			if (data.email) {
+				location.assign('/');
+			}
+		})
 		.catch(err => console.error(err))
 		.finally(e => console.log("finished"));
-	}
+	})
 	
 </script>
 </body>

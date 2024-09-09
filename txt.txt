@@ -11,3 +11,7 @@ app idea
 -- validate tag
 -- do filter
 -- do comment
+
+
+>> do error handling (copy from ninja github)
+>> login

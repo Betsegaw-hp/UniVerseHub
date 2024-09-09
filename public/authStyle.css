@@ -89,6 +89,11 @@ input {
 	width: 100%;
 }
 
+.error{
+	color: #ff0099;
+	font-size: 0.7em;
+  }
+
 .container {
 	background-color: #fff;
 	border-radius: 10px;
