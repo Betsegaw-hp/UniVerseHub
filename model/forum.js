@@ -5,11 +5,13 @@ const Schema = mongoose.Schema;
 const forumPostSchema = new Schema({
     title: {
         type: String,
-        required: true
+        required: true,
+        minlength: 1
     },
     content: {
         type: String,
-        required: true
+        required: true,
+        minlength: 10
     },
     author: {
         type: Schema.Types.ObjectId,

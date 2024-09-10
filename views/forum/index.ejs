@@ -4,13 +4,17 @@
     if(data) {
         categories = data.categories;
         posts = data.posts;
-        console.log(posts[0].author)
     }
 %>
 
 <!DOCTYPE html>
 <html lang="en">
-    <%- include('../partials/head')  %> 
+    <head>
+        <%- include('../partials/head')  %> 
+        <!-- Include the timeLapse.js file -->
+        <script src="/timeLapse.js"></script>
+    </head>
+    
 <body>
     <%- include('../partials/nav')  %>
 
@@ -26,13 +30,13 @@
                 <div class="list-group">
                     <% if (categories.length > 0) { %>
                         <% categories.forEach(category => { %>
-                          <a href="/category/<%= category._id %>" class="list-group-item list-group-item-action forum-card" >
+                          <a href="/category/<%= category.name %>" class="list-group-item list-group-item-action forum-card" >
                             <div class="d-flex w-100 justify-content-between">
                                 <h5 class="mb-1"><%= category.name %></h5>
-                                <small>3 new posts</small>
+                                <!-- <small>3 new posts</small> -->
                             </div>
                             <p class="mb-1"> <%= category.description %> </p>
-                            <small>1.2k topics · 5.6k posts</small>
+                            <small><%= category.postCount %> topics</small>
                           </a>
                         <% }) %>
                       <% } else { %>
@@ -47,32 +51,20 @@
                     </div>
                     <ul class="list-group list-group-flush">
                         <% if (posts.length > 0) { %>
-                            <% posts.forEach(post => { %>
+                            <!-- the slicing also happens at backend. this is just formality -->
+                            <% posts.slice(0,4).forEach(post => {  %>
                                 <li class="list-group-item">
                                     <a href="/forum/<%= post._id %>" class="text-decoration-none">
                                         <%= post.title %>
                                     </a>
                                     <br><small class="text-muted">
-                                        by <%= post.author.username %> · <%= post.createdAt ? new Date(post.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "sometime" %>  ago
+                                        by <%= post.author.username %> ·  <span class="timePassed" data-date="<%= post.createdAt %>"></span>
                                     </small>
                                 </li>  
                             <% }) %>
                         <% } else { %>
                             <p>There is no posts to display...</p>
                         <% } %>
-
-                        <li class="list-group-item">
-                            <a href="#" class="text-decoration-none">Best study spots on campus</a>
-                            <br><small class="text-muted">by Mike T. · 5 hours ago</small>
-                        </li>
-                        <li class="list-group-item">
-                            <a href="#" class="text-decoration-none">Summer internship opportunities</a>
-                            <br><small class="text-muted">by Emily R. · 1 day ago</small>
-                        </li>
-                        <li class="list-group-item">
-                            <a href="#" class="text-decoration-none">New AI course announced!</a>
-                            <br><small class="text-muted">by Prof. Johnson · 2 days ago</small>
-                        </li>
                     </ul>
                 </div>
                 <div class="card">
@@ -99,35 +91,100 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form>
+                    <form id="post_form">
                         <div class="mb-3">
                             <label for="topicTitle" class="form-label">Topic Title</label>
-                            <input type="text" class="form-control" id="topicTitle" required>
+                            <input type="text" class="form-control" id="topicTitle" name="title" required>
                         </div>
                         <div class="mb-3">
                             <label for="topicCategory" class="form-label">Category</label>
-                            <select class="form-select" id="topicCategory" required>
+                            <select class="form-select" id="topicCategory" name="category" required>
                                 <option value="">Choose a category...</option>
-                                <option value="academic">Academic Discussions</option>
-                                <option value="campus">Campus Life</option>
-                                <option value="career">Career & Internships</option>
-                                <option value="tech">Tech Corner</option>
+                                <% if (categories.length > 0) { %>
+                                    <% categories.forEach(category => { %>
+                                        <option value="<%= category.name %>"><%= category.name %></option>
+                                    <% }) %>
+                                <% } else { %>
+                                    <option value="" disabled>here is no category to display...</option>
+                                <% } %>
                             </select>
                         </div>
                         <div class="mb-3">
                             <label for="topicContent" class="form-label">Content</label>
-                            <textarea class="form-control" id="topicContent" rows="5" required></textarea>
+                            <textarea class="form-control" id="topicContent" rows="5" name="body_content" required></textarea>
                         </div>
                     </form>
+                    <div id="form_alert" style="cursor:not-allowed;" class="alert alert-danger fade" role="alert">
+                        <p id="alert_msg"></p> 
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Post Topic</button>
+                    <button type="submit" form="post_form" class="btn btn-primary">Post Topic</button>
                 </div>
             </div>
         </div>
     </div>
 
     <%- include('../partials/footer')  %> 
+
+
+    <script>
+        const form = document.querySelector("#post_form");
+        const form_alert = document.querySelector("#form_alert");
+        const alert_msg = document.querySelector("#alert_msg");
+
+        form.addEventListener("submit", (e) => {
+            e.preventDefault();
+
+            const title = form.title.value;
+            const body_content = form.body_content.value;
+            const category = form.category.value;
+
+            const options = {
+               method: "POST",
+               headers: { 'Content-Type': 'application/json' },
+               body: JSON.stringify({
+                 title: title,
+                 body_content: body_content,
+                 category: category
+               })
+            }
+
+            fetch("/forum", options)
+            .then(res => res.json())
+            .then(data => {
+                if(data.errors) {
+                    form_alert.classList.add('show');
+                    let msg = "error occured";
+                    if(data.errors.title != '') msg = data.errors.title;
+                    else if(data.errors.content != '') msg = data.errors.content;
+                    else if(data.errors.category != '') msg = data.errors.category;
+                    alert_msg.textContent = msg;
+                    console.log(msg)
+                }
+                if (data.post) {
+                    location.assign('/forum');
+                }
+            })
+            .catch(err => console.error(err));
+        });
+
+        form_alert.addEventListener("click", (e) => {
+            form_alert.classList.remove('show');
+        })
+    </script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const timeEle = document.querySelectorAll('.timePassed');
+        timeEle.forEach(ele => {
+            const createdAt = ele.dataset.date; // Assuming post.createdAt is in ISO format
+            const timePassedStr = timePassed(createdAt);
+            ele.textContent = timePassedStr
+        });
+    });
+</script>
+
 </body>
 </html>
