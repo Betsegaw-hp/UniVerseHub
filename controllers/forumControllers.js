@@ -3,7 +3,7 @@ const Category = require('../model/category');
 const handleErrors = require('../utils/errorHandler');
 
 
-const getPostsByCategory = async (categoryName) => {
+const getPostsByCategory = async (categoryName, limit) => {
     try {
         const category = await Category.findOne({ name: categoryName });
 
@@ -13,9 +13,9 @@ const getPostsByCategory = async (categoryName) => {
         }
 
         // Fetch posts for the found category
-        const posts = await ForumPost.find({ category: category._id })
-            .populate('author', 'username email') 
-            .populate('category', 'name') 
+        const posts = await ForumPost.find({ category: category._id }, "title")
+            // .populate('author', 'username email') 
+            // .populate('category', 'name') 
             .exec();
 
         // console.log('Posts:', posts);
@@ -97,15 +97,46 @@ const forum_post = async (req, res) => {
 
 
 const forum_dlt = (req, res) => {
-    
+    const id = req.params.id
+
+    ForumPost.findByIdAndDelete(id)
+    .then(result => {
+        console.info("deleted!", result);
+        res.json({ redirect : '/blogs'})
+    }).catch( err => {
+        const errors = handleErrors(err);
+        res.status(400).json({ errors });
+        console.log(err);
+    })
 }
 
-const forum_detail_get = (req, res) => {
+const forum_detail_get = async (req, res) => {
+    const id = req.params.id;
+
+    ForumPost.findById(id)
+    .populate('author', "username email")
+    .populate("category", "name")
+    .then(async result => {
+
+        try {
+            
+            const categoryName = result.category.name;
+            const relatedPosts = await getPostsByCategory(categoryName);
+            console.log({...result.toObject(), relatedPosts} );
+            res.render('forum/detail', { title: "detail", post: {...result.toObject(), relatedPosts} });
+        } catch (error) {
+            
+        }
+    })
+    .catch(err => {
+        console.error(err)
+        res.redirect('../404')
+    })
 
 }
 
 const forum_update = (req, res) => {
-
+    
 }
 
 module.exports = {

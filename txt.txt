@@ -11,7 +11,5 @@ app idea
 -- validate tag
 -- do filter
 -- do comment
-
-
->> do error handling (copy from ninja github)
->> login
+>> revisit relevent post feature. (i.e the post it self shouldn't be a relevent post to itself)
+>> make sure to use .env
