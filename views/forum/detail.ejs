@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+    <%- include('../partials/head')  %>
+<body>
+    <%- include('../partials/nav')  %>
+
+    <div class="container mt-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="#">Home</a></li>
+                <li class="breadcrumb-item"><a href="#">Forum</a></li>
+                <li class="breadcrumb-item"><a href="#">Academic Discussions</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Tips for acing your finals</li>
+            </ol>
+        </nav>
+
+        <div class="row">
+            <div class="col-md-9">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h1 class="card-title">Tips for acing your finals</h1>
+                        <div class="d-flex align-items-center mb-3">
+                            <img src="/placeholder.svg?height=64&width=64" alt="Sarah J." class="avatar me-3">
+                            <div>
+                                <h5 class="mb-0">Sarah J.</h5>
+                                <small class="text-muted">Posted on May 15, 2023 at 14:30</small>
+                            </div>
+                        </div>
+                        <p class="card-text">Hello fellow students! With finals week approaching, I thought it would be helpful to share some tips that have worked well for me in the past. Here are my top 5 strategies for acing your exams:</p>
+                        <ol>
+                            <li><strong>Start early:</strong> Begin your revision at least two weeks before the exam date. This gives you time to cover all topics and reduces last-minute stress.</li>
+                            <li><strong>Create a study schedule:</strong> Allocate specific time slots for each subject, ensuring you cover all areas evenly.</li>
+                            <li><strong>Use active recall:</strong> Instead of just re-reading notes, try to recall information from memory. This helps reinforce your learning.</li>
+                            <li><strong>Take regular breaks:</strong> Use the Pomodoro technique - study for 25 minutes, then take a 5-minute break. This helps maintain focus and prevents burnout.</li>
+                            <li><strong>Practice past papers:</strong> This familiarizes you with the exam format and types of questions you might encounter.</li>
+                        </ol>
+                        <p>Remember, everyone has different study methods that work for them. These are just suggestions based on my experience. What strategies have worked well for you?</p>
+                        <div class="mt-3">
+                            <button class="btn btn-outline-primary me-2"><i class="bi bi-hand-thumbs-up"></i> Like (15)</button>
+                            <button class="btn btn-outline-secondary"><i class="bi bi-bookmark"></i> Save</button>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 class="mb-3">Comments (3)</h3>
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="d-flex">
+                            <img src="/placeholder.svg?height=48&width=48" alt="Mike T." class="comment-avatar me-3">
+                            <div class="flex-grow-1">
+                                <h5 class="mb-0">Mike T.</h5>
+                                <small class="text-muted">May 15, 2023 at 15:45</small>
+                                <p class="mt-2">Great tips, Sarah! I'd add that group study sessions can be really helpful too. Explaining concepts to others can reinforce your own understanding.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="d-flex">
+                            <img src="/placeholder.svg?height=48&width=48" alt="Emily R." class="comment-avatar me-3">
+                            <div class="flex-grow-1">
+                                <h5 class="mb-0">Emily R.</h5>
+                                <small class="text-muted">May 16, 2023 at 09:20</small>
+                                <p class="mt-2">Thanks for sharing! I find that summarizing key points on flashcards helps me a lot. It's a quick way to review important information.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="d-flex">
+                            <img src="/placeholder.svg?height=48&width=48" alt="Alex K." class="comment-avatar me-3">
+                            <div class="flex-grow-1">
+                                <h5 class="mb-0">Alex K.</h5>
+                                <small class="text-muted">May 16, 2023 at 11:05</small>
+                                <p class="mt-2">These are all great suggestions! I'd also recommend staying hydrated and getting enough sleep. It's amazing how much these can affect your focus and memory.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Add a comment</h5>
+                        <form>
+                            <div class="mb-3">
+                                <textarea class="form-control" rows="3" placeholder="Write your comment here..."></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Post Comment</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        Related Topics
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item"><a href="#" class="text-decoration-none">Effective note-taking strategies</a></li>
+                        <li class="list-group-item"><a href="#" class="text-decoration-none">Dealing with exam anxiety</a></li>
+                        <li class="list-group-item"><a href="#" class="text-decoration-none">Best study apps for students</a></li>
+                        <li class="list-group-item"><a href="#" class="text-decoration-none">How to balance study and social life</a></li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        Forum Guidelines
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-unstyled mb-0">
+                            <li><i class="bi bi-check-circle text-success me-2"></i>Be respectful to others</li>
+                            <li><i class="bi bi-check-circle text-success me-2"></i>Stay on topic</li>
+                            <li><i class="bi bi-check-circle text-success me-2"></i>No spam or self-promotion</li>
+                            <li><i class="bi bi-check-circle text-success me-2"></i>Report inappropriate content</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <%- include('../partials/footer')  %> 
+</body>
+</html>

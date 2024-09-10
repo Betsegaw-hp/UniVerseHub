@@ -4,7 +4,71 @@
 <body>
     <%- include('./partials/nav')  %> 
 
-    <h1> Welcome to the Boring site!</h1>
+    <div class="container mt-4">
+        <div class="jumbotron bg-light p-5 rounded">
+            <h1 class="display-4">Welcome to UniVerseHub</h1>
+            <p class="lead">Connect with fellow students, share ideas, and explore a world of knowledge through forums and videos.</p>
+            <hr class="my-4">
+            <p>Join discussions, watch educational content, and expand your university experience.</p>
+            <a class="btn btn-primary btn-lg" href="#" role="button">Join the Discussion</a>
+            <a class="btn btn-secondary btn-lg" href="#" role="button">Explore Videos</a>
+        </div>
+
+        <h2 class="mt-5 mb-4">What's Trending</h2>
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="bi bi-chat-dots"></i> Hot Forum Topics</h5>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">Exam preparation strategies</li>
+                            <li class="list-group-item">Campus life hacks</li>
+                            <li class="list-group-item">Internship opportunities</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="bi bi-camera-video"></i> Popular Videos</h5>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">DIY dorm room decor</li>
+                            <li class="list-group-item">Study with me: 4-hour session</li>
+                            <li class="list-group-item">A day in the life of a med student</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="bi bi-people"></i> Active Communities</h5>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">Computer Science Majors</li>
+                            <li class="list-group-item">Student Entrepreneurs</li>
+                            <li class="list-group-item">Mental Health Support Group</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-light p-5 rounded mt-5">
+            <h2>Join Our Community</h2>
+            <p class="lead">Get the latest updates, forum highlights, and featured videos delivered to your inbox.</p>
+            <form class="row g-3">
+                <div class="col-auto">
+                    <input type="email" class="form-control" id="inputEmail" placeholder="Enter your email">
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary mb-3">Subscribe</button>
+                </div>
+            </form>
+            <p class="text-muted"><small>By subscribing, you agree to our Terms of Service and Privacy Policy.</small></p>
+        </div>
+    </div>
+
     <%- include('./partials/footer')  %> 
 </body>
 </html>

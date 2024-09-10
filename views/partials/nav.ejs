@@ -1,18 +1,40 @@
 <% 
     let client = "";
-    if(user) client = user.email ;
+    if(user) client = user.name ;
 %>
 
-<nav>
-    <div class="logo">
-        <h1>Astonish</h1>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container">
+        <a class="navbar-brand" href="/">
+            <i class="bi bi-globe"></i> UniVerseHub
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" href="/forum"><i class="bi bi-chat-dots"></i> Forum</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#"><i class="bi bi-camera-video"></i> Videos</a>
+                </li>
+            </ul>
+            <form class="d-flex me-2">
+                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-success" type="submit">Search</button>
+            </form>
+            <div class="dropdown">
+                <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-person-circle"></i> welcome, <%= client %>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuLink">
+                    <li><a class="dropdown-item" href="#">Profile</a></li>
+                    <li><a class="dropdown-item" href="#">Settings</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="/auth/logout">Log out</a></li>
+                </ul>
+            </div>
+        </div>
     </div>
-    <ul class="nav">
-        <li style="text-transform: lowercase;"><h4>welcome, <%= client %> </h4></li>
-        <li><a href="/">Home</a></li>
-        <li><a href="/about">About</a></li>
-        <li><a href="/blogs">Blogs</a></li>
-        <li><a href="/blogs/create">New Blog</a></li>
-        <li><a href="/auth/logout">Logout</a></li>
-    </ul>
 </nav>

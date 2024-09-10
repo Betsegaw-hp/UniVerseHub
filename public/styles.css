@@ -1,126 +1,104 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&display=swap');
-body {
-  max-width: 1200px;
-  margin: 20px auto;
-  padding: 0 20px;
-  font-family: 'Noto Serif', serif;
-  max-width: 1200px;
+
+
+* 
+{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+html, body {
+    font-family: 'Noto Serif', serif;
+    height: 100%;
 }
-p, h1, h2, h3, a, ul {
-  margin: 0;
-  padding: 0;
-  text-decoration: none;
-  color: #222;
-}
-/* nav & footer styles */
-nav{
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 60px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #ddd;
-  text-transform: uppercase;
-}
-nav ul {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-}
-nav li {
-  list-style-type: none;
-  margin-left: 20px;
-}
-nav h1 {
-  font-size: 3em;
-}
-nav p, nav a {
-  color: #777;
-  font-weight: 300;
-}
-footer {
-  color: #777;
-  text-align: center;
-  margin: 80px auto 20px;
-}
-/* h2 {
-  margin-bottom: 40px;
-} */
-h3 {
-  text-transform: capitalize;
-  margin-bottom: 8px;
-}
+
 .content  {
-  margin-left: 20px;
-  display: grid ;
-  gap: 1rem;
+    margin-left: 20px;
+    display: grid ;
+    gap: 1rem;
 }
 /* index styles */
 .blogs a {
-  border-left: .3rem solid rgb(161, 7, 161);
-  padding: 0.5rem;
-  padding-left: 1rem;
-  background-color:rgba(234, 140, 234, 0.085);
+    border-left: .3rem solid rgb(161, 7, 161);
+    padding: 0.5rem;
+    padding-left: 1rem;
+    background-color:rgba(234, 140, 234, 0.085);
 }
 .blogs a:hover {
-  background-color:rgba(234, 140, 234, 0.338);
+    background-color:rgba(234, 140, 234, 0.338);
 }
 
 .blogs a h2 {
-  
+
 }
 .blogs a p {
-  padding-left: 0.5rem;
+    padding-left: 0.5rem;
 }
 
 /* details styles */
 .details .heading {
-  display:flex;
-  justify-content: space-between;
-  gap:1rem;
+    display:flex;
+    justify-content: space-between;
+    gap:1rem;
 }
 .details .heading div {
-  padding: 1rem 0;
+    padding: 1rem 0;
 }
 .details .dlt-btn , .edit-btn {
-  height: fit-content;
-  color: white;
-  padding: 0.5rem;
-  border: 0;
-  border-radius: 10%;
-  cursor: pointer;
+    height: fit-content;
+    color: white;
+    padding: 0.5rem;
+    border: 0;
+    border-radius: 10%;
+    cursor: pointer;
 }
 .details .dlt-btn {
-  background: crimson;
+    background: crimson;
 }
 .details .edit-btn {
-  background: teal;
+    background: teal;
 }
 
 /* create styles */
 .create-blog form {
-  min-width: 400px;
-  margin: 0 auto;
+    min-width: 400px;
+    margin: 0 auto;
 }
 .create-blog input,
 .create-blog textarea {
-  display: block;
-  width: 100%;
-  margin: 10px 0;
-  padding: 8px;
+    display: block;
+    width: 100%;
+    margin: 10px 0;
+    padding: 8px;
 }
 .create-blog label  {
-  display: block;
-  margin-top: 24px;
+    display: block; 
+    margin-top: 24px;
 }
 textarea  {
-  height: 120px;
+    height: 120px;
 }
 .create-blog button  {
-  margin-top: 20px;
-  background: crimson;
-  color: white;
-  padding: 6px;
-  border: 0;
-  font-size: 1.2em;
-  cursor: pointer;
+    margin-top: 20px;
+    background: crimson;
+    color: white;
+    padding: 6px;
+    border: 0;
+    font-size: 1.2em;
+    cursor: pointer;
+}
+
+/* forum */
+.avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+.comment-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
 }

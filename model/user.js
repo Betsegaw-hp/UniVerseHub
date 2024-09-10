@@ -16,6 +16,11 @@ const userSchema = new Schema({
         required: true,
         lowercase: true
     },
+    avatarUrl: String,
+    roles: {
+        type: [String],
+        default: ['user']
+    },
     username: {
         type: String,
         unique: true,
@@ -24,6 +29,11 @@ const userSchema = new Schema({
         type: String,
         required: true,
         minlength: 6
+    },
+    stats: {
+        postCount: { type: Number, default: 0 },
+        commentCount: { type: Number, default: 0 },
+        videoCount: { type: Number, default: 0 }
     }
 }, { timestamps: true});
 

@@ -3,6 +3,7 @@ const mongoose = require('mongoose')
 const morgan = require('morgan')
 const cookieParser = require('cookie-parser')
 const blogRoutes = require('./routes/blogRoutes')
+const forumRoutes = require('./routes/forumRoutes')
 const authRoutes = require('./routes/authRoutes')
 const {requireAuth, checkUser} = require('./middleware/authMiddleware');
 
@@ -32,7 +33,7 @@ app.use('*', checkUser);
 app.use('/auth', authRoutes);
 
 app.get('/', requireAuth,  (req, res ) => {
-    res.render('index', { title : 'Home'})
+    res.render('index', { title : 'UniVerseHub - Connect, Share, Learn'})
 })
 
 app.get('/about', requireAuth, (req, res) => {
@@ -40,6 +41,9 @@ app.get('/about', requireAuth, (req, res) => {
 })
 // blog routes
 app.use('/blogs', requireAuth,  blogRoutes)
+
+//forum routes
+app.use('/forum', requireAuth, forumRoutes);
 
 
 app.use((req, res) => {
