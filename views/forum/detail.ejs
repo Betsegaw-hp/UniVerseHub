@@ -50,7 +50,10 @@
                         <p>Remember, everyone has different study methods that work for them. These are just suggestions based on my experience. What strategies have worked well for you?</p> -->
                         <p><%= post.content %></p>
                         <div class="mt-3 action-container">
-                            <button class="btn btn-outline-primary me-2"><i class="bi bi-hand-thumbs-up"></i> Like (<%= post.likeCount %>)</button>
+                            <button id="like-btn" class="btn btn-outline-primary me-2 <%= post.hasLiked ? "active" : "" %> " 
+                                    data-bs-toggle="button" data-liked="<%= post.hasLiked %>">
+                                <i class="bi bi-hand-thumbs-up"></i> Like <span id="like-count">(<%= post.likeCount %>)</span>
+                            </button>
                             <button class="btn btn-outline-secondary"><i class="bi bi-bookmark"></i> Save</button>
                             
                             <% if(user._id.toString() === post.author._id.toString()) { %>
@@ -261,8 +264,41 @@
             .then( res => res.json())
             .then(data => window.location.href = data.redirect )
             .catch(err =>console.log(err))
-        })
-    </script>
+        });
 
+    
+        // like btn service
+        const likeBtn = document.querySelector("#like-btn");
+
+        likeBtn.addEventListener("click", async (e) => {
+            e.preventDefault();
+
+            const postId = postIdParent.dataset.postid;  
+            const likeCountSpan = document.getElementById('like-count');
+
+            const isLiked = likeBtn.dataset.liked === 'true';
+
+            try {
+                const response = await fetch(`/forum/${postId}/like`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Update the UI
+                    likeBtn.dataset.liked = !isLiked;
+                    likeCountSpan.textContent = `(${data.likeCount})`;
+                } else {
+                    console.error(data.error);
+                }
+            } catch (error) {
+                console.error("Error liking post:", error);
+            }
+                })
+    </script>
 </body>
 </html>

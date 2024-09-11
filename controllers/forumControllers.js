@@ -70,6 +70,7 @@ const forum_post = async (req, res) => {
         const { title, body_content, category } = req.body;
 
         const categoryDoc = await Category.findOne({ name: category });
+        
         if (!categoryDoc) {
             return res.status(400).json({ errors: { category: "Category not found" } });
         }
@@ -123,7 +124,10 @@ const forum_detail_get = async (req, res) => {
             const relatedPosts = await getPostsByCategory(categoryName);
             const categoryCollec = await Category.find({}, 'name');
 
-            const postData = {...result.toObject(), relatedPosts, categoryCollec};
+            // checking if the user liked the post
+            const hasLiked = result.likedBy.includes(res.locals.user._id);
+
+            const postData = {...result.toObject(), relatedPosts, categoryCollec, hasLiked};
             res.render('forum/detail', { 
                 title: `${result.title} - UniVerseHub Forum`, 
                 post: postData
@@ -172,11 +176,50 @@ const forum_update = async (req, res) => {
     }
 }
 
+const likePost = async (req, res) => {
+    const { id } = req.params;
+    const userId = res.locals.user._id;  
+
+    console.log(req.params)
+
+    try {
+        const post = await ForumPost.findById(id);
+        if (!post) return res.status(404).json({ error: "Post not found" });
+
+        // Check if user has already liked the post
+        const hasLiked = post.likedBy.includes(userId);
+
+        if (hasLiked) {
+            // Unlike the post
+            post.likeCount -= 1;
+            post.likedBy.pull(userId);
+        } else {
+            // Like the post
+            post.likeCount += 1;
+            post.likedBy.push(userId);
+        }
+
+        // Save the post with updated likeCount
+        await post.save();
+
+        res.status(200).json({
+            likeCount: post.likeCount,
+            hasLiked: !hasLiked
+        });
+    } catch (err) {
+        const errors = handleErrors(err);
+        res.status(400).json({ errors });
+        console.log(err);    
+    }
+};
+
+
 module.exports = {
     forum_get,
     forum_post,
     forum_dlt,
     forum_detail_get,
-    forum_update
+    forum_update,
+    likePost
 }
 
