@@ -207,6 +207,7 @@
         const form_alert = document.querySelector("#form_alert");
         const alert_msg = document.querySelector("#alert_msg");
         const postIdParent = document.querySelector("#editTopicModal");
+        const dltBtn = document.querySelector(".dlt-btn");
 
         form.addEventListener("submit", (e) => {
             e.preventDefault();
@@ -231,6 +232,7 @@
             .then(res => res.json())
             .then(data => {
                 if(data.errors) {
+                    console.log(data.errors)
                     form_alert.classList.add('show');
                     let msg = "error occured";
                     if(data.errors.title != '') msg = data.errors.title;
@@ -248,6 +250,17 @@
 
         form_alert.addEventListener("click", (e) => {
             form_alert.classList.remove('show');
+        })
+
+
+        dltBtn.addEventListener("click", (e) => {
+
+            const endpoint = `/forum/${postIdParent.dataset.postid}`
+
+            fetch(endpoint, { method: 'DELETE'})
+            .then( res => res.json())
+            .then(data => window.location.href = data.redirect )
+            .catch(err =>console.log(err))
         })
     </script>
 

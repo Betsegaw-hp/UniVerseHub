@@ -38,11 +38,17 @@ const handleErrors = (err) => {
       });
     } else if (err.message.includes('ForumPost validation failed')) {
         Object.values(err.errors).forEach(({ properties }) => {
-          // console.log(val);
-          // console.log(properties);
+
           formPost_errors[properties.path] = properties.message;
           errors = formPost_errors;
         });
+    } else {
+      errors = {...user_errors, ...formPost_errors} ;
+      Object.values(err.errors).forEach(({ properties }) => {
+          
+        formPost_errors[properties.path] = properties.message;
+        errors = formPost_errors;
+      });
     }
 
     return errors;
