@@ -31,9 +31,9 @@ const userSchema = new Schema({
         minlength: 6
     },
     stats: {
-        postCount: { type: Number, default: 0 },
-        commentCount: { type: Number, default: 0 },
-        videoCount: { type: Number, default: 0 }
+        postCount: { type: Number, default: 0, min: 0 },
+        commentCount: { type: Number, default: 0, min: 0 },
+        videoCount: { type: Number, default: 0, min: 0 }
     }
 }, { timestamps: true});
 
@@ -44,11 +44,15 @@ userSchema.pre('save', async function (next) {
       this.username = `${this.name.replace(/\s+/g, '_').toLowerCase()}_${this.email.split('@')[0]}${new Date().getUTCSeconds().toString()}`;
     }
 
+    if (!this.isModified('password')) return next(); // Skip hashing if password hasn't changed
     // hashing
-    const salt = await bcrypt.genSalt();
-    this.password = await bcrypt.hash(this.password, salt);
-
-    next();
+    try {
+        const salt = await bcrypt.genSalt();
+        this.password = await bcrypt.hash(this.password, salt);
+        next(); 
+    } catch (error) {
+        next(error); 
+    }
   });
 
   // static method for login

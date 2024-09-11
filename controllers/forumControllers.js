@@ -4,7 +4,7 @@ const User = require('../model/user');
 const handleErrors = require('../utils/errorHandler');
 
 
-const getPostsByCategory = async (categoryName, limit) => {
+const getPostsByCategory = async (categoryName, field = null ) => {
     try {
         const category = await Category.findOne({ name: categoryName });
 
@@ -13,11 +13,20 @@ const getPostsByCategory = async (categoryName, limit) => {
             return [];
         }
 
+        let posts = null;
         // Fetch posts for the found category
-        const posts = await ForumPost.find({ category: category._id }, "title")
-            // .populate('author', 'username email') 
-            // .populate('category', 'name') 
-            .exec();
+        if(field) {
+
+            posts = await ForumPost.find({ category: category._id }, field)
+                // .populate('author', 'username email') 
+                // .populate('category', 'name') 
+                .exec();
+        } else {
+            posts = await ForumPost.find({ category: category._id })
+                .populate('author', 'username email') 
+                .populate('category', 'name') 
+                .exec();
+        }
 
         // console.log('Posts:', posts);
         return posts;
@@ -88,12 +97,13 @@ const forum_post = async (req, res) => {
         console.log("Post saved:", savedPost);
 
         // update user stat for postCount
-        const user = await User.findById(res.locals.user._id);
-        user.stats.postCount += 1;
+        const user = await User.findByIdAndUpdate(
+            res.locals.user._id,
+            { $inc: { 'stats.postCount': 1 } },
+            { new: true, runValidators: true } 
+        );
 
         console.log("postCount:", user.stats.postCount);
-
-        await user.save();
 
         res.status(201).json({ post: savedPost });
 
@@ -113,8 +123,12 @@ const forum_dlt = (req, res) => {
 
         // update user stat for postCount 
         // I am not sure if this feature needed but doesn't hurt :)
-        const user = await User.findById(res.locals.user._id);
-        user.stats.postCount = user.stats.postCount > 0 ? user.stats.postCount -= 1 : 0;
+        const user = await User.findByIdAndUpdate(
+            res.locals.user._id,
+            { $inc: { 'stats.postCount': -1 } },
+            { new: true, runValidators: true }
+        );
+        
 
         console.log("postCount:", user.stats.postCount);
 
@@ -146,7 +160,7 @@ const forum_detail_get = async (req, res) => {
         try {
             
             const categoryName = result.category.name;
-            const relatedPosts = await getPostsByCategory(categoryName);
+            const relatedPosts = await getPostsByCategory(categoryName, "title");
             const categoryCollec = await Category.find({}, 'name');
 
             // checking if the user liked the post
@@ -260,10 +274,13 @@ const comment_post = async (req, res) => {
         console.log("comment saved: " , comment);
 
         // update user stat for commentCount
-        const user = await User.findById(res.locals.user._id);
-        user.stats.commentCount += 1;
+        const user = await User.findByIdAndUpdate(
+            res.locals.user._id,
+            { $inc: { 'stats.commentCount': 1 } },
+            { new: true, runValidators: true }
+        );
 
-        await user.save();
+        console.log("commentCount:" , user.stats.commentCount);
 
         res.status(201).json({ comment });
 
@@ -271,6 +288,29 @@ const comment_post = async (req, res) => {
         const errors = handleErrors(err);
         res.status(400).json({ errors });
         console.log(err);
+    }
+}
+
+const forum_category_get = async (req, res) => {
+    const { name } = req.params;
+
+    try {
+        const categoryDoc = await Category.findOne({ name });
+
+        if (!categoryDoc) {
+            return res.status(400).json({ errors: { category: "Category not found" } });
+        }
+
+        const posts = await getPostsByCategory(categoryDoc.name);
+
+        const categoryData = {...categoryDoc.toObject(), ...posts};
+
+        console.log(categoryData);
+
+        res.render('forum/category', { title: "category" });
+    } catch (err) {
+        console.log(err);
+        res.stats(404).redirect('../404');
     }
 }
 
@@ -282,6 +322,7 @@ module.exports = {
     forum_detail_get,
     forum_update,
     likePost,
-    comment_post
+    comment_post,
+    forum_category_get
 }
 

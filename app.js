@@ -46,6 +46,7 @@ app.use('/blogs', requireAuth,  blogRoutes)
 app.use('/forum', requireAuth, forumRoutes);
 
 
+
 app.use((req, res) => {
     res.status(404).render('404', { title : 'Not found'})
 })

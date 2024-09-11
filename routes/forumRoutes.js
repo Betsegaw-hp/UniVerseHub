@@ -9,7 +9,8 @@ const {
     forum_detail_get,
     forum_update,
     likePost,
-    comment_post
+    comment_post,
+    forum_category_get
 } = forumControllers;
 
 router.get('/', forum_get);
@@ -19,6 +20,8 @@ router.delete('/:id', forum_dlt);
 router.get('/:id', forum_detail_get);
 router.put('/:id/like', likePost);
 router.post('/:id/comment', comment_post);
+
+router.get('/category/:name', forum_category_get);
 
 
 module.exports = router;
