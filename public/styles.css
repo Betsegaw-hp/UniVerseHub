@@ -36,28 +36,41 @@ html, body {
     padding-left: 0.5rem;
 }
 
-/* details styles */
-.details .heading {
-    display:flex;
-    justify-content: space-between;
-    gap:1rem;
+/* forum detail */
+
+.action-container {
+    display: flex;
+    gap: 1rem;
 }
-.details .heading div {
-    padding: 1rem 0;
+.post_privilages {
+    display: flex;
+    gap: 1rem;
 }
-.details .dlt-btn , .edit-btn {
+
+.post_privilages .dlt-btn , .edit-btn {
     height: fit-content;
-    color: white;
-    padding: 0.5rem;
+    padding: 0.5rem 1rem;
     border: 0;
     border-radius: 10%;
     cursor: pointer;
 }
-.details .dlt-btn {
-    background: crimson;
+.post_privilages .dlt-btn {
+    border: 1px solid crimson;
+    color: crimson;
 }
-.details .edit-btn {
-    background: teal;
+.post_privilages .edit-btn {
+    border: 1px solid teal;
+    color: teal;
+}
+
+.post_privilages .dlt-btn:hover {
+    background: crimson;
+    color: white;
+}
+
+.post_privilages .edit-btn:hover {
+    background:  teal;
+    color: white;
 }
 
 /* create styles */

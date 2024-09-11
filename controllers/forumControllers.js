@@ -85,7 +85,6 @@ const forum_post = async (req, res) => {
         const savedPost = await ForumPost.create(post);
         console.log("Post saved:", savedPost);
 
-        // Send a success response
         res.status(201).json({ post: savedPost });
 
     } catch (err) {
@@ -102,7 +101,7 @@ const forum_dlt = (req, res) => {
     ForumPost.findByIdAndDelete(id)
     .then(result => {
         console.info("deleted!", result);
-        res.json({ redirect : '/blogs'})
+        res.json({ redirect : '/forum'})
     }).catch( err => {
         const errors = handleErrors(err);
         res.status(400).json({ errors });
@@ -122,10 +121,15 @@ const forum_detail_get = async (req, res) => {
             
             const categoryName = result.category.name;
             const relatedPosts = await getPostsByCategory(categoryName);
-            console.log({...result.toObject(), relatedPosts} );
-            res.render('forum/detail', { title: "detail", post: {...result.toObject(), relatedPosts} });
+            const categoryCollec = await Category.find({}, 'name');
+
+            const postData = {...result.toObject(), relatedPosts, categoryCollec};
+            res.render('forum/detail', { 
+                title: `${result.title} - UniVerseHub Forum`, 
+                post: postData
+            });
         } catch (error) {
-            
+            console.error(err);
         }
     })
     .catch(err => {
@@ -135,8 +139,37 @@ const forum_detail_get = async (req, res) => {
 
 }
 
-const forum_update = (req, res) => {
-    
+const forum_update = async (req, res) => {
+
+    try {
+        const { title, body_content, category, postId } = req.body;
+        
+        const categoryDoc = await Category.findOne({ name: category });
+        if (!categoryDoc) {
+            return res.status(400).json({ errors: { category: "Category not found" } });
+        }
+        
+        console.log(req.body)
+
+        const updatedPost = await ForumPost.findByIdAndUpdate(
+            postId ,
+            {
+                title, 
+                content: body_content, 
+                category: categoryDoc._id
+            },
+            { new : true, runValidators: true}
+        ).exec();
+
+        console.log(updatedPost)
+
+        res.status(200).json({ post: updatedPost });
+
+    } catch (err) {
+        const errors = handleErrors(err);
+        res.status(400).json({ errors });
+        console.log(err);    
+    }
 }
 
 module.exports = {
