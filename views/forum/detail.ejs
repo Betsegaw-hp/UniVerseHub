@@ -237,11 +237,13 @@
                 if(data.errors) {
                     console.log(data.errors)
                     form_alert.classList.add('show');
-                    let msg = "error occured";
+                    let msg = null;
                     if(data.errors.title != '') msg = data.errors.title;
                     else if(data.errors.content != '') msg = data.errors.content;
                     else if(data.errors.category != '') msg = data.errors.category;
-                    alert_msg.textContent = msg;
+
+                    if(!msg) msg = "Unexpected Error occured. ";
+                    alert_msg.textContent = msg
                     console.log(msg)
                 }
                 if (data.post) {

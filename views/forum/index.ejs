@@ -160,6 +160,8 @@
                     if(data.errors.title != '') msg = data.errors.title;
                     else if(data.errors.content != '') msg = data.errors.content;
                     else if(data.errors.category != '') msg = data.errors.category;
+
+                    if(!msg) msg = "Unexpected Error occured. ";
                     alert_msg.textContent = msg;
                     console.log(msg)
                 }

@@ -1,5 +1,6 @@
 const { ForumPost, Comment } = require('../model/forum');
 const Category = require('../model/category');
+const User = require('../model/user');
 const handleErrors = require('../utils/errorHandler');
 
 
@@ -70,7 +71,7 @@ const forum_post = async (req, res) => {
         const { title, body_content, category } = req.body;
 
         const categoryDoc = await Category.findOne({ name: category });
-        
+
         if (!categoryDoc) {
             return res.status(400).json({ errors: { category: "Category not found" } });
         }
@@ -86,6 +87,14 @@ const forum_post = async (req, res) => {
         const savedPost = await ForumPost.create(post);
         console.log("Post saved:", savedPost);
 
+        // update user stat for postCount
+        const user = await User.findById(res.locals.user._id);
+        user.stats.postCount += 1;
+
+        console.log("postCount:", user.stats.postCount);
+
+        await user.save();
+
         res.status(201).json({ post: savedPost });
 
     } catch (err) {
@@ -100,8 +109,18 @@ const forum_dlt = (req, res) => {
     const id = req.params.id
 
     ForumPost.findByIdAndDelete(id)
-    .then(result => {
-        console.info("deleted!", result);
+    .then(async result => {
+        console.info("deleted!", result._id);
+
+        // update user stat for postCount 
+        // I am not sure if this feature needed but doesn't hurt :)
+        const user = await User.findById(res.locals.user._id);
+        user.stats.postCount = user.stats.postCount > 0 ? user.stats.postCount -= 1 : 0;
+
+        console.log("postCount:", user.stats.postCount);
+
+        await user.save();
+
         res.json({ redirect : '/forum'})
     }).catch( err => {
         const errors = handleErrors(err);
@@ -179,8 +198,6 @@ const forum_update = async (req, res) => {
 const likePost = async (req, res) => {
     const { id } = req.params;
     const userId = res.locals.user._id;  
-
-    console.log(req.params)
 
     try {
         const post = await ForumPost.findById(id);
