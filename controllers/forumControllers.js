@@ -104,7 +104,6 @@ const forum_post = async (req, res) => {
     }
 };
 
-
 const forum_dlt = (req, res) => {
     const id = req.params.id
 
@@ -135,6 +134,13 @@ const forum_detail_get = async (req, res) => {
     ForumPost.findById(id)
     .populate('author', "username email")
     .populate("category", "name")
+    .populate({
+        path: 'recentComments',
+        populate: {
+            path: 'author', 
+            select: 'username name' 
+        }
+    })
     .then(async result => {
 
         try {
@@ -147,10 +153,12 @@ const forum_detail_get = async (req, res) => {
             const hasLiked = result.likedBy.includes(res.locals.user._id);
 
             const postData = {...result.toObject(), relatedPosts, categoryCollec, hasLiked};
+
             res.render('forum/detail', { 
                 title: `${result.title} - UniVerseHub Forum`, 
                 post: postData
             });
+
         } catch (error) {
             console.error(err);
         }
@@ -230,6 +238,40 @@ const likePost = async (req, res) => {
     }
 };
 
+const comment_post = async (req, res) => {
+
+    
+    try {
+        const { id } = req.params;
+        const { content } = req.body;
+
+        const post = await ForumPost.findById(id);
+        if (!post) return res.status(404).json({ error: "Post not found" });
+    
+        const commentDoc = {
+            content,
+            post: post._id,
+            author: res.locals.user._id
+        };
+
+        
+        const comment = await Comment.create(commentDoc);
+              
+        console.log("comment saved: " , comment);
+
+        // update user stat for commentCount
+        const user = await User.findById(res.locals.user._id);
+        user.stats.commentCount += 1;
+
+        res.status(201).json({ comment });
+
+    } catch (err) {
+        const errors = handleErrors(err);
+        res.status(400).json({ errors });
+        console.log(err);
+    }
+}
+
 
 module.exports = {
     forum_get,
@@ -237,6 +279,7 @@ module.exports = {
     forum_dlt,
     forum_detail_get,
     forum_update,
-    likePost
+    likePost,
+    comment_post
 }
 

@@ -1,4 +1,4 @@
-
+<% console.log(post) %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -13,6 +13,9 @@
             padding-top: 10px;
         }
        </style>
+
+        <!-- Include the timeLapse.js file -->
+        <script src="/timeLapse.js"></script>
     </head>
 <body>
     <%- include('../partials/nav')  %>
@@ -36,18 +39,9 @@
                             <img src="/placeholder.svg?height=64&width=64" alt="Sarah J." class="avatar me-3">
                             <div>
                                 <h5 class="mb-0"><%= post.author.username %></h5>
-                                <small class="text-muted">Posted on <%= post.createdAt.toDateString() %></small>
+                                <small class="text-muted">Posted on <%= post.createdAt.toUTCString() %></small>
                             </div>
                         </div>
-                        <!-- <p class="card-text">Hello fellow students! With finals week approaching, I thought it would be helpful to share some tips that have worked well for me in the past. Here are my top 5 strategies for acing your exams:</p>
-                        <ol>
-                            <li><strong>Start early:</strong> Begin your revision at least two weeks before the exam date. This gives you time to cover all topics and reduces last-minute stress.</li>
-                            <li><strong>Create a study schedule:</strong> Allocate specific time slots for each subject, ensuring you cover all areas evenly.</li>
-                            <li><strong>Use active recall:</strong> Instead of just re-reading notes, try to recall information from memory. This helps reinforce your learning.</li>
-                            <li><strong>Take regular breaks:</strong> Use the Pomodoro technique - study for 25 minutes, then take a 5-minute break. This helps maintain focus and prevents burnout.</li>
-                            <li><strong>Practice past papers:</strong> This familiarizes you with the exam format and types of questions you might encounter.</li>
-                        </ol>
-                        <p>Remember, everyone has different study methods that work for them. These are just suggestions based on my experience. What strategies have worked well for you?</p> -->
                         <p><%= post.content %></p>
                         <div class="mt-3 action-container">
                             <button id="like-btn" class="btn btn-outline-primary me-2 <%= post.hasLiked ? "active" : "" %> " 
@@ -69,32 +63,33 @@
                     </div>
                 </div>
 
-                <h3 class="mb-3">Comments (3)</h3>
-                <div class="card mb-3">
-                    <div class="card-body">
-                        <div class="d-flex">
-                            <img src="/placeholder.svg?height=48&width=48" alt="Mike T." class="comment-avatar me-3">
-                            <div class="flex-grow-1">
-                                <h5 class="mb-0">Mike T.</h5>
-                                <small class="text-muted">May 15, 2023 at 15:45</small>
-                                <p class="mt-2">Great tips, Sarah! I'd add that group study sessions can be really helpful too. Explaining concepts to others can reinforce your own understanding.</p>
+                <h3 class="mb-3"> 
+                    <abbr title="Number of comment shown here is limited by admin. it will replace the old if it is over the limit.">Comments </abbr>
+                    (<%=  post.recentComments.length %>) 
+                </h3>
+                <% if (post.recentComments.length > 0) { %>
+                    <% post.recentComments.map(comment => { %>
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <div class="d-flex">
+                                    <img src="/placeholder.svg?height=48&width=48" alt="Mike T." class="comment-avatar me-3">
+                                    <div class="flex-grow-1">
+                                        <h5 class="mb-0"><%= comment.author.name %></h5>
+                                        <small class="text-muted">@<%= comment.author.username %> 
+                                            <% if(comment.author._id.toString() === post.author._id.toString()) {%>
+                                                <span class="mark">Author</span>
+                                            <% } %>
+                                        </small> · <small class="timePassed" data-date="<%= comment.createdAt %>"></small>
+                                        <p class="mt-2"><%= comment.content %></p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-                <div class="card mb-3">
-                    <div class="card-body">
-                        <div class="d-flex">
-                            <img src="/placeholder.svg?height=48&width=48" alt="Emily R." class="comment-avatar me-3">
-                            <div class="flex-grow-1">
-                                <h5 class="mb-0">Emily R.</h5>
-                                <small class="text-muted">May 16, 2023 at 09:20</small>
-                                <p class="mt-2">Thanks for sharing! I find that summarizing key points on flashcards helps me a lot. It's a quick way to review important information.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="card mb-3">
+                    <% }) %>
+                <% } %>
+
+                <!-- sample comment -->
+                <!-- <div class="card mb-3">
                     <div class="card-body">
                         <div class="d-flex">
                             <img src="/placeholder.svg?height=48&width=48" alt="Alex K." class="comment-avatar me-3">
@@ -105,14 +100,14 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> -->
 
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">Add a comment</h5>
-                        <form>
+                        <form id="commentForm">
                             <div class="mb-3">
-                                <textarea class="form-control" rows="3" placeholder="Write your comment here..."></textarea>
+                                <textarea class="form-control" rows="3" name="content" placeholder="Write your comment here..."></textarea>
                             </div>
                             <button type="submit" class="btn btn-primary">Post Comment</button>
                         </form>
@@ -258,7 +253,7 @@
         })
 
 
-        dltBtn.addEventListener("click", (e) => {
+        dltBtn && dltBtn.addEventListener("click", (e) => {
 
             const endpoint = `/forum/${postIdParent.dataset.postid}`
 
@@ -269,10 +264,40 @@
         });
 
     
+        // comment service
+        const commentForm = document.querySelector("#commentForm");
+
+        commentForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const postId = postIdParent.dataset.postid; 
+
+            try {
+                const response = await fetch(`/forum/${postId}/comment`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ content: commentForm.content.value })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    location.reload();
+                } else {
+                    console.error(data.error);
+                }
+            } catch (error) {
+                console.error("Error liking post:", error);
+            }
+        });
+
+
         // like btn service
         const likeBtn = document.querySelector("#like-btn");
 
-        likeBtn.addEventListener("click", async (e) => {
+        likeBtn && likeBtn.addEventListener("click", async (e) => {
             e.preventDefault();
 
             const postId = postIdParent.dataset.postid;  
@@ -300,7 +325,19 @@
             } catch (error) {
                 console.error("Error liking post:", error);
             }
-                })
+        })
+
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const timeEle = document.querySelectorAll('.timePassed');
+            timeEle.forEach(ele => {
+                const createdAt = ele.dataset.date; // Assuming post.createdAt is in ISO format
+                const timePassedStr = timePassed(createdAt);
+                ele.textContent = timePassedStr;
+            });
+        });
     </script>
 </body>
 </html>

@@ -8,7 +8,8 @@ const {
     forum_dlt,
     forum_detail_get,
     forum_update,
-    likePost
+    likePost,
+    comment_post
 } = forumControllers;
 
 router.get('/', forum_get);
@@ -17,6 +18,7 @@ router.put('/', forum_update);
 router.delete('/:id', forum_dlt);
 router.get('/:id', forum_detail_get);
 router.put('/:id/like', likePost);
+router.post('/:id/comment', comment_post);
 
 
 module.exports = router;

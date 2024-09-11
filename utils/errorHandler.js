@@ -8,6 +8,9 @@ const handleErrors = (err) => {
     let formPost_errors = {
       content: '', title:'', category: '' // forum
     }
+    let comment_errors = {
+      content: '', author: '', post: ''
+    }
 
     //by default 
     errors = user_errors;
@@ -41,6 +44,12 @@ const handleErrors = (err) => {
 
           formPost_errors[properties.path] = properties.message;
           errors = formPost_errors;
+        });
+    } else if (err.message.includes('Comment validation failed')) {
+        Object.values(err.errors).forEach(({ properties }) => {
+
+          comment_errors[properties.path] = properties.message;
+          errors = comment_errors;
         });
     } 
 

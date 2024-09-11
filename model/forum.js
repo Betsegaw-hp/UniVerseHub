@@ -39,14 +39,7 @@ const forumPostSchema = new Schema({
         type: Schema.Types.ObjectId, 
         ref: 'User' 
     }],
-    recentComments: [{
-        author: {
-            type: Schema.Types.ObjectId,
-            ref: 'User'
-        },
-        content: String,
-        createdAt: Date
-    }]
+    recentComments: [{ type: Schema.Types.ObjectId, ref: 'Comment' }],
 }, { timestamps: true });
 
 // Comment Schema
@@ -66,6 +59,27 @@ const commentSchema = new Schema({
         required: true
     }
 }, { timestamps: true });
+
+
+commentSchema.post('save', async function (doc, next) {
+
+    try {
+
+        const commentLimit = 10;
+
+        await ForumPost.findByIdAndUpdate(
+            doc.post,
+            {
+                $push: { recentComments: { $each: [doc._id], $position: 0, $slice: commentLimit } } 
+            }
+        );
+        next();
+    } catch (err) {
+        console.error("critical error: while updating forumPost from comment schema");
+        next(err);
+    }
+
+});
 
 
 const ForumPost = mongoose.model('ForumPost', forumPostSchema);
