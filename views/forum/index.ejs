@@ -32,7 +32,7 @@
                         <% categories.forEach(category => { %>
                           <a href="/category/<%= category.name %>" class="list-group-item list-group-item-action forum-card" >
                             <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1"><%= category.name %></h5>
+                                <h5 class="mb-1 capitalize"><%= category.name %></h5>
                                 <!-- <small>3 new posts</small> -->
                             </div>
                             <p class="mb-1"> <%= category.description %> </p>
@@ -54,7 +54,7 @@
                             <!-- the slicing also happens at backend. this is just formality -->
                             <% posts.slice(0,4).forEach(post => {  %>
                                 <li class="list-group-item">
-                                    <a href="/forum/<%= post._id %>" class="text-decoration-none">
+                                    <a href="/forum/<%= post._id %>" class="text-decoration-none capitalize">
                                         <%= post.title %>
                                     </a>
                                     <br><small class="text-muted">

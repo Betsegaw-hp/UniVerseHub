@@ -159,7 +159,7 @@ const forum_detail_get = async (req, res) => {
                 post: postData
             });
 
-        } catch (error) {
+        } catch (err) {
             console.error(err);
         }
     })
@@ -262,6 +262,8 @@ const comment_post = async (req, res) => {
         // update user stat for commentCount
         const user = await User.findById(res.locals.user._id);
         user.stats.commentCount += 1;
+
+        await user.save();
 
         res.status(201).json({ comment });
 

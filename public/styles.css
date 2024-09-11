@@ -18,6 +18,23 @@ html, body {
     display: grid ;
     gap: 1rem;
 }
+
+/* util class */
+
+.capitalize {
+    text-transform:capitalize;
+}
+
+.lowercase {
+    text-transform: lowercase;
+}
+
+.uppercase {
+    text-transform: uppercase;
+}
+
+
+
 /* index styles */
 .blogs a {
     border-left: .3rem solid rgb(161, 7, 161);
@@ -29,9 +46,6 @@ html, body {
     background-color:rgba(234, 140, 234, 0.338);
 }
 
-.blogs a h2 {
-
-}
 .blogs a p {
     padding-left: 0.5rem;
 }
