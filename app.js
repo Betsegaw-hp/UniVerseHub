@@ -43,8 +43,12 @@ app.get('/about', requireAuth, (req, res) => {
 app.use('/blogs', requireAuth,  blogRoutes)
 
 //forum routes
-app.use('/forum', requireAuth, forumRoutes);
+app.use('/forum', requireAuth, forumRoutes)
 
+// temp
+app.use('/profile', (req, res) => {
+    res.render('profile')
+})
 
 
 app.use((req, res) => {

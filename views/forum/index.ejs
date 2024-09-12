@@ -28,6 +28,14 @@
                     </button>
                 </div>
                 <div class="list-group">
+                    <a href="forum/category/All Topics" class="list-group-item list-group-item-action forum-card" >
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1 capitalize">All Topics</h5>
+                            <!-- <small>3 new posts</small> -->
+                        </div>
+                        <p class="mb-1">Join discussions on a wide range of subjects. Connect and share your thoughts on any topic that interests you. </p>
+                        <small><%= posts.length %> topics</small>
+                      </a>
                     <% if (categories.length > 0) { %>
                         <% categories.forEach(category => { %>
                           <a href="forum/category/<%= category.name %>" class="list-group-item list-group-item-action forum-card" >
@@ -47,11 +55,10 @@
             <div class="col-md-4">
                 <div class="card mb-4">
                     <div class="card-header">
-                        Recent Topics
+                        Recent Topics(<%= posts.length %>)
                     </div>
                     <ul class="list-group list-group-flush">
                         <% if (posts.length > 0) { %>
-                            <!-- the slicing also happens at backend. this is just formality -->
                             <% posts.slice(0,4).forEach(post => {  %>
                                 <li class="list-group-item">
                                     <a href="/forum/<%= post._id %>" class="text-decoration-none capitalize">
@@ -74,8 +81,6 @@
                     <div class="card-body">
                         <p>Total Members: 15,678</p>
                         <p>Total Topics: 3,490</p>
-                        <p>Total Posts: 15,700</p>
-                        <p>Online Now: 234</p>
                     </div>
                 </div>
             </div>

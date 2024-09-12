@@ -3,44 +3,10 @@ const Category = require('../model/category');
 const User = require('../model/user');
 const handleErrors = require('../utils/errorHandler');
 
-
-const getPostsByCategory = async (categoryName, field = null ) => {
-    try {
-        const category = await Category.findOne({ name: categoryName });
-
-        if (!category) {
-            console.log('Category not found');
-            return [];
-        }
-
-        let posts = null;
-        // Fetch posts for the found category
-        if(field) {
-
-            posts = await ForumPost.find({ category: category._id }, field)
-                // .populate('author', 'username email') 
-                // .populate('category', 'name') 
-                .exec();
-        } else {
-            posts = await ForumPost.find({ category: category._id })
-                .populate('author', 'username email') 
-                .populate('category', 'name') 
-                .exec();
-        }
-
-        // console.log('Posts:', posts);
-        return posts;
-
-    } catch (err) {
-        console.error('Error fetching posts:', err);
-        return [];
-    }
-};
-
 const forum_get =  (req, res) => {
 
     Promise.all([
-        ForumPost.find().sort({ createdAt: -1 }).limit(4) 
+        ForumPost.find().sort({ createdAt: -1 }) 
         .populate('author', "username email"),  // limit is also set on frontend
         
         Category.find().sort({ createdAt: -1 })
@@ -295,22 +261,90 @@ const forum_category_get = async (req, res) => {
     const { name } = req.params;
 
     try {
-        const categoryDoc = await Category.findOne({ name });
+        let data = null;
+        let categoryName = "Category";
+        // special case
+        if(name === "All Topics") {
+            categoryName = name;
+            data = {
+                posts: await ForumPost.find(),
+                category: {
+                    name,
+                    description: "Join discussions on a wide range of subjects. Connect and share your thoughts on any topic that interests you."
+                }
+            }
+        } else {
 
-        if (!categoryDoc) {
-            return res.status(400).json({ errors: { category: "Category not found" } });
+            const categoryDoc = await Category.findOne({ name });
+    
+            if (!categoryDoc) {
+                return res.status(404).redirect('../404');
+            }
+    
+            const posts = await getPostsByCategory(categoryDoc.name);
+
+            // console.log(posts)
+            data = {posts,  category: categoryDoc};
+
+            categoryName = categoryDoc.name;
         }
+        
 
-        const posts = await getPostsByCategory(categoryDoc.name);
-
-        const categoryData = {...categoryDoc.toObject(), ...posts};
-
-        console.log(categoryData);
-
-        res.render('forum/category', { title: "category" });
+        res.render('forum/category', { title: categoryName, data });
     } catch (err) {
         console.log(err);
-        res.stats(404).redirect('../404');
+    }
+}
+
+
+// utils
+const getPostsByCategory = async (categoryName, field = null ) => {
+    try {
+        const category = await Category.findOne({ name: categoryName });
+
+        if (!category) {
+            console.log('Category not found');
+            return [];
+        }
+
+        let posts = null;
+        // Fetch posts for the found category
+        if(field) {
+
+            posts = await ForumPost.find({ category: category._id }, field)
+                // .populate('author', 'username email') 
+                // .populate('category', 'name') 
+                .exec();
+        } else {
+            posts = await ForumPost.find({ category: category._id })
+                .populate('author', 'username email') 
+                .populate('category', 'name') 
+                .exec();
+        }
+
+        // console.log('Posts:', posts);
+        return posts;
+
+    } catch (err) {
+        console.error('Error fetching posts:', err);
+        return [];
+    }
+};
+
+const getTopContributors = async (limit=5) => {
+    // just top posters
+    try {
+        const topPosters = await User.find() 
+        .sort({ 'stats.postCount': -1 })  
+        .limit(limit)  
+        .select('username stats.postCount') 
+        .exec();
+  
+        console.log(topPosters)
+        return topPosters;
+    } catch (err) {
+        console.error(err);
+        return []
     }
 }
 
