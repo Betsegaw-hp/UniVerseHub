@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const forumControllers = require('../controllers/forumControllers');
+const forumControllers = require('../controllers/forumController');
 
 const {
     forum_get,

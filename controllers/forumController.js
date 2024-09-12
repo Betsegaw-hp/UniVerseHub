@@ -7,7 +7,7 @@ const forum_get =  (req, res) => {
 
     Promise.all([
         ForumPost.find().sort({ createdAt: -1 }) 
-        .populate('author', "username email"),  // limit is also set on frontend
+        .populate('author', "username email avatarUrl"),  // limit is also set on frontend
         
         Category.find().sort({ createdAt: -1 })
     ])
@@ -112,13 +112,13 @@ const forum_detail_get = async (req, res) => {
     const id = req.params.id;
 
     ForumPost.findById(id)
-    .populate('author', "username email")
+    .populate('author', "username email name avatarUrl")
     .populate("category", "name")
     .populate({
         path: 'recentComments',
         populate: {
             path: 'author', 
-            select: 'username name' 
+            select: 'username name avatarUrl' 
         }
     })
     .then(async result => {
@@ -267,7 +267,9 @@ const forum_category_get = async (req, res) => {
         if(name === "All Topics") {
             categoryName = name;
             data = {
-                posts: await ForumPost.find(),
+                posts:  await ForumPost.find()    
+                                       .populate('author', 'username email avatarUrl') 
+                                       .populate('category', 'name').exec() ,
                 category: {
                     name,
                     description: "Join discussions on a wide range of subjects. Connect and share your thoughts on any topic that interests you."
@@ -317,7 +319,7 @@ const getPostsByCategory = async (categoryName, field = null ) => {
                 .exec();
         } else {
             posts = await ForumPost.find({ category: category._id })
-                .populate('author', 'username email') 
+                .populate('author', 'username email avatarUrl') 
                 .populate('category', 'name') 
                 .exec();
         }

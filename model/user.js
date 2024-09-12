@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const  { isEmail } = require('validator');
 const bcrypt = require('bcrypt');
+const { default: isURL } = require('validator/lib/isURL');
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
@@ -16,7 +17,20 @@ const userSchema = new Schema({
         required: true,
         lowercase: true
     },
-    avatarUrl: String,
+    bio: {
+      type: String,
+      minlength: 20,
+      maxlength: 250
+    },
+    address: {
+        type: String,
+        minlength: 2
+    },
+    occupation: String,
+    avatarUrl: { 
+        type: String,
+        validate: [isURL, 'make sure it is URL!']
+    },
     roles: {
         type: [String],
         default: ['user']
@@ -37,8 +51,18 @@ const userSchema = new Schema({
     }
 }, { timestamps: true});
 
+
 userSchema.pre('save', async function (next) {
-    // Pre-save hook to set default username
+
+
+    // set deafult avatarUrl (dicebear as a provider)
+    if(!this.avatarUrl) {
+        const avatarCategory = ["lorelei", "initials", "thumbs", "identicon"];
+        const avatarSeed = this.name;
+        this.avatarUrl = `https://api.dicebear.com/9.x/${avatarCategory[0]}/svg?seed=${avatarSeed}&backgroundType=solid,gradientLinear&backgroundRotation=0,360,20,40&glassesProbability=25&hairAccessoriesProbability=10&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf,transparent`;
+    }
+
+    // set default username
     if (!this.username) {
       // Create default username from name and email
       this.username = `${this.name.replace(/\s+/g, '_').toLowerCase()}_${this.email.split('@')[0]}${new Date().getUTCSeconds().toString()}`;

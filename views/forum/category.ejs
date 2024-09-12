@@ -5,6 +5,8 @@
         category = data.category
         posts = data.posts;
     }
+
+    console.log(posts[0].author)
 %>
 
 <!DOCTYPE html>
@@ -88,7 +90,7 @@
                                         <%
                                         const sortedByCreatedAt = posts.sort((a,b) => b.createdAt.valueOf() - a.createdAt.valueOf()); 
                                         %>
-                                        <% posts.map(post => { %>
+                                        <% sortedByCreatedAt.map(post => { %>
                                             <a href="/forum/<%= post._id %>" class="list-group-item list-group-item-action topic-card">
                                                 <div class="d-flex w-100 justify-content-between">
                                                     <h5 class="mb-1 capitalize"><%= post.title %></h5>
@@ -96,7 +98,7 @@
                                                 </div>
                                                 <p class="mb-1 clamp-text"><%= post.content %></p>
                                                 <div class="d-flex align-items-center mt-2">
-                                                    <img src="/placeholder.svg?height=32&width=32" alt="BackendDev" class="avatar me-2">
+                                                    <img src="<%= post.author.avatarUrl %>" alt="<%= post.author.name %>" class="avatar me-2">
                                                     <small class="text-muted">
                                                         Posted by <%= post.author.username %>
                                                         <i class="bi bi-chat-dots ms-2"></i> <%= post.recentComments.length %> comments
@@ -122,7 +124,7 @@
                                                 </div>
                                                 <p class="mb-1 clamp-text"><%= post.content %></p>
                                                 <div class="d-flex align-items-center mt-2">
-                                                    <img src="/placeholder.svg?height=32&width=32" alt="BackendDev" class="avatar me-2">
+                                                    <img src="<%= post.author.avatarUrl %>" alt="<%= post.author.name %>" class="avatar me-2">
                                                     <small class="text-muted">
                                                         Posted by <%= post.author.username %>
                                                         <i class="bi bi-chat-dots ms-2"></i> <%= post.recentComments.length %> comments
@@ -148,7 +150,7 @@
                                                 </div>
                                                 <p class="mb-1 clamp-text"><%= post.content %></p>
                                                 <div class="d-flex align-items-center mt-2">
-                                                    <img src="/placeholder.svg?height=32&width=32" alt="BackendDev" class="avatar me-2">
+                                                    <img src="<%= post.author.avatarUrl %>" alt="<%= post.author.name %>" class="avatar me-2">
                                                     <small class="text-muted">
                                                         Posted by <%= post.author.username %>
                                                         <i class="bi bi-chat-dots ms-2"></i> <%= post.recentComments.length %> comments

@@ -12,6 +12,11 @@
             height: 100vh;
             padding-top: 10px;
         }
+        .form-control:focus {
+            box-shadow: none;
+            border-color: #0e2426;
+        }
+
        </style>
 
         <!-- Include the timeLapse.js file -->
@@ -36,10 +41,13 @@
                     <div class="card-body">
                         <h1 class="card-title capitalize"><%= post.title %></h1>
                         <div class="d-flex align-items-center mb-3">
-                            <img src="/placeholder.svg?height=64&width=64" alt="Sarah J." class="avatar me-3">
+                            <img src="<%= post.author.avatarUrl %>" alt="<%= post.author.name %>" class="avatar me-3">
                             <div>
-                                <h5 class="mb-0"><%= post.author.username %></h5>
-                                <small class="text-muted">Posted on <%= post.createdAt.toUTCString() %></small>
+                                <h5 class="mb-0 capitalize"><%= post.author.name %></h5>
+                                <a class="text-decoration-none" href="/profile/<%= post.author.username %>">
+                                    <small class="mb-0 text-muted">@<%= post.author.username %></small>
+                                </a>
+                                · <small class="text-muted">Posted on <%= post.createdAt.toUTCString() %></small>
                             </div>
                         </div>
                         <p><%= post.content %></p>
@@ -67,14 +75,48 @@
                     <abbr title="Number of comment shown here is limited by admin. it will replace the old if it is over the limit.">Comments </abbr>
                     (<%=  post.recentComments.length %>) 
                 </h3>
+                <!-- old comment form design -->
+                <!-- <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Add a comment</h5>
+                        <form id="commentForm">
+                            <div class="mb-3">
+                                <textarea class="form-control" rows="1" name="content" placeholder="Write your comment here..."></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Post Comment</button>
+                        </form>
+                    </div>
+                </div> -->
+                
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <form id="commentForm">
+                            <div class="mb-3 position-relative">
+                                <textarea class="form-control form-control-sm border-0 bg-light" 
+                                          rows="2" 
+                                          name="content" 
+                                          placeholder="Share your thoughts..."
+                                          style="resize: none; outline: none;" required aria-required="true"></textarea>
+                                <div class="position-absolute bottom-0 end-0 p-3">
+                                    <span class="text-muted" id="charCount">0/500</span>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <button type="submit" class="btn btn-dark px-4 py-2 btn-sm">
+                                    <i class="bi bi-send me-2"></i>Comment
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
                 <% if (post.recentComments.length > 0) { %>
                     <% post.recentComments.map(comment => { %>
                         <div class="card mb-3">
                             <div class="card-body">
                                 <div class="d-flex">
-                                    <img src="/placeholder.svg?height=48&width=48" alt="Mike T." class="comment-avatar me-3">
+                                    <img src="<%= comment.author.avatarUrl %>" alt="<%= comment.author.name %>" class="comment-avatar me-3">
                                     <div class="flex-grow-1">
-                                        <h5 class="mb-0"><%= comment.author.name %></h5>
+                                        <h5 class="mb-0 capitalize"><%= comment.author.name %></h5>
                                         <small class="text-muted">@<%= comment.author.username %> 
                                             <% if(comment.author._id.toString() === post.author._id.toString()) {%>
                                                 <span class="mark">Author</span>
@@ -87,32 +129,6 @@
                         </div>
                     <% }) %>
                 <% } %>
-
-                <!-- sample comment -->
-                <!-- <div class="card mb-3">
-                    <div class="card-body">
-                        <div class="d-flex">
-                            <img src="/placeholder.svg?height=48&width=48" alt="Alex K." class="comment-avatar me-3">
-                            <div class="flex-grow-1">
-                                <h5 class="mb-0">Alex K.</h5>
-                                <small class="text-muted">May 16, 2023 at 11:05</small>
-                                <p class="mt-2">These are all great suggestions! I'd also recommend staying hydrated and getting enough sleep. It's amazing how much these can affect your focus and memory.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div> -->
-
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Add a comment</h5>
-                        <form id="commentForm">
-                            <div class="mb-3">
-                                <textarea class="form-control" rows="3" name="content" placeholder="Write your comment here..."></textarea>
-                            </div>
-                            <button type="submit" class="btn btn-primary">Post Comment</button>
-                        </form>
-                    </div>
-                </div>
             </div>
             <div class="col-md-3 sidebar-sticky">
                 <div class="card mb-4">
@@ -337,6 +353,24 @@
                 const timePassedStr = timePassed(createdAt);
                 ele.textContent = timePassedStr;
             });
+        });
+    </script>
+
+    <script>
+        const maxLength = 150;
+        document.getElementById("charCount").textContent = `0/${maxLength}`;
+
+        document.querySelector('textarea[name="content"]').addEventListener('input', function() {
+            const currentLength = this.value.length;
+            const charCountElement = document.getElementById('charCount');
+            charCountElement.textContent = `${currentLength}/${maxLength}`;
+            
+            if (currentLength > maxLength) {
+                charCountElement.classList.add('text-danger');
+                this.value = this.value.substring(0, maxLength);
+            } else {
+                charCountElement.classList.remove('text-danger');
+            }
         });
     </script>
 </body>

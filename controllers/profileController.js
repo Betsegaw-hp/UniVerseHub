@@ -1,0 +1,59 @@
+const {ForumPost} = require('../model/forum');
+const User = require('../model/user');
+
+const profile_get = async (req, res) => {
+
+    try {
+
+        if(req.params.username === res.locals.user.username) {
+
+            const posts = await ForumPost.find({ author: res.locals.user._id });
+            res.render('profile', { title: "Profile", posts, currentUser: true });
+        } else {
+            const username = req.params.username;
+            const user = await User.findOne({ username });
+            if(!user) {
+                return res.redirect('../404');
+            }
+    
+            const posts = await ForumPost.find({ author: user._id });
+            res.render('profile', { title: "Profile", posts, otherUser: user, currentUser: false });
+        }
+
+    } catch (err) {
+        console.error(err);
+        return res.redirect('../404');
+    }
+
+
+}
+
+const profile_edit_get = (req, res) => {
+    res.render('profile/editProfile', { title: "Update Profile"});
+}
+
+const profile_update_put = (req,res) => {
+
+}
+
+const getProfileByUsername = async (username) => {
+   
+    try {
+        
+        const user = await User.findOne({ username });
+        if(!user) {
+            return null;
+        }
+
+        return user;
+
+    } catch (err) {
+        
+    }
+}
+
+module.exports = { 
+    profile_get,
+    profile_edit_get,
+    profile_update_put
+ };

@@ -1,8 +1,3 @@
-<% 
-    let client = "";
-    if(user) client = user.name ;
-%>
-
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container">
         <a class="navbar-brand" href="/">
@@ -26,10 +21,15 @@
             </form>
             <div class="dropdown">
                 <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="bi bi-person-circle"></i> welcome, <%= client %>
+                    <% if(user) { %>
+                        <img src="<%= user.avatarUrl %>" alt="avatar" class="avatar-sm"> welcome, <span class="capitalize"><%= user.name %></span>
+                    <% } else { %>
+                        <!-- this shouldn't happen. if happens auth messed up -->
+                        <i class="bi bi-person-circle"></i> Welcome, stranger?
+                    <% } %>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuLink">
-                    <li><a class="dropdown-item" href="#">Profile</a></li>
+                    <li><a class="dropdown-item" href="/profile/<%= user.username || "404" %>">Profile</a></li>
                     <li><a class="dropdown-item" href="#">Settings</a></li>
                     <li><hr class="dropdown-divider"></li>
                     <li><a class="dropdown-item" href="/auth/logout">Log out</a></li>

@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser')
 const blogRoutes = require('./routes/blogRoutes')
 const forumRoutes = require('./routes/forumRoutes')
 const authRoutes = require('./routes/authRoutes')
+const profileRoutes = require('./routes/profileRoutes')
 const {requireAuth, checkUser} = require('./middleware/authMiddleware');
 
 const app = express()
@@ -39,16 +40,16 @@ app.get('/', requireAuth,  (req, res ) => {
 app.get('/about', requireAuth, (req, res) => {
     res.render('about', { title: 'About'})
 })
+
+// profile routes
+app.use('/profile', requireAuth,  profileRoutes);
+
 // blog routes
 app.use('/blogs', requireAuth,  blogRoutes)
 
 //forum routes
 app.use('/forum', requireAuth, forumRoutes)
 
-// temp
-app.use('/profile', (req, res) => {
-    res.render('profile')
-})
 
 
 app.use((req, res) => {
