@@ -22,7 +22,7 @@
             <div class="dropdown">
                 <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
                     <% if(user) { %>
-                        <img src="<%= user.avatarUrl %>" alt="avatar" class="avatar-sm"> welcome, <span class="capitalize"><%= user.name %></span>
+                        <img src="<%= user.avatarUrl %>" alt="avatar" class="avatar-sm" /> welcome, <span class="capitalize"><%= user.name %></span>
                     <% } else { %>
                         <!-- this shouldn't happen. if happens auth messed up -->
                         <i class="bi bi-person-circle"></i> Welcome, stranger?

@@ -12,10 +12,6 @@
             height: 100vh;
             padding-top: 10px;
         }
-        .form-control:focus {
-            box-shadow: none;
-            border-color: #0e2426;
-        }
 
        </style>
 
@@ -41,7 +37,7 @@
                     <div class="card-body">
                         <h1 class="card-title capitalize"><%= post.title %></h1>
                         <div class="d-flex align-items-center mb-3">
-                            <img src="<%= post.author.avatarUrl %>" alt="<%= post.author.name %>" class="avatar me-3">
+                            <img src="<%= post.author.avatarUrl %>" alt="<%= post.author.name %>" class="avatar border border-warning me-3">
                             <div>
                                 <h5 class="mb-0 capitalize"><%= post.author.name %></h5>
                                 <a class="text-decoration-none" href="/profile/<%= post.author.username %>">
@@ -89,8 +85,9 @@
                 </div> -->
                 
                 <div class="card shadow-sm mb-4">
-                    <div class="card-body p-4">
-                        <form id="commentForm">
+                    <div class="card-body row gap-2 p-4">
+                        <img src="<%= user.avatarUrl %>" alt="avatar" class="col-md-1 shadow-sm avatar border border-warning" />
+                        <form id="commentForm" class="col">
                             <div class="mb-3 position-relative">
                                 <textarea class="form-control form-control-sm border-0 bg-light" 
                                           rows="2" 
@@ -114,7 +111,7 @@
                         <div class="card mb-3">
                             <div class="card-body">
                                 <div class="d-flex">
-                                    <img src="<%= comment.author.avatarUrl %>" alt="<%= comment.author.name %>" class="comment-avatar me-3">
+                                    <img src="<%= comment.author.avatarUrl %>" alt="<%= comment.author.name %>" class="comment-avatar border border-warning me-3">
                                     <div class="flex-grow-1">
                                         <h5 class="mb-0 capitalize"><%= comment.author.name %></h5>
                                         <small class="text-muted">@<%= comment.author.username %> 

@@ -21,6 +21,8 @@ router.get('/:id', forum_detail_get);
 router.put('/:id/like', likePost);
 router.post('/:id/comment', comment_post);
 
+// this is fine b/c /forum is category
+// /forum/category shouldn't exist
 router.get('/category/:name', forum_category_get);
 
 

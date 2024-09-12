@@ -8,9 +8,9 @@ const {
     profile_edit_get
  } = profileController;
 
-router.get('/:username', profile_get);
 router.get('/update', profile_edit_get);
 router.put('/update', profile_update_put);
+router.get('/:username', profile_get);
 
 
 module.exports = router;
