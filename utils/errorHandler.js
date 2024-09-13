@@ -25,9 +25,10 @@ const handleErrors = (err) => {
       errors.password = 'That password is incorrect';
     }
   
-    // duplicate email error
+    // duplicate error
     if (err.code === 11000) {
-      errors.email = 'that email is already registered';
+      if(err.keyValue.email) errors.email = 'that email is already registered';
+      if(err.keyValue.username) errors.username = `The username <em>${err.keyValue.username}</em> is taken!`;
       return errors;
     }
   

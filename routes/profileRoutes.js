@@ -8,7 +8,7 @@ const {
     profile_edit_get
  } = profileController;
 
-router.get('/update', profile_edit_get);
+router.get('/setting', profile_edit_get);
 router.put('/update', profile_update_put);
 router.get('/:username', profile_get);
 

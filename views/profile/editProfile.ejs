@@ -1,14 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Profile - UniVerseHub</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <%- include('../partials/head')  %> 
     <style>
         .profile-header {
-            background-color: #f8f9fa;
             padding: 2rem 0;
             margin-bottom: 2rem;
         }
@@ -17,48 +12,15 @@
             height: 150px;
             border-radius: 50%;
             object-fit: cover;
-            border: 5px solid #fff;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
         }
     </style>
 </head>
-<body class="bg-light">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container">
-            <a class="navbar-brand" href="#"><i class="bi bi-globe"></i> UniVerseHub</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Forum</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Videos</a>
-                    </li>
-                </ul>
-                <div class="dropdown">
-                    <a class="btn btn-light dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-person-circle"></i> John Doe
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuLink">
-                        <li><a class="dropdown-item active" href="#">Edit Profile</a></li>
-                        <li><a class="dropdown-item" href="#">Settings</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="#">Logout</a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </nav>
+<body class="bg-white">
+    <%- include('../partials/nav')  %>
 
-    <div class="profile-header">
+    <div id="avatarContainer" class="profile-header bg-light-subtle">
         <div class="container text-center">
-            <img src="https://via.placeholder.com/150" alt="Current Profile Picture" class="avatar-preview mb-3" id="avatarPreview">
+            <a href="#avatar"><img src="<%= user.avatarUrl %>" alt="Current Profile Picture" class="avatar-preview shadow-sm border border-5 border-dark mb-3" id="avatarPreview"></a>
             <h1 class="display-4">Edit Your Profile</h1>
         </div>
     </div>
@@ -70,39 +32,65 @@
                     <div class="card-body">
                         <ul class="nav nav-tabs mb-4" id="myTab" role="tablist">
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link active" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="true">Profile</button>
+                                <button class="nav-link active" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="true">
+                                    <i class="bi bi-person-circle"></i> Profile
+                                </button>
                             </li>
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="security-tab" data-bs-toggle="tab" data-bs-target="#security" type="button" role="tab" aria-controls="security" aria-selected="false">Security</button>
+                                <button class="nav-link" id="security-tab" data-bs-toggle="tab" data-bs-target="#security" type="button" role="tab" aria-controls="security" aria-selected="false">
+                                    <i class="bi bi-shield-lock"></i> Security
+                                </button>
                             </li>
                         </ul>
                         <div class="tab-content" id="myTabContent">
+                            <div id="form_alert" class="alert alert-danger alert-dismissible show fade" role="alert">
+                                <small id="alertMsg"></small>
+                                <i class="bi bi-x-circle-fill"></i>
+                            </div>
                             <div class="tab-pane fade show active" id="profile" role="tabpanel" aria-labelledby="profile-tab">
-                                <form>
-                                    <div class="mb-3">
-                                        <label for="name" class="form-label">Name</label>
-                                        <input type="text" class="form-control" id="name" name="name" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="username" class="form-label">Username</label>
-                                        <input type="text" class="form-control" id="username" name="username" required>
-                                        <div class="form-text">Changing your username may affect how others find you on the platform.</div>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="bio" class="form-label">Bio</label>
-                                        <textarea class="form-control" id="bio" name="bio" rows="3"></textarea>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="address" class="form-label">Address</label>
-                                        <input type="text" class="form-control" id="address" name="address">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="occupation" class="form-label">Occupation</label>
-                                        <input type="text" class="form-control" id="occupation" name="occupation">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="avatarUrl" class="form-label">Avatar URL</label>
-                                        <input type="url" class="form-control" id="avatarUrl" name="avatarUrl">
+                                <form id="updateProfileForm" class="needs-validation" novalidate>
+                                    <div class="row row-cols-1 row-cols-md-1">
+                                        <div class="col mb-3">
+                                            <label for="name" class="form-label">Name</label>
+                                            <input type="text" class="form-control" id="name" value="<%= user.name %>" name="name" required>
+                                            <div id="nameInvalidFeedback" class="invalid-feedback">
+                                                Name can't be empty!
+                                            </div>
+                                        </div>
+                                        <div class="col mb-3">
+                                            <label for="username" class="form-label">
+                                                Username <i class="bi bi-info-circle"  data-bs-toggle="tooltip" data-bs-title="your username will be unavailable except for you."></i>
+                                            </label>
+                                            <input type="text" class="form-control" id="username" value="<%= user.username %>" name="username" required>
+                                            <div id="UsernameCheckFeedback" class="form-text">Changing your username may affect how others find you on the platform.</div>
+                                            <div id="UsernameInvalidFeedback" class="invalid-feedback">
+                                                username can't be empty!
+                                            </div>
+                                            <div id="UsernameValidFeedback" class="valid-feedback">
+                                                Available.
+                                            </div>
+                                        </div>
+                                        <div class="col mb-3">
+                                            <label for="bio" class="form-label">Bio</label>
+                                            <textarea class="form-control" id="bio" name="bio" rows="3"><%= user.bio %></textarea>
+                                        </div>
+                                        <div class="col-lg-4 mb-3">
+                                            <label for="address" class="form-label">Address</label>
+                                            <input type="text" class="form-control" id="address" value="<%= user.address %>" name="address">
+                                        </div>
+                                        <div class="col-lg-4 mb-3">
+                                            <label for="occupation" class="form-label">Occupation</label>
+                                            <input type="text" class="form-control" id="occupation" value="<%= user.occupation %>" name="occupation">
+                                        </div>
+                                        <div class="col-lg-4 mb-3">
+                                            <label for="avatarUrl" class="form-label">
+                                                Avatar URL <i class="bi bi-info-circle"  data-bs-toggle="tooltip" data-bs-title="check your avatar above for live preview."></i>
+                                            </label>
+                                            <input type="url" class="form-control" id="avatarUrl" value="<%= user.avatarUrl %>" name="avatarUrl">
+                                            <div class="invalid-feedback">
+                                                Make sure it is a url link
+                                            </div>
+                                        </div>
                                     </div>
                                     <button type="submit" class="btn btn-primary">Update Profile</button>
                                 </form>
@@ -131,18 +119,144 @@
         </div>
     </div>
 
-    <footer class="bg-dark text-light text-center py-3 mt-5">
-        <div class="container">
-            <p class="mb-0">&copy; 2023 UniVerseHub. All rights reserved.</p>
-        </div>
-    </footer>
+    <%- include('../partials/footer')  %>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const updateProfileForm = document.getElementById("updateProfileForm");
+        const usernameInvalidFeedback = document.getElementById("UsernameInvalidFeedback");
+        const usernameValidFeedback = document.getElementById("UsernameValidFeedback");
+        const UsernameCheckFeedback = document.getElementById('UsernameCheckFeedback');
+        const form_alert = document.querySelector("#form_alert");
+        const alertMsg = document.getElementById("alertMsg");
+
+        form_alert.style.display = "none";
+        // check usernaem availability
+        let debounceTimer;
+
+        updateProfileForm.username.addEventListener("input", (e) => {
+
+            const username = updateProfileForm.username.value.trim();
+
+            usernameInvalidFeedback.textContent = "";
+            usernameValidFeedback.textContent = "";
+
+            // Clear any previous debounce timer
+            clearTimeout(debounceTimer);
+
+
+            if (username.length > 0) {
+                UsernameCheckFeedback.style.display = "block";
+                UsernameCheckFeedback.textContent = "Checking availability...";
+
+                debounceTimer = setTimeout(() => {
+                    // Make the AJAX request after the user stops typing
+                    fetch(`/auth/check-username?username=${username}`)
+                        .then(response => response.json())
+                        .then(data => {
+
+                            UsernameCheckFeedback.style.display = "none";
+
+                            if (data.available) {
+                                updateProfileForm.username.classList.toggle("is-invalid", false); // Removes the class if it exists
+                                updateProfileForm.username.classList.toggle("is-valid", true); // adds the class if it doesn't exists
+                                usernameValidFeedback.textContent = "Available!";
+                            } else {
+                                updateProfileForm.username.classList.toggle("is-valid", false);  
+                                updateProfileForm.username.classList.toggle("is-invalid", true);
+                                usernameInvalidFeedback.textContent = "Unavailable. try again!";
+                            }
+                        })
+                        .catch(error => {
+                            UsernameCheckFeedback.style.display = "none";
+                            console.error('Error checking username:', error);
+                        });
+                }, 1000);
+            } else {
+                UsernameCheckFeedback.style.display = "none";
+            }
+        });
+
+        updateProfileForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+
+            const currentValues = {
+                name: updateProfileForm.name.value.trim(),
+                username: updateProfileForm.username.value.trim(),
+                bio: updateProfileForm.bio.value.trim(),
+                address: updateProfileForm.address.value.trim(),
+                occupation: updateProfileForm.occupation.value.trim(),
+                avatarUrl: updateProfileForm.avatarUrl.value.trim()
+            };
+
+            if (currentValues.name === '' || currentValues.username === '' ) {
+                console.log("not good");
+            } else {
+                fetch("/profile/update", {
+                    method: "PUT",
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(currentValues)
+                })
+                .then(res => res.json())
+                .then(data => {
+                    form_alert.style.display = "block";
+                    if(data.user) {
+                        form_alert.classList.toggle("alert-danger", false);
+                        form_alert.classList.toggle("alert-success", true);
+                        console.log(data.user)
+                        alertMsg.innerHTML = `Profile updated successfully! ~ <a href="/profile/${data.user.username}">check profile</a>`;
+                    }
+                    if (data.errors) {
+                        form_alert.classList.toggle("alert-success", false);
+                        form_alert.classList.toggle("alert-danger", true);
+                        alertMsg.innerHTML = data.errors.username;
+                        console.log(data.errors)
+                    }
+                    if(data.error) {
+                        alertMsg.textContent = data.error;
+                    }
+                })
+                .catch(error => {
+                    console.error(error)
+                });
+            }
+        })
+
+        form_alert.addEventListener("click", (e) => {
+            form_alert.style.display = "none";
+        })
+    </script>
+
     <script>
         document.getElementById('avatarUrl').addEventListener('input', function() {
             const preview = document.getElementById('avatarPreview');
             preview.src = this.value || 'https://via.placeholder.com/150';
+            document.getElementById('avatarContainer').scrollIntoView({ behavior: 'smooth' });
+            window.location.hash = '#avatar';
         });
+    </script>
+
+    <script>
+        (() => {
+            'use strict'
+
+            // Fetch all the forms we want to apply custom Bootstrap validation styles to
+            const forms = document.querySelectorAll('.needs-validation')
+
+            // Loop over them and prevent submission
+            Array.from(forms).forEach(form => {
+                form.addEventListener('submit', event => {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+
+                form.classList.add('was-validated')
+                }, false)
+            })
+        })()
+
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
     </script>
 </body>
 </html>

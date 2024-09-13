@@ -1,4 +1,3 @@
-const { json } = require('express');
 const User = require('../model/user');
 const jwt = require('jsonwebtoken');
 const handleErrors = require('../utils/errorHandler');
@@ -57,9 +56,37 @@ const auth_logout = (req, res) => {
     res.redirect('/');
 }
 
+const username_availability_get = async (req, res) => {
+    const { username } = req.query;
+
+    try {
+        // Check if the username exists in the database
+        const user = await User.findOne({ username });
+        
+        let isAvailable = false;
+
+        if (user) {
+            // Username is taken
+            // but
+            if(user.username === res.locals.user.username) isAvailable = true;
+        } else {
+            // Username is available
+            isAvailable = true;
+        }
+
+        return res.status(200).json({ available: isAvailable });
+        
+    } catch (err) {
+        const errors = handleErrors(err);
+        res.status(400).json({errors});
+        console.error(errors);
+    }
+}
+
 module.exports = {
     auth_page_get,
     login_post,
     signup_post,
-    auth_logout
+    auth_logout,
+    username_availability_get
 };

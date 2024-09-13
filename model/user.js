@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const  { isEmail } = require('validator');
 const bcrypt = require('bcrypt');
+const crypto = require('crypto');
 const { default: isURL } = require('validator/lib/isURL');
 const Schema = mongoose.Schema;
 
@@ -23,8 +24,7 @@ const userSchema = new Schema({
       maxlength: 250
     },
     address: {
-        type: String,
-        minlength: 2
+        type: String
     },
     occupation: String,
     avatarUrl: { 
@@ -64,8 +64,9 @@ userSchema.pre('save', async function (next) {
 
     // set default username
     if (!this.username) {
+        console.log(this.username)
       // Create default username from name and email
-      this.username = `${this.name.replace(/\s+/g, '_').toLowerCase()}_${this.email.split('@')[0]}${new Date().getUTCSeconds().toString()}`;
+      this.username = `${this.name.trim().replace(/\s+/g, '_').toLowerCase()}_${this.email.split('@')[0].slice(0, 4)}_${crypto.randomBytes(3).toString('hex')}`;
     }
 
     if (!this.isModified('password')) return next(); // Skip hashing if password hasn't changed
