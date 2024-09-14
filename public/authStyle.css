@@ -242,8 +242,9 @@ input {
 }
 
 footer {
-    background-color: #222;
+    background-color: #171616;
     color: #fff;
+	padding: 2rem;
     font-size: 14px;
     bottom: 0;
     position: fixed;
@@ -258,7 +259,7 @@ footer p {
 }
 
 footer i {
-    color: red;
+    color: rgb(244, 67, 67);
 }
 
 footer a {

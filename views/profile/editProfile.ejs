@@ -43,9 +43,9 @@
                             </li>
                         </ul>
                         <div class="tab-content" id="myTabContent">
-                            <div id="form_alert" class="alert alert-danger alert-dismissible show fade" role="alert">
-                                <small id="alertMsg"></small>
+                            <div id="form_alert" class="alert alert-danger gap-2 alert-dismissible show fade" role="alert">
                                 <i class="bi bi-x-circle-fill"></i>
+                                <small id="alertMsg"></small>
                             </div>
                             <div class="tab-pane fade show active" id="profile" role="tabpanel" aria-labelledby="profile-tab">
                                 <form id="updateProfileForm" class="needs-validation" novalidate>
@@ -96,10 +96,13 @@
                                 </form>
                             </div>
                             <div class="tab-pane fade" id="security" role="tabpanel" aria-labelledby="security-tab">
-                                <form>
+                                <form id="passwordChangeForm" class="needs-validation" novalidate>
                                     <div class="mb-3">
                                         <label for="currentPassword" class="form-label">Current Password</label>
                                         <input type="password" class="form-control" id="currentPassword" name="currentPassword" required>
+                                        <div id="currPassInvalidFeedback" class="invalid-feedback">
+                                            Must not be empty!
+                                        </div>
                                     </div>
                                     <div class="mb-3">
                                         <label for="newPassword" class="form-label">New Password</label>
@@ -108,6 +111,9 @@
                                     <div class="mb-3">
                                         <label for="confirmNewPassword" class="form-label">Confirm New Password</label>
                                         <input type="password" class="form-control" id="confirmNewPassword" name="confirmNewPassword" required>
+                                        <div id="confPassInvalidFeedback" class="invalid-feedback">
+                                            Must not be empty!
+                                        </div>
                                     </div>
                                     <button type="submit" class="btn btn-primary">Change Password</button>
                                 </form>
@@ -126,6 +132,11 @@
         const usernameInvalidFeedback = document.getElementById("UsernameInvalidFeedback");
         const usernameValidFeedback = document.getElementById("UsernameValidFeedback");
         const UsernameCheckFeedback = document.getElementById('UsernameCheckFeedback');
+
+        const passwordChangeForm = document.getElementById("passwordChangeForm");
+        const currPassInvalidFeedback = document.getElementById("currPassInvalidFeedback");
+        const confPassInvalidFeedback = document.getElementById("confPassInvalidFeedback");
+
         const form_alert = document.querySelector("#form_alert");
         const alertMsg = document.getElementById("alertMsg");
 
@@ -221,9 +232,63 @@
             }
         })
 
+        currPassInvalidFeedback.textContent = "Must not be empty!";
+        confPassInvalidFeedback.textContent = "Must not be empty!";
+
+        passwordChangeForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+
+            const newPassword = passwordChangeForm.newPassword.value;
+            const confirmNewPassword = passwordChangeForm.confirmNewPassword.value;
+            const currentPassword = passwordChangeForm.currentPassword.value;
+
+            if( newPassword !== confirmNewPassword ) {
+                passwordChangeForm.confirmNewPassword.classList.toggle("is-valid", false);
+                passwordChangeForm.confirmNewPassword.classList.toggle("is-invalid", true);
+                confPassInvalidFeedback.textContent = "Do not match!";
+            } else {
+                passwordChangeForm.confirmNewPassword.classList.toggle("is-invalid", false);
+                passwordChangeForm.confirmNewPassword.classList.toggle("is-valid", true);
+            }
+
+            fetch("/profile/change-password", {
+                    method: "PUT",
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        currentPassword,
+                        newPassword,
+                        confirmNewPassword
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    form_alert.style.display = "block";
+                    if(data.redirect) {
+                        form_alert.classList.toggle("alert-danger", false);
+                        form_alert.classList.toggle("alert-success", true);
+                        alertMsg.innerHTML = `Password changed successfully!`;
+
+                        setTimeout(() => window.location.href = data.redirect , 2000);
+                        
+                    }
+                    if (data.errors) {
+                        form_alert.classList.toggle("alert-success", false);
+                        form_alert.classList.toggle("alert-danger", true);
+                        alertMsg.innerHTML = data.errors.password;
+                        console.log(data.errors)
+                    }
+                    if(data.error) {
+                        alertMsg.textContent = data.error;
+                    }
+                })
+                .catch(error => {
+                    console.error(error)
+                });
+
+        });
         form_alert.addEventListener("click", (e) => {
             form_alert.style.display = "none";
-        })
+        });
     </script>
 
     <script>

@@ -107,7 +107,9 @@
                                     <img src="<%= comment.author.avatarUrl %>" alt="<%= comment.author.name %>" class="comment-avatar border border-warning me-3">
                                     <div class="flex-grow-1">
                                         <h5 class="mb-0 capitalize"><%= comment.author.name %></h5>
-                                        <small class="text-muted">@<%= comment.author.username %> 
+                                        <a class="text-decoration-none" href="/profile/<%= comment.author.username %>">
+                                            <small class="text-muted">@<%= comment.author.username %> 
+                                        </a>
                                             <% if(comment.author._id.toString() === post.author._id.toString()) {%>
                                                 <span class="mark">Author</span>
                                             <% } %>

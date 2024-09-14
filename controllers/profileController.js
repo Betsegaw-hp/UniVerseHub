@@ -11,7 +11,7 @@ const profile_get = async (req, res) => {
             const posts = await ForumPost.find({ author: res.locals.user._id });
             const aggregateStats = await getAggragateUserStat(res.locals.user._id);
 
-            res.render('profile', { title: "Profile", posts, aggregateStats, currentUser: true });
+            res.render('profile', { title: `Profile - ${res.locals.user.username}`, posts, aggregateStats, currentUser: true });
         } else {
             const username = req.params.username;
             const user = await User.findOne({ username });
@@ -20,7 +20,7 @@ const profile_get = async (req, res) => {
     
             const posts = await ForumPost.find({ author: user._id });
             const aggregateStats = await getAggragateUserStat(user._id);
-            res.render('profile', { title: "Profile", posts, otherUser: user, aggregateStats,  currentUser: false });
+            res.render('profile', { title: `Profile - ${user.username}`, posts, otherUser: user, aggregateStats,  currentUser: false });
         }
 
     } catch (err) {
@@ -65,6 +65,43 @@ const profile_update_put = async (req,res) => {
     }
 }
 
+const password_update_put = async (req, res) => {
+    const {
+        currentPassword,
+        newPassword,
+        confirmNewPassword
+    } = req.body;
+
+    try {
+        if (!currentPassword || !newPassword || !confirmNewPassword) {
+            return res.status(400).json({ error: "All fields are required!" });
+        }
+
+        if (newPassword !== confirmNewPassword) {
+            return res.status(400).json({ error: "Passwords do not match!" });
+        }
+
+        const user = await User.login(res.locals.user.email, currentPassword);
+
+        user.password = newPassword;
+
+        // used this method specifically to trigger pre('save') hook for hashing
+        await user.save()
+
+        //TODO: to increase security, Invalidating jwt token from the server is a must
+        // now i am just depending on the client(script) to logout
+        res.status(300).json({ redirect: '/auth/logout'});
+
+    } catch (err) {
+        if(err.message = "incorrect password") {
+            return res.status(400).json({ error: "Incorrect current password!" });
+        }
+        const errors = handleErrors(err);
+        res.status(400).json({ errors });
+        console.error(err);
+    }
+}
+
 const getAggragateUserStat = async (userId) => {
     try {
         const stats = await ForumPost.aggregate([
@@ -89,5 +126,6 @@ const getAggragateUserStat = async (userId) => {
 module.exports = { 
     profile_get,
     profile_edit_get,
-    profile_update_put
+    profile_update_put,
+    password_update_put
  };
