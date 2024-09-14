@@ -1,15 +1,11 @@
-app idea
 
-- blog advance it
--- catagory
--- author
--- date
--- comment
 
 - TODO
--- update blog
--- validate tag
+-- update blog - done
+-- validate tag - done 
 -- do filter
--- do comment
->> revisit relevent post feature. (i.e the post it self shouldn't be a relevent post to itself)
+-- do comment - done
+>> revisit relevent post feature. (i.e the post it self shouldn't be a relevent post to itself) - done
+>> do pagination
+>> do search feature (consider both category and topic)
 >> make sure to use .env

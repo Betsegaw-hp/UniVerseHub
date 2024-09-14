@@ -1,13 +1,35 @@
+<!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <%- include('./partials/head')  %> 
-   
+    <style>
+        .error-page {
+            min-height: 70vh;
+            display: flex;
+            align-items: center;
+        }
+    </style>
 </head>
 <body>
   <%- include('./partials/nav.ejs') %>
-  <h1>404 - OOPS!</h1>
-  <h2>That page does not exist</h2>
+    <div class="error-page ">
+        <div class="container text-center">
+            <img src="404.svg" alt="404 Illustration" class="img-fluid mb-4" width="150" height="150">
+            <h2 class="h3 fw-light text-secondary mb-3">Oops! Page Not Found</h2>
+            <p class="lead text-muted mb-5">
+                We're sorry, but the page you're looking for doesn't seem to exist.
+            </p>
+            <div class="d-flex justify-content-center gap-3">
+                <a href="/" class="btn btn-primary btn-lg">
+                    <i class="bi bi-house-door me-2"></i>Return Home
+                </a>
+                <a href="/contact" class="btn btn-outline-secondary btn-lg">
+                    <i class="bi bi-headset me-2"></i>Contact Support
+                </a>
+            </div>
+        </div>
+    </div>
 
-  <%- include('./partials/footer.ejs') %>
+    <%- include('./partials/footer.ejs') %>
 </body>
 </html>
