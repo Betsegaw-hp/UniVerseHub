@@ -12,6 +12,10 @@ const handleErrors = (err) => {
       content: '', author: '', post: ''
     }
 
+    let category_errors = {
+      name: '', description: '', type: ''
+    }
+
     //by default 
     errors = user_errors;
 
@@ -29,6 +33,7 @@ const handleErrors = (err) => {
     if (err.code === 11000) {
       if(err.keyValue.email) errors.email = 'that email is already registered';
       if(err.keyValue.username) errors.username = `The username <em>${err.keyValue.username}</em> is taken!`;
+      if(err.keyValue.name) errors.name =  `That category already exists`;
       return errors;
     }
   
@@ -51,6 +56,12 @@ const handleErrors = (err) => {
 
           comment_errors[properties.path] = properties.message;
           errors = comment_errors;
+        });
+    } else if (err.message.includes('Category validation failed')) {
+        Object.values(err.errors).forEach(({ properties }) => {
+
+          category_errors[properties.path] = properties.message;
+          errors = category_errors;
         });
     } 
 

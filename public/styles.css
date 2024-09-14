@@ -42,6 +42,14 @@ html, body {
   }
   
 
+.sidebar-sticky {
+    flex: 1;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    padding-top: 5rem;
+}
+
 
 /* index styles */
 .blogs a {
@@ -64,33 +72,33 @@ html, body {
     display: flex;
     gap: 1rem;
 }
-.post_privilages {
+.privilages {
     display: flex;
     gap: 1rem;
 }
 
-.post_privilages .dlt-btn , .edit-btn {
+.privilages .dlt-btn , .edit-btn {
     height: fit-content;
     padding: 0.5rem 1rem;
     border: 0;
     border-radius: 10%;
     cursor: pointer;
 }
-.post_privilages .dlt-btn {
+.privilages .dlt-btn {
     border: 1px solid crimson;
     color: crimson;
 }
-.post_privilages .edit-btn {
+.privilages .edit-btn {
     border: 1px solid teal;
     color: teal;
 }
 
-.post_privilages .dlt-btn:hover {
+.privilages .dlt-btn:hover {
     background: crimson;
     color: white;
 }
 
-.post_privilages .edit-btn:hover {
+.privilages .edit-btn:hover {
     background:  teal;
     color: white;
 }

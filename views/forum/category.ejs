@@ -33,6 +33,12 @@
     <%- include('../partials/nav')  %>
 
     <div class="container mt-4">
+        <div id="general_category_alert" class="alert alert-danger gap-2 align-items-center" role="alert">
+            <span><i class="bi bi-exclamation-triangle"></i></span>
+            <div id="general_category_alert_msg">
+              Something Unexpected happend
+            </div>
+        </div>
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="/">Home</a></li>
@@ -46,15 +52,26 @@
                 <h1 class="mb-0 capitalize"><%= category.name %></h1>
                 <p class="lead"><%= category.description %></p>
             </div>
-            <div class="col-md-4 text-md-end">
-                <!-- for "All Topics" only -->
-                <% if( category.name === "All Topics" ) { %>
-                    <a href="/forum" class=""><i class="bi bi-plus-circle"></i> New Topic</a>
-                <% } else { %>
-                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newTopicModal">
-                    <i class="bi bi-plus-circle"></i> New Topic
-                </button>
-                <% } %>
+            <div class="col-md-4 text-md-end action-container">
+                <div class="row" style="align-content: flex-start;">
+                    <!-- for "All Topics" only -->
+                     <div class="col addTopic">
+                         <% if( category.name === "All Topics" ) { %>
+                             <a href="/forum" class=""><i class="bi bi-plus-circle"></i> New Topic</a>
+                         <% } else { %>
+                             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newTopicModal">
+                                 <i class="bi bi-plus-circle"></i> New Topic
+                             </button>
+                         <% } %>
+                     </div>
+    
+                    <% if(user.roles.includes('admin')) { %>
+                        <div class="col-md-4 privilages">
+                            <div id="editPostBtn" class="edit-btn" data-bs-toggle="modal" data-bs-target="#editCategoryModal"><i class="bi bi-pencil"></i></div>
+                            <div class="dlt-btn"><i class="bi bi-trash"></i></div>
+                        </div>
+                    <% } %>
+                </div>
             </div>
         </div>
 
@@ -245,6 +262,37 @@
         </div>
     </div>
 
+    <!-- Edit category modal (for admins) -->
+    <div class="modal fade" id="editCategoryModal" tabindex="-1" aria-labelledby="editCategoryModalLabel" data-categoryId="<%= category._id %>" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editCategoryModalLabel">Edit Category</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="category_post_form">
+                        <div class="mb-3">
+                            <label for="categoryName" class="form-label">Category Name</label>
+                            <input type="text" class="form-control" id="categoryName" value="<%= category.name %>" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="categoryDiscription" class="form-label">Description</label>
+                            <input type="text" class="form-control" id="categoryDiscription" value="<%= category.description %>" name="description" required>
+                        </div>
+                    </form>
+                    <div id="category_form_alert" style="cursor:not-allowed;" class="alert alert-danger fade" role="alert">
+                        <p id="category_alert_msg"></p> 
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" form="category_post_form" class="btn btn-primary">Edit Category</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <%- include('../partials/footer')  %>
 
 
@@ -252,6 +300,16 @@
         const form = document.querySelector("#post_form");
         const form_alert = document.querySelector("#form_alert");
         const alert_msg = document.querySelector("#alert_msg");
+        const categoryForm = document.querySelector("#category_post_form");
+        const CategoryForm_alert = document.querySelector("#category_form_alert");
+        const CategoryForm_alert_msg = document.querySelector("#category_alert_msg");
+        const categoryIdParent = document.querySelector("#editCategoryModal");
+        const dltBtn = document.querySelector(".dlt-btn");
+
+        const categoryAlert = document.querySelector("#general_category_alert");
+        const categoryAlertMsg = document.querySelector("#general_category_alert_msg");
+
+
 
         form.addEventListener("submit", (e) => {
             e.preventDefault();
@@ -293,7 +351,82 @@
 
         form_alert.addEventListener("click", (e) => {
             form_alert.classList.remove('show');
-        })
+        });
+
+        // admin previlage
+        CategoryForm_alert.addEventListener("click", (e) => {
+            CategoryForm_alert.classList.remove('show');
+        });
+
+        categoryForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+
+            const name = categoryForm.name.value;
+            const description = categoryForm.description.value;
+
+            const options = {
+               method: "PUT",
+               headers: { 'Content-Type': 'application/json' },
+               body: JSON.stringify({
+                 name, 
+                 description,
+                 categoryId : categoryIdParent.dataset.categoryid
+               })
+            }
+
+            fetch("/forum/category", options)
+            .then(res => res.json())
+            .then(data => {
+                if(data.errors) {
+                    CategoryForm_alert.classList.add('show');
+                    let msg = "error occured";
+                    if(data.errors.name != '') msg = data.errors.name;
+                    else if(data.errors.description != '') msg = data.errors.description;
+                    else if(data.errors.msg != '') msg = data.errors.msg;
+                    
+                    if(!msg) msg = "Unexpected Error occured. ";
+                    CategoryForm_alert_msg.textContent = msg;
+                    console.log(msg)
+                }
+                if (data.category) {
+                    // b/c I am editing a  url. we need the edited path
+                    location.assign(`/forum/category/${data.category.name}`);
+                }
+            })
+            .catch(err => console.error(err));
+        });
+    
+        categoryAlert.style.display = "none";
+        console.log(categoryAlert)
+        let alertTimeOut;
+
+        dltBtn && dltBtn.addEventListener("click", (e) => {
+
+            const isConfirmed =  confirm("Are you sure you want to Delete a category?");
+            clearTimeout(alertTimeOut);
+
+            if(isConfirmed) {
+                const endpoint = `/forum/category/${categoryIdParent.dataset.categoryid}`;
+
+                fetch(endpoint, { method: 'DELETE'})
+                .then( res => res.json())
+                .then(data => {
+                    if(data.error) {
+                        categoryAlert.style.display = "flex";
+                        categoryAlertMsg.textContent = `${data.error}`;
+
+                        alertTimeOut =  setTimeout(()=> {
+                            categoryAlert.style.display = "none";
+                        }, 4000);
+                    }
+                    if(data.redirect) {
+                        window.location.href = data.redirect;
+                    }
+                } )
+                .catch(err =>console.log(err))
+            }
+
+        });
     </script>
 
     <script>

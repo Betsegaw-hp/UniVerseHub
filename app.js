@@ -6,6 +6,7 @@ const blogRoutes = require('./routes/blogRoutes')
 const forumRoutes = require('./routes/forumRoutes')
 const authRoutes = require('./routes/authRoutes')
 const profileRoutes = require('./routes/profileRoutes')
+const homeRoutes = require('./routes/homeRoutes')
 const {requireAuth, checkUser} = require('./middleware/authMiddleware');
 
 const app = express()
@@ -33,9 +34,7 @@ app.use('*', checkUser);
 // auth routes
 app.use('/auth', authRoutes);
 
-app.get('/', requireAuth,  (req, res ) => {
-    res.render('index', { title : 'UniVerseHub - Connect, Share, Learn'})
-})
+app.get('/', requireAuth,  homeRoutes);
 
 app.get('/about', requireAuth, (req, res) => {
     res.render('about', { title: 'About'})

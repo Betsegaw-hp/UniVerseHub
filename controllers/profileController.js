@@ -9,16 +9,18 @@ const profile_get = async (req, res) => {
         if(req.params.username === res.locals.user.username) {
 
             const posts = await ForumPost.find({ author: res.locals.user._id });
-            res.render('profile', { title: "Profile", posts, currentUser: true });
+            const aggregateStats = await getAggragateUserStat(res.locals.user._id);
+
+            res.render('profile', { title: "Profile", posts, aggregateStats, currentUser: true });
         } else {
             const username = req.params.username;
             const user = await User.findOne({ username });
-            if(!user) {
-                return res.redirect('../404');
-            }
+
+            if(!user) return res.redirect('../404');
     
             const posts = await ForumPost.find({ author: user._id });
-            res.render('profile', { title: "Profile", posts, otherUser: user, currentUser: false });
+            const aggregateStats = await getAggragateUserStat(user._id);
+            res.render('profile', { title: "Profile", posts, otherUser: user, aggregateStats,  currentUser: false });
         }
 
     } catch (err) {
@@ -63,19 +65,24 @@ const profile_update_put = async (req,res) => {
     }
 }
 
-const getProfileByUsername = async (username) => {
-   
+const getAggragateUserStat = async (userId) => {
     try {
-        
-        const user = await User.findOne({ username });
-        if(!user) {
-            return null;
-        }
+        const stats = await ForumPost.aggregate([
+            {
+                $match: { author: userId }  // Filter by author
+            },
+            {
+                $group: {
+                    _id: "$author",
+                    totalLikes: { $sum: "$likeCount" }  // Sum the likes for all posts by this user
+                }
+            }]
+        );
 
-        return user;
-
+        return stats[0];
     } catch (err) {
-        
+        console.error(err);
+        return null;
     }
 }
 

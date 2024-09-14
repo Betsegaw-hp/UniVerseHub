@@ -5,13 +5,6 @@
     <head>
         <%- include('../partials/head')  %> 
        <style>
-        .sidebar-sticky {
-            flex: 1;
-            position: sticky;
-            top: 0;
-            height: 100vh;
-            padding-top: 10px;
-        }
 
        </style>
 
@@ -55,7 +48,7 @@
                             <button class="btn btn-outline-secondary"><i class="bi bi-bookmark"></i> Save</button>
                             
                             <% if(user._id.toString() === post.author._id.toString()) { %>
-                            <div class="post_privilages">
+                            <div class="privilages">
                                 <div id="editPostBtn" class="edit-btn" data-bs-toggle="modal" data-bs-target="#editTopicModal"><i class="bi bi-pencil"></i></div>
                                 <div class="dlt-btn"><i class="bi bi-trash"></i></div>
                             </div>

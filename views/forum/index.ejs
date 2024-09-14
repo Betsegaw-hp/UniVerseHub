@@ -11,6 +11,7 @@
 <html lang="en">
     <head>
         <%- include('../partials/head')  %> 
+
         <!-- Include the timeLapse.js file -->
         <script src="/timeLapse.js"></script>
     </head>
@@ -26,6 +27,11 @@
                     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newTopicModal">
                         <i class="bi bi-plus-circle"></i> Start New Topic
                     </button>
+                    <% if(user.roles.includes('admin')) { %>
+                        <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#newCategoryModal">
+                            <i class="bi bi-plus-circle"></i> New Category
+                        </button>
+                    <% } %>
                 </div>
                 <div class="list-group">
                     <a href="forum/category/All Topics" class="list-group-item list-group-item-action forum-card" >
@@ -52,7 +58,7 @@
                       <% } %>
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-4 sidebar-sticky">
                 <div class="card mb-4">
                     <div class="card-header">
                         Recent Topics(<%= posts.length %>)
@@ -131,6 +137,37 @@
         </div>
     </div>
 
+    <!-- New category modal (for admins) -->
+    <div class="modal fade" id="newCategoryModal" tabindex="-1" aria-labelledby="newCategoryModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="newCategoryModalLabel">Add New Category</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="category_post_form">
+                        <div class="mb-3">
+                            <label for="categoryName" class="form-label">Category Name</label>
+                            <input type="text" class="form-control" id="categoryName" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="categoryDiscription" class="form-label">Description</label>
+                            <input type="text" class="form-control" id="categoryDiscription" name="description" required>
+                        </div>
+                    </form>
+                    <div id="category_form_alert" style="cursor:not-allowed;" class="alert alert-danger fade" role="alert">
+                        <p id="category_alert_msg"></p> 
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" form="category_post_form" class="btn btn-primary">Add Category</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <%- include('../partials/footer')  %> 
 
 
@@ -138,6 +175,9 @@
         const form = document.querySelector("#post_form");
         const form_alert = document.querySelector("#form_alert");
         const alert_msg = document.querySelector("#alert_msg");
+        const categoryForm = document.querySelector("#category_post_form");
+        const CategoryForm_alert = document.querySelector("#category_form_alert");
+        const CategoryForm_alert_msg = document.querySelector("#category_alert_msg");
 
         form.addEventListener("submit", (e) => {
             e.preventDefault();
@@ -179,19 +219,59 @@
 
         form_alert.addEventListener("click", (e) => {
             form_alert.classList.remove('show');
-        })
+        });
+
+        // admin previlage
+        CategoryForm_alert.addEventListener("click", (e) => {
+            CategoryForm_alert.classList.remove('show');
+        });
+
+        categoryForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+
+            const name = categoryForm.name.value;
+            const description = categoryForm.description.value;
+
+            const options = {
+               method: "POST",
+               headers: { 'Content-Type': 'application/json' },
+               body: JSON.stringify({
+                 name, 
+                 description
+               })
+            }
+
+            fetch("/forum/category", options)
+            .then(res => res.json())
+            .then(data => {
+                if(data.errors) {
+                    CategoryForm_alert.classList.add('show');
+                    let msg = "error occured";
+                    if(data.errors.name != '') msg = data.errors.name;
+                    else if(data.errors.description != '') msg = data.errors.description;
+                    
+                    if(!msg) msg = "Unexpected Error occured. ";
+                    CategoryForm_alert_msg.textContent = msg;
+                    console.log(msg)
+                }
+                if (data.category) {
+                    window.location.href = `/forum/category/${data.category.name}`;
+                }
+            })
+            .catch(err => console.error(err));
+        });
     </script>
 
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const timeEle = document.querySelectorAll('.timePassed');
-        timeEle.forEach(ele => {
-            const createdAt = ele.dataset.date; // Assuming post.createdAt is in ISO format
-            const timePassedStr = timePassed(createdAt);
-            ele.textContent = timePassedStr
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const timeEle = document.querySelectorAll('.timePassed');
+            timeEle.forEach(ele => {
+                const createdAt = ele.dataset.date; // Assuming post.createdAt is in ISO format
+                const timePassedStr = timePassed(createdAt);
+                ele.textContent = timePassedStr
+            });
         });
-    });
-</script>
+    </script>
 
 </body>
 </html>

@@ -1,3 +1,11 @@
+<% 
+    let categories = [];
+    let posts = [];
+    if(data) {
+        categories = data.categories;
+        posts = data.posts;
+    }
+%>
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -24,9 +32,11 @@
                     <div class="card-body">
                         <h5 class="card-title"><i class="bi bi-chat-dots"></i> Hot Forum Topics</h5>
                         <ul class="list-group list-group-flush">
-                            <li class="list-group-item">Exam preparation strategies</li>
-                            <li class="list-group-item">Campus life hacks</li>
-                            <li class="list-group-item">Internship opportunities</li>
+                            <% if(posts.length > 0) { %>
+                                <% posts.slice(0,3).map(post => { %>
+                                    <a class="text-decoration-none" href="/forum/<%= post._id %>" ><li class="list-group-item"><%= post.title %></li></a>
+                                <% }) %>
+                            <% } %>
                         </ul>
                     </div>
                 </div>
@@ -48,9 +58,11 @@
                     <div class="card-body">
                         <h5 class="card-title"><i class="bi bi-people"></i> Active Communities</h5>
                         <ul class="list-group list-group-flush">
-                            <li class="list-group-item">Computer Science Majors</li>
-                            <li class="list-group-item">Student Entrepreneurs</li>
-                            <li class="list-group-item">Mental Health Support Group</li>
+                            <% if(categories.length > 0) { %>
+                                <% categories.slice(0,3).map(category => { %>
+                                    <a class="text-decoration-none" href="/forum/category/<%= category.name %>"><li class="list-group-item"><%= category.name %></li></a>
+                                <% }) %>
+                            <% } %>
                         </ul>
                     </div>
                 </div>
