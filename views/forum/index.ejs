@@ -27,7 +27,7 @@
                     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newTopicModal">
                         <i class="bi bi-plus-circle"></i> Start New Topic
                     </button>
-                    <% if(user.roles.includes('admin')) { %>
+                    <% if(user.role ===  "moderator" || user.role === "admin") { %>
                         <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#newCategoryModal">
                             <i class="bi bi-plus-circle"></i> New Category
                         </button>

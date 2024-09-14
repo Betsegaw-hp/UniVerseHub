@@ -6,7 +6,7 @@ const requireAuth = (req, res, next) => {
     const token = req.cookies.jwt;
 
     if(token) {
-        jwt.verify(token, 'guada secret', (err, decodedToken) => {
+        jwt.verify(token, process.env.JWT_SECRET, (err, decodedToken) => {
             if(err) {
                 console.error(err);
                 res.redirect('/auth');
@@ -23,16 +23,21 @@ const checkUser = (req, res, next) => {
     const token = req.cookies.jwt;
 
     if(token) {
-        jwt.verify(token, 'guada secret', async (err, decodedToken) => {
+        jwt.verify(token, process.env.JWT_SECRET, async (err, decodedToken) => {
             if(err) {
                 console.log(err);
                 res.locals.user = null;
                 next();
             } else {
-                // console.log(decodedToken);
-                const user = await User.findById(decodedToken.id);
-                res.locals.user = user;
-                next();
+                try {
+                    const user = await User.findById(decodedToken.id);
+                    res.locals.user = user;  
+                    next();
+                } catch (err) {
+                    console.error('Error finding user:', err);
+                    res.locals.user = null;
+                    next();
+                }
             }
         });
     } else {
@@ -41,4 +46,33 @@ const checkUser = (req, res, next) => {
     }
 }
 
-module.exports = {requireAuth, checkUser};
+const requireRole = (roles) => {
+    return (req, res, next) => {
+        const token = req.cookies.jwt;
+
+        if (token) {
+            jwt.verify(token, process.env.JWT_SECRET, async (err, decodedToken) => {
+                if (err) {
+                    console.error(err);
+                    return res.status(401).json({ error: 'Unauthorized access' });
+                } else {
+                    try {
+                        const user = await User.findById(decodedToken.id);
+                        if (roles.includes(user.role)) {
+                            next();  // User has the required role, proceed to the route
+                        } else {
+                            return res.status(403).json({ error: 'Forbidden: Insufficient permissions' });
+                        }
+                    } catch (err) {
+                        console.error('Error finding user:', err);
+                        return res.status(500).json({ error: 'Internal server error' });
+                    }
+                }
+            });
+        } else {
+            return res.status(401).json({ error: 'Unauthorized: No token provided' });
+        }
+    };
+};
+
+module.exports = {requireAuth, checkUser, requireRole};

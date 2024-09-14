@@ -80,8 +80,14 @@ const forum_post = async (req, res) => {
     }
 };
 
-const forum_dlt = (req, res) => {
+const forum_dlt = async (req, res) => {
     const id = req.params.id;
+
+    const post = await ForumPost.findById(id, 'author');
+    if( res.locals.user.role === 'user' 
+        && post.author.toString() !== res.locals.user._id.toString() ) {
+        return res.status(403).json({ error :  "Permision denied! You are not the author of this post!"  })
+    }
 
     ForumPost.findByIdAndDelete(id)
     .then(async result => {
@@ -154,13 +160,16 @@ const forum_update = async (req, res) => {
 
     try {
         const { title, body_content, category, postId } = req.body;
+
+        const post = await ForumPost.findById(postId, 'author');
+        if(post.author.toString() !== res.locals.user._id.toString()) {
+            return res.status(403).json({ errors : { msg: "Permision denied! You are not the author of this post!" } })
+        }
         
         const categoryDoc = await Category.findOne({ name: category });
         if (!categoryDoc) {
             return res.status(400).json({ errors: { category: "Category not found" } });
         }
-        
-        console.log(req.body)
 
         const updatedPost = await ForumPost.findByIdAndUpdate(
             postId ,
@@ -172,7 +181,7 @@ const forum_update = async (req, res) => {
             { new : true, runValidators: true}
         ).exec();
 
-        console.log(updatedPost)
+        console.log("post updated!")
 
         res.status(200).json({ post: updatedPost });
 

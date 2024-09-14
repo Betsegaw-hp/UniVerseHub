@@ -31,9 +31,10 @@ const userSchema = new Schema({
         type: String,
         validate: [isURL, 'make sure it is URL!']
     },
-    roles: {
-        type: [String],
-        default: ['user']
+    role: { 
+        type: String, 
+        enum: ['admin', 'user', 'moderator'],
+        default: 'user' 
     },
     username: {
         type: String,

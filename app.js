@@ -2,6 +2,7 @@ const express = require('express')
 const mongoose = require('mongoose')
 const morgan = require('morgan')
 const cookieParser = require('cookie-parser')
+const dotenv = require('dotenv')
 const blogRoutes = require('./routes/blogRoutes')
 const forumRoutes = require('./routes/forumRoutes')
 const authRoutes = require('./routes/authRoutes')
@@ -9,11 +10,12 @@ const profileRoutes = require('./routes/profileRoutes')
 const homeRoutes = require('./routes/homeRoutes')
 const {requireAuth, checkUser} = require('./middleware/authMiddleware');
 
+dotenv.config();
 const app = express()
-const port = 3000
+const port = process.env.PORT
 
 // db connection
-mongoose.connect('mongodb://localhost:27017/test')  
+mongoose.connect(process.env.DB_URI)  
         .then((res) => {
             console.log('Database successfully connected!')
             app.listen(port, () => console.log(`listening at port ${port}`))

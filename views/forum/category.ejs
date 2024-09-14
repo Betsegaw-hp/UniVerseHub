@@ -65,7 +65,7 @@
                          <% } %>
                      </div>
     
-                    <% if(user.roles.includes('admin')) { %>
+                     <% if(user.role === 'moderator' || user.role === "admin") { %>
                         <div class="col-md-4 privilages">
                             <div id="editPostBtn" class="edit-btn" data-bs-toggle="modal" data-bs-target="#editCategoryModal"><i class="bi bi-pencil"></i></div>
                             <div class="dlt-btn"><i class="bi bi-trash"></i></div>
@@ -377,6 +377,10 @@
             fetch("/forum/category", options)
             .then(res => res.json())
             .then(data => {
+                if(data.error) {
+                    CategoryForm_alert.classList.add('show');
+                    CategoryForm_alert_msg.textContent = data.error;
+                }
                 if(data.errors) {
                     CategoryForm_alert.classList.add('show');
                     let msg = "error occured";
@@ -386,7 +390,7 @@
                     
                     if(!msg) msg = "Unexpected Error occured. ";
                     CategoryForm_alert_msg.textContent = msg;
-                    console.log(msg)
+                    
                 }
                 if (data.category) {
                     // b/c I am editing a  url. we need the edited path
@@ -405,26 +409,27 @@
             const isConfirmed =  confirm("Are you sure you want to Delete a category?");
             clearTimeout(alertTimeOut);
 
-            if(isConfirmed) {
-                const endpoint = `/forum/category/${categoryIdParent.dataset.categoryid}`;
+            if(!isConfirmed) return;
 
-                fetch(endpoint, { method: 'DELETE'})
-                .then( res => res.json())
-                .then(data => {
-                    if(data.error) {
-                        categoryAlert.style.display = "flex";
-                        categoryAlertMsg.textContent = `${data.error}`;
+            const endpoint = `/forum/category/${categoryIdParent.dataset.categoryid}`;
 
-                        alertTimeOut =  setTimeout(()=> {
-                            categoryAlert.style.display = "none";
-                        }, 4000);
-                    }
-                    if(data.redirect) {
-                        window.location.href = data.redirect;
-                    }
-                } )
-                .catch(err =>console.log(err))
-            }
+            fetch(endpoint, { method: 'DELETE'})
+            .then( res => res.json())
+            .then(data => {
+                if(data.error) {
+                    categoryAlert.style.display = "flex";
+                    categoryAlertMsg.textContent = `${data.error}`;
+
+                    alertTimeOut =  setTimeout(()=> {
+                        categoryAlert.style.display = "none";
+                    }, 4000);
+                }
+                if(data.redirect) {
+                    window.location.href = data.redirect;
+                }
+            } )
+            .catch(err =>console.log(err));
+            
 
         });
     </script>

@@ -15,5 +15,7 @@ router.post('/signup', signup_post);
 router.post('/login', login_post);
 router.get('/logout', auth_logout);
 router.get('/check-username', username_availability_get);
+// router.get('/admin/login', auth_admin_login_get);
+// router.get('/admin/signup', auth_admin_signup_get);
 
 module.exports = router;

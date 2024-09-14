@@ -4,11 +4,18 @@ const handleErrors = require('../utils/errorHandler');
 
 
 const maxAge = 1 * 24 * 60 * 60; // 1 day
-const createToken = (id) => {
-    return jwt.sign({id}, 'guada secret', {
-        expiresIn: maxAge // in sec
-    });
+const createToken = (id, role) => {
+
+    const token = jwt.sign(
+        { id, role },
+        process.env.JWT_SECRET,
+        { expiresIn: maxAge }
+      );
+
+    return token;
 }
+
+
 
 const auth_page_get = (req, res ) => {
     res.render('auth/index');
@@ -21,7 +28,7 @@ const login_post = async (req, res) => {
 
     try {
         const user = await User.login(email, password);
-        const token = createToken(user._id);
+        const token = createToken(user._id, user.role);
         res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000, sameSite: true });
         res.status(200).json(user);
     } catch (err) {
@@ -40,7 +47,7 @@ const signup_post  = async (req, res) => {
 
     try {
         const user = await User.create({name, email, password});
-        const token = createToken(user._id);
+        const token = createToken(user._id, user.role);
         res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000, sameSite: true });
         res.status(200).json(user);
     } catch (err) {

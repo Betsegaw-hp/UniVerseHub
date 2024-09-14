@@ -68,11 +68,7 @@
                     <div class="card-body">
                         <h5 class="card-title">Badges</h5>
                         <div class="d-flex flex-wrap gap-2">
-                            <% if( userData.roles.length > 0) { %>
-                                <% userData.roles.forEach(role => { %>
-                                    <span class="badge bg-primary capitalize"><%= role %></span>
-                                <% }); %>
-                            <% } %>
+                            <span class="badge bg-primary capitalize"><%= userData.role %></span>
                         </div>
                     </div>
                 </div>

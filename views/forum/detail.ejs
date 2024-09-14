@@ -15,6 +15,12 @@
     <%- include('../partials/nav')  %>
 
     <div class="container mt-4">
+        <div id="general_post_alert" class="alert alert-danger gap-2 align-items-center" role="alert">
+            <span><i class="bi bi-exclamation-triangle"></i></span>
+            <div id="general_post_alert_msg">
+              Something Unexpected happend
+            </div>
+        </div>
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="/">Home</a></li>
@@ -48,11 +54,11 @@
                             <button class="btn btn-outline-secondary"><i class="bi bi-bookmark"></i> Save</button>
                             
                             <% if(user._id.toString() === post.author._id.toString()) { %>
-                            <div class="privilages">
-                                <div id="editPostBtn" class="edit-btn" data-bs-toggle="modal" data-bs-target="#editTopicModal"><i class="bi bi-pencil"></i></div>
-                                <div class="dlt-btn"><i class="bi bi-trash"></i></div>
-                            </div>
-                            <% } else if (user.roles.includes('admin')){ %>
+                                <div class="privilages">
+                                    <div id="editPostBtn" class="edit-btn" data-bs-toggle="modal" data-bs-target="#editTopicModal"><i class="bi bi-pencil"></i></div>
+                                    <div class="dlt-btn"><i class="bi bi-trash"></i></div>
+                                </div>
+                            <% } else if (user.role === 'moderator' || user.role === "admin" ){ %>
                                 <div class="dlt-btn"><i class="bi bi-trash"></i></div>
                             <% } %>
                             
@@ -215,6 +221,10 @@
         const postIdParent = document.querySelector("#editTopicModal");
         const dltBtn = document.querySelector(".dlt-btn");
 
+        const general_post_alert = document.querySelector("#general_post_alert");
+        const general_post_alert_msg = document.querySelector("#general_post_alert_msg");
+
+
         form.addEventListener("submit", (e) => {
             e.preventDefault();
 
@@ -244,6 +254,7 @@
                     if(data.errors.title != '') msg = data.errors.title;
                     else if(data.errors.content != '') msg = data.errors.content;
                     else if(data.errors.category != '') msg = data.errors.category;
+                    else if(data.errors.msg != '') msg = data.errors.msg;
 
                     if(!msg) msg = "Unexpected Error occured. ";
                     alert_msg.textContent = msg
@@ -260,14 +271,33 @@
             form_alert.classList.remove('show');
         })
 
+        general_post_alert.style.display = "none";
+        console.log(general_post_alert)
+        let alertTimeOut;
 
         dltBtn && dltBtn.addEventListener("click", (e) => {
+            const isConfirmed =  confirm("Are you sure you want to Delete this post?");
+            clearTimeout(alertTimeOut);
+
+            if(!isConfirmed) return ;
 
             const endpoint = `/forum/${postIdParent.dataset.postid}`
 
             fetch(endpoint, { method: 'DELETE'})
             .then( res => res.json())
-            .then(data => window.location.href = data.redirect )
+            .then(data => {
+                if(data.error) {
+                    general_post_alert.style.display = "flex";
+                    general_post_alert_msg.textContent = `${data.error}`;
+
+                    alertTimeOut =  setTimeout(()=> {
+                        general_post_alert.style.display = "none";
+                    }, 4000);
+                }
+                if(data.redirect) {
+                    window.location.href = data.redirect;
+                }
+            } )
             .catch(err =>console.log(err))
         });
 
