@@ -54,7 +54,7 @@ app.use('/forum', requireAuth, forumRoutes)
 
 
 // admin routes
-app.use('/admin', requireRole(['admin']), adminRoutes)
+app.use('/admin', requireAuth,  requireRole(['admin']), adminRoutes)
 
 app.use((req, res) => {
     res.status(404).render('404', { title : 'Not found'})

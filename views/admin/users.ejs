@@ -186,7 +186,7 @@
             })
             .then(res => res.json())
             .then(data => {
-                if(data.error) {
+                if(data.errors) {
                     form_alert.classList.add('show');
                     let msg = "error occured";
                     if(data.errors.role != '') msg = data.errors.role;
