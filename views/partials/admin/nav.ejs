@@ -9,11 +9,18 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="#"><i class="bi bi-person-circle"></i> John Doe</a>
+                <li class="nav-item d-flex align-items-center gap-2">
+                    <% if(user) { %>
+                        <a class="nav-link capitalize" href="/profile/<%= user.username %>">
+                            <img src="<%= user.avatarUrl %>" alt="avatar" class="avatar-sm" /> <%= user.name %>
+                        </a>
+                    <% } else { %>
+                        <!-- this shouldn't happen. if happens auth messed up -->
+                        <i class="bi bi-person-circle"></i> Welcome, stranger?
+                    <% } %>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#"><i class="bi bi-box-arrow-right"></i> Logout</a>
+                    <a class="nav-link" href="/auth/logout"><i class="bi bi-box-arrow-right"></i> Logout</a>
                 </li>
             </ul>
         </div>

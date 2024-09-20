@@ -32,6 +32,9 @@
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuLink">
                     <li><a class="dropdown-item" href="/profile/<%= user?.username || "404" %>">Profile</a></li>
                     <li><a class="dropdown-item" href="/profile/setting">Settings</a></li>
+                    <% if(user.role === 'admin') {%>
+                        <li><a class="dropdown-item" href="/admin">Admin Dashboard</a></li>
+                    <% } %>
                     <li><hr class="dropdown-divider"></li>
                     <li><a class="dropdown-item" href="/auth/logout">Log out</a></li>
                 </ul>
