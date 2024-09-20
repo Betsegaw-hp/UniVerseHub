@@ -40,7 +40,6 @@
                                             <td><%= request.user.name %></td>
                                             <td><%= request.user.role  %></td>
                                             <td><%= request.requestedRole %></td>
-                                            <td><%= request.createdAt.toLocaleDateString() %></td>
                                             <td data-requestId="<%= request._id %>">
                                                 <button class="approveBtn btn btn-sm btn-success"><i class="bi bi-check-circle"></i> Approve</button>
                                                 <button class="rejectBtn btn btn-sm btn-danger"><i class="bi bi-x-circle"></i> Reject</button>
