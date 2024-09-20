@@ -52,7 +52,11 @@
                                                         <td><%= user.role %></td>
                                                         <td><%= user.createdAt.toUTCString() %></td>
                                                         <td data-userId="<%= user._id %>">
-                                                            <button class="btn btn-sm btn-primary"><i class="bi bi-pencil"></i> Edit</button>
+                                                            <button class="edit-btn btn btn-sm btn-primary" 
+                                                                    data-bs-target="#editUserModel" 
+                                                                    data-bs-toggle="modal">
+                                                                <i class="bi bi-pencil"></i> Edit
+                                                            </button>
                                                             <button class="suspend-btn btn btn-sm btn-warning"><i class="bi bi-pause-circle"></i> Suspend</button>
                                                         </td>
                                                     </tr>
@@ -119,10 +123,19 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="post_form">
+                    <form id="user_form">
                         <div class="mb-3">
                             <label for="userRole" class="form-label">Role</label>
-                            <input type="text" class="form-control" name="title" id="topicTitle" required>
+                            <select class="form-select mb-2" name="role">
+                                <option value="" >choose a role...</option>
+                                <option value="admin">Admin</option>
+                                <option value="moderator">Moderator</option>
+                                <option value="user">User</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="userRole" class="form-label">New password</label>
+                            <input type="text" class="form-control" name="newPassword">
                         </div>
                     </form>
                     <div id="form_alert" style="cursor:not-allowed;" class="alert alert-danger fade" role="alert">
@@ -131,15 +144,70 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" form="post_form" class="btn btn-primary">Create Topic</button>
+                    <button type="submit" form="user_form" class="btn btn-primary">Edit User</button>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
+        const userForm = document.getElementById("user_form");
+        const form_alert = document.querySelector("#form_alert");
+        const alert_msg = document.querySelector("#alert_msg");
+        const editBtns = document.querySelectorAll(".edit-btn");
         const suspendBtn = document.querySelectorAll(".suspend-btn");
         const reactivateBtn = document.querySelectorAll(".reactivate-btn");
+
+        // the code position matters for the next two methods
+        editBtns.forEach(btn => {
+            btn.addEventListener("click", (e) => {
+                const userId = btn.parentElement.dataset.userid;
+
+                userForm.setAttribute("data-userId", userId);
+
+            })
+        });
+
+        userForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+
+            const userId = userForm.dataset.userid;
+            const newPassword = userForm.newPassword.value;
+            const role = userForm.role.value;
+
+            fetch('/admin/force-edit-user', {
+                method: "POST",
+                headers: { 'Content-Type' : 'application/json' },
+                body: JSON.stringify({
+                    userId,
+                    newPassword,
+                    role
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.error) {
+                    form_alert.classList.add('show');
+                    let msg = "error occured";
+                    if(data.errors.role != '') msg = data.errors.role;
+                    else if(data.errors.password != '') msg = data.errors.password;
+
+                    if(!msg) msg = "Unexpected Error occured. ";
+                    alert_msg.textContent = msg;
+                    console.log(msg)
+                }
+
+                if(data.error){
+                    form_alert.classList.add('show');
+                    alert_msg.textContent = data.error;
+                }
+
+                if (data.msg) {
+                    location.reload();
+                }
+            })
+            .catch(err => console.error(err));
+        })
 
         reactivateBtn.forEach(btn => {
             btn.addEventListener("click", (e) => {

@@ -3,7 +3,7 @@ const handleErrors = (err) => {
     // console.log(err.message, err.code);
     let errors = null;
     let user_errors = { 
-      email: '', password: '', name: '', username: '', // auth
+      email: '', password: '', name: '', username: '', role: '' // auth
      };
     let formPost_errors = {
       content: '', title:'', category: '' // forum

@@ -1,5 +1,6 @@
 const PromotionRequest = require('../model/promotionRequest');
 const User = require('../model/user');
+const handleErrors = require('../utils/errorHandler');
 
 const admin_page_get = async (req, res) => {
 
@@ -130,6 +131,48 @@ const users_get = async (req, res ) => {
     }
 }
 
+const force_edit_user = async (req, res) => {
+    const {
+        role,
+        newPassword,
+        userId
+    } = req.body;
+
+    try {
+        if(!role && !newPassword) {
+            return res.status(400).json({ error: "fill atleast one field!" });
+        }
+
+        if(role) {
+            const user = await User.findByIdAndUpdate(
+                userId,
+                { role },
+                {new: true, runValidators: true}
+            );
+
+            console.log("role updated: ", user.role);
+        }
+
+        if(newPassword) {
+
+           const  user = await User.findById(userId);
+           user.password = newPassword;
+
+            // used this method specifically to trigger pre('save') hook for hashing
+           await user.save();
+
+           console.log("password updated: ", user.password);
+        }
+
+        res.status(200).json({ msg: "Updated successfully!" });
+        
+    } catch (err) {
+        const errors = handleErrors(err);
+        res.status(400).json({ errors });
+        console.error(err);
+    }
+}
+
 module.exports = {
     admin_page_get,
     suspend_user_put,
@@ -137,5 +180,6 @@ module.exports = {
     role_requests_get,
     approve_role_request_put,
     reject_role_request_put,
-    users_get
+    users_get,
+    force_edit_user
 }

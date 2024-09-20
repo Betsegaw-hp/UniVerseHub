@@ -8,8 +8,10 @@
 >> revisit relevent post feature. (i.e the post it self shouldn't be a relevent post to itself) - done
 >> do pagination
 >> do search feature (consider both category and topic)
->> make sure to use .env
+>> make sure to use .env - done
 >> To increase security, Invalidating jwt token from the server is a must
 >> To increase integrity, inaddition to role authorization, 
    make sure forum dlt and update only accesseble to the author of that forum and admin/moderator
-   (exception to editing for admin/moderators)
+   (exception to editing for admin/moderators) - done
+
+>> use more error handling(UI) for admin side
