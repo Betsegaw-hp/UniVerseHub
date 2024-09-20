@@ -53,15 +53,15 @@
                             </button>
                             <button class="btn btn-outline-secondary"><i class="bi bi-bookmark"></i> Save</button>
                             
+                            <div class="privilages">
                             <% if(user._id.toString() === post.author._id.toString()) { %>
-                                <div class="privilages">
                                     <div id="editPostBtn" class="edit-btn" data-bs-toggle="modal" data-bs-target="#editTopicModal"><i class="bi bi-pencil"></i></div>
                                     <div class="dlt-btn"><i class="bi bi-trash"></i></div>
-                                </div>
+                               
                             <% } else if (user.role === 'moderator' || user.role === "admin" ){ %>
                                 <div class="dlt-btn"><i class="bi bi-trash"></i></div>
                             <% } %>
-                            
+                             </div>
                         </div>
                     </div>
                 </div>
