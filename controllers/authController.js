@@ -28,6 +28,9 @@ const login_post = async (req, res) => {
 
     try {
         const user = await User.login(email, password);
+        if(user.status === 'suspended') {
+            return res.status(400).json({errors: { status: "This Account is Suspended!" }});
+        }
         const token = createToken(user._id, user.role);
         res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000, sameSite: true });
         res.status(200).json(user);

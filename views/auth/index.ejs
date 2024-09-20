@@ -44,6 +44,7 @@
 			<div class="login email error"></div>
 			<input type="password" placeholder="Password" name="password" required />
 			<div class="login password error"></div>
+			<div class="login accountStatus error"></div>
 			<a href="#">Forgot your password?</a>
 			<button id="loginBtn" type="submit">Sign In</button>
 		</form>
@@ -80,6 +81,7 @@
 
 	const loginEmailError = document.querySelector('.login.email.error');
 	const loginPasswordError = document.querySelector('.login.password.error');
+	const loginAccountStatusError = document.querySelector('.login.accountStatus.error');
 
 	
 	loginForm.addEventListener("submit", (e) => {
@@ -88,6 +90,7 @@
 		// reset errors
 		loginEmailError.textContent = '';
     	loginPasswordError.textContent = '';
+		loginAccountStatusError.textContent = '';
 		
 		const email = loginForm.email.value;
 		const password = loginForm.password.value;
@@ -105,6 +108,7 @@
 			if (data.errors) {
 				loginEmailError.textContent = data.errors.email;
 				loginPasswordError.textContent = data.errors.password;
+				loginAccountStatusError.textContent = data.errors.status;
 			}
 
 			if (data.email) {
