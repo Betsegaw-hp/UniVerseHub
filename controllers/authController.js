@@ -46,7 +46,16 @@ const signup_post  = async (req, res) => {
     const password = req.body.password;
 
     try {
-        const user = await User.create({name, email, password});
+        // Check if any user exists in the database
+        const userCount = await User.countDocuments();
+        
+        // If no user exists, make this user an admin
+        let role = "user";
+        if (userCount === 0) {
+            role = "admin";
+        }
+
+        const user = await User.create({name, email, password, role});
         const token = createToken(user._id, user.role);
         res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000, sameSite: true });
         res.status(200).json(user);
@@ -89,6 +98,7 @@ const username_availability_get = async (req, res) => {
         console.error(errors);
     }
 }
+
 
 module.exports = {
     auth_page_get,

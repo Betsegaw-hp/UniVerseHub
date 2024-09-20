@@ -1,17 +1,20 @@
 const {ForumPost} = require('../model/forum');
 const User = require('../model/user');
+const PromotionRequest = require('../model/promotionRequest')
 const handleErrors = require('../utils/errorHandler');
 
 const profile_get = async (req, res) => {
 
     try {
 
+
         if(req.params.username === res.locals.user.username) {
 
             const posts = await ForumPost.find({ author: res.locals.user._id });
             const aggregateStats = await getAggragateUserStat(res.locals.user._id);
+            const promotionRequest = await PromotionRequest.findOne({user : res.locals.user._id});
 
-            res.render('profile', { title: `Profile - ${res.locals.user.username}`, posts, aggregateStats, currentUser: true });
+            res.render('profile', { title: `Profile - ${res.locals.user.username}`, posts, aggregateStats, promotionRequest, currentUser: true });
         } else {
             const username = req.params.username;
             const user = await User.findOne({ username });
@@ -102,6 +105,41 @@ const password_update_put = async (req, res) => {
     }
 }
 
+
+const role_request_post = async (req, res) => {
+    const { role } = req.body;
+    try {
+        if(!role) {
+            return res.status(400).json({ error: "role can't be empty!"});
+        }
+        if(role.toLowerCase() === res.locals.user.role) {
+            return res.status(400).json({ error: `You are already ${role}! No need for this request.`});
+        }
+
+        let promotionRequest = await PromotionRequest.findOne({ user: res.locals.user._id});
+        if(promotionRequest) {
+
+            promotionRequest.requestedRole = role;
+            promotionRequest.status = 'pending';
+           await promotionRequest.save();
+
+        } else {
+            promotionRequest = await PromotionRequest.create({
+                user: res.locals.user._id,
+                requestedRole: role.toLowerCase()
+            });
+        }
+        
+
+        console.log("request made: ", promotionRequest);
+
+        res.status(200).json({ msg: "request made successfully", promotionRequest })
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ errors: err});
+    }
+}
+
 const getAggragateUserStat = async (userId) => {
     try {
         const stats = await ForumPost.aggregate([
@@ -127,5 +165,6 @@ module.exports = {
     profile_get,
     profile_edit_get,
     profile_update_put,
-    password_update_put
+    password_update_put,
+    role_request_post
  };

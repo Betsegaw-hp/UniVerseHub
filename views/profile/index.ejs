@@ -64,14 +64,60 @@
                         </ul>
                     </div>
                 </div>
-                <div class="card">
+                <div class="card mb-4">
                     <div class="card-body">
                         <h5 class="card-title">Badges</h5>
                         <div class="d-flex flex-wrap gap-2">
-                            <span class="badge bg-primary capitalize"><%= userData.role %></span>
+                            <span class="badge <%= userData.role === 'user' ? "text-bg-primary" : "text-bg-warning" %> capitalize"><%= userData.role %></span>
+                            <% if(userData.status === 'suspended') { %>
+                                <span class="badge text-bg-danger capitalize"><%= userData.status %></span>
+                            <% } %>
                         </div>
                     </div>
                 </div>
+                <% if(currentUser && promotionRequest) {%>
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Promotion Request</h5>
+                            <% let statusMsg = "pending..." %>
+                            <% if( promotionRequest.status === 'approved' ) { %>
+                                <% statusMsg = "approved!" %>
+                            <% } %>
+
+                            <% if( promotionRequest.status === 'rejected' ) { %>
+                                <% statusMsg = 'rejected!' %>
+                                
+                            <% } %>
+                            <p class="alert alert-light" role="alert">
+                                Request to be promoted to <span class="badge text-bg-secondary capitalize"><%= promotionRequest.requestedRole %></span> is  <%= statusMsg %>
+                            </p>
+                            
+                            <form id="role_request_form" class="mb-2">
+                                <select class="form-select mb-2" name="role">
+                                    <option value="" >choose a role...</option>
+                                    <option value="admin">Admin</option>
+                                    <option value="moderator">Moderator</option>
+                                </select>
+                                <button type="submit" class="btn btn-primary">Promote Me</button>
+                            </form>
+
+                        </div>
+                    </div>
+                <% } else if( currentUser ) { %>
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Promotion Request</h5>
+                            <form id="role_request_form" class="">
+                                <select class="form-select mb-2" name="role">
+                                    <option value="" >choose a role...</option>
+                                    <option value="admin">Admin</option>
+                                    <option value="moderator">Moderator</option>
+                                </select>
+                                <button type="submit" class="btn btn-primary">Promote Me</button>
+                            </form>
+                        </div>
+                    </div>
+                <% } %>
             </div>
             <div class="col-md-9">
                 <ul class="nav nav-tabs mb-4" id="myTab" role="tablist">
@@ -167,6 +213,29 @@
 
     <%- include('../partials/footer')  %>
 
+    <script>
+        const roleForm = document.querySelector("#role_request_form");
+
+        roleForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+
+            const role = roleForm.role.value;
+
+            fetch('/profile/role-request',{
+                method: "POST",
+                headers: { 'Content-Type' : 'application/json'},
+                body: JSON.stringify({ role })
+            })
+            .then(res => res.json())
+            .then(data => {
+                console.log(data)
+                if(!data.error) {
+                    location.reload()
+                }
+            })
+            .catch(err => console.error(err))
+        })
+    </script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const timeEle = document.querySelectorAll('.timePassed');

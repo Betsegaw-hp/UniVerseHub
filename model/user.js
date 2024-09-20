@@ -3,6 +3,7 @@ const  { isEmail } = require('validator');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const { default: isURL } = require('validator/lib/isURL');
+const { type } = require('os');
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
@@ -44,6 +45,11 @@ const userSchema = new Schema({
         type: String,
         required: true,
         minlength: 6
+    },
+    status: {
+        type:String,
+        enum: ['active', 'suspended'],
+        default: 'active'
     },
     stats: {
         postCount: { type: Number, default: 0, min: 0 },

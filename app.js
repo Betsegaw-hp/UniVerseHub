@@ -8,7 +8,8 @@ const forumRoutes = require('./routes/forumRoutes')
 const authRoutes = require('./routes/authRoutes')
 const profileRoutes = require('./routes/profileRoutes')
 const homeRoutes = require('./routes/homeRoutes')
-const {requireAuth, checkUser} = require('./middleware/authMiddleware');
+const adminRoutes = require('./routes/adminRoutes');
+const {requireAuth, checkUser, requireRole} = require('./middleware/authMiddleware');
 
 dotenv.config();
 const app = express()
@@ -52,6 +53,8 @@ app.use('/blogs', requireAuth,  blogRoutes)
 app.use('/forum', requireAuth, forumRoutes)
 
 
+// admin routes
+app.use('/admin', requireRole(['admin']), adminRoutes)
 
 app.use((req, res) => {
     res.status(404).render('404', { title : 'Not found'})

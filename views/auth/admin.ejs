@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+</head>
+<body>
+    <script>
+        let userInput;
+        let msg = "Please enter a password:";
+        do {
+            userInput = prompt(`${msg}`);
+        } while (validator(userInput) && userInput !== null );
+
+
+        function validator(userInput) {
+            if(userInput === '') return false;
+            
+            fetch('/auth/admin/login', {
+                method: 'POST',
+                headers: { "Content-Type" : "application/json" },
+                body: JSON.stringify({
+                    password : userInput
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.redirect) {}
+                if(data.errors) {}
+            })
+        }
+
+        console.log("Thank you! You entered: " + userInput);
+
+    </script>
+</body>
+</html>
