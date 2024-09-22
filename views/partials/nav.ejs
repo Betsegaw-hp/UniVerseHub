@@ -11,34 +11,53 @@
                 <li class="nav-item">
                     <a class="nav-link" href="/forum"><i class="bi bi-chat-dots"></i> Forum</a>
                 </li>
-                <li class="nav-item">
+                <!-- <li class="nav-item">
                     <a class="nav-link" href="#"><i class="bi bi-camera-video"></i> Videos</a>
-                </li>
+                </li> -->
             </ul>
-            <form class="d-flex me-2">
-                <input class="form-control me-1" type="search" placeholder="Search" aria-label="Search">
+            <form id="search_form" class="d-flex me-2">
+                <input class="form-control me-1" list="datalistOptions" type="search" name="searchText" placeholder="Search" aria-label="Search">
                 <button class="btn btn-outline-success" type="submit"><i class="bi bi-search"></i></button>
                 <!-- https://getbootstrap.com/docs/5.3/forms/input-group/#segmented-buttons (for ref) -->
+                <datalist id="datalistOptions">
+                    <option value="San Francisco">
+                </datalist>
             </form>
             <div class="dropdown">
-                <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
-                    <% if(user) { %>
+                <% if(user) { %>
+                    <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
                         <img src="<%= user.avatarUrl %>" alt="avatar" class="avatar-sm" /> welcome, <span class="capitalize"><%= user.name %></span>
-                    <% } else { %>
-                        <!-- this shouldn't happen. if happens auth messed up -->
-                        <i class="bi bi-person-circle"></i> Welcome, stranger?
-                    <% } %>
-                </a>
-                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuLink">
-                    <li><a class="dropdown-item" href="/profile/<%= user?.username || "404" %>">Profile</a></li>
-                    <li><a class="dropdown-item" href="/profile/setting">Settings</a></li>
-                    <% if(user.role === 'admin') {%>
-                        <li><a class="dropdown-item" href="/admin">Admin Dashboard</a></li>
-                    <% } %>
-                    <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item" href="/auth/logout">Log out</a></li>
-                </ul>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuLink">
+                        <li><a class="dropdown-item" href="/profile/<%= user?.username || "404" %>">Profile</a></li>
+                        <li><a class="dropdown-item" href="/profile/setting">Settings</a></li>
+                        <% if(user?.role === 'admin') {%>
+                            <li><a class="dropdown-item" href="/admin">Admin Dashboard</a></li>
+                        <% } %>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="/auth/logout">Log out</a></li>
+                    </ul>
+                <% } else { %>
+                    <a href="/auth" class="btn btn-primary">Join Us</a>
+                <% } %>
             </div>
         </div>
     </div>
 </nav>
+
+<script>
+    const searchForm = document.getElementById("search_form");
+
+    searchForm.addEventListener('input', (e) => {
+
+        const searchText = searchForm.searchText.value;
+
+        // Clear any previous debounce timer
+        clearTimeout(debounceTimer);
+
+        if(searchText.length > 2) {
+
+        }
+    })
+
+</script>

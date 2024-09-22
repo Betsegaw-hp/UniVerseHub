@@ -54,7 +54,7 @@ const profile_update_put = async (req,res) => {
                 name, username, bio,
                 address, occupation, avatarUrl
             }, 
-            {new : true, rrunValidators: true}
+            {new : true, runValidators: true}
         ).exec();
 
         console.log("updated:" , updatedUser);
@@ -83,20 +83,21 @@ const password_update_put = async (req, res) => {
         if (newPassword !== confirmNewPassword) {
             return res.status(400).json({ error: "Passwords do not match!" });
         }
-
+        
         const user = await User.login(res.locals.user.email, currentPassword);
+        console.log(currentPassword, newPassword)
 
         user.password = newPassword;
 
         // used this method specifically to trigger pre('save') hook for hashing
-        await user.save()
+        await user.save();
 
         //TODO: to increase security, Invalidating jwt token from the server is a must
         // now i am just depending on the client(script) to logout
         res.status(300).json({ redirect: '/auth/logout'});
 
     } catch (err) {
-        if(err.message = "incorrect password") {
+        if(err.message === "incorrect password") {
             return res.status(400).json({ error: "Incorrect current password!" });
         }
         const errors = handleErrors(err);

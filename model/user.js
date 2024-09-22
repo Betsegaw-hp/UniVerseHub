@@ -29,8 +29,7 @@ const userSchema = new Schema({
     },
     occupation: String,
     avatarUrl: { 
-        type: String,
-        validate: [isURL, 'make sure it is URL!']
+        type: String
     },
     role: { 
         type: String, 
