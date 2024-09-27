@@ -65,7 +65,7 @@
                          <% } %>
                      </div>
     
-                     <% if(user.role === 'moderator' || user.role === "admin") { %>
+                     <% if(category.name !== "All Topics" && (user.role === 'moderator' || user.role === "admin")) { %>
                         <div class="col-md-4 privilages">
                             <div id="editPostBtn" class="edit-btn" data-bs-toggle="modal" data-bs-target="#editCategoryModal"><i class="bi bi-pencil"></i></div>
                             <div class="dlt-btn"><i class="bi bi-trash"></i></div>

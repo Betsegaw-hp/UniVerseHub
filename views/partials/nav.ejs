@@ -16,7 +16,7 @@
                 </li> -->
             </ul>
             <form id="search_form" class="d-flex me-2">
-                <input class="form-control me-1" list="datalistOptions" type="search" name="searchText" placeholder="Search" aria-label="Search">
+                <input class="form-control me-1" list="datalistOptions" type="search" name="searchText" placeholder="Search for topics..." aria-label="Search">
                 <button class="btn btn-outline-success" type="submit"><i class="bi bi-search"></i></button>
                 <!-- https://getbootstrap.com/docs/5.3/forms/input-group/#segmented-buttons (for ref) -->
                 <datalist id="datalistOptions">
@@ -47,6 +47,7 @@
 
 <script>
     const searchForm = document.getElementById("search_form");
+    let debounceTimer;
 
     searchForm.addEventListener('input', (e) => {
 
@@ -54,9 +55,19 @@
 
         // Clear any previous debounce timer
         clearTimeout(debounceTimer);
+        
+        if(searchText.length > 0) {
 
-        if(searchText.length > 2) {
-
+            debounceTimer = setTimeout(()=>{
+    
+               fetch(`/search/topic/${searchText}`)
+               .then(res => res.json())
+               .then(data => {
+                console.log(data)
+               })
+               .catch(err => console.error(err));
+               
+            }, 1000);
         }
     })
 

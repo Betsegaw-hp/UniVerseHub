@@ -14,4 +14,14 @@
 
 >> do pagination
 >> do search feature (consider both category and topic)
+>> add tags
+>> work on blogs(UI and functionality)
+>> make content body markdown supported
+>> bookmark functionality
+>> delete comment
+>> upvote/like comment
+>> report/flag comment, topics, users
 >> use more error handling(UI) for admin side
+
+>> start video sharing 
+>> integrate payment sys for video monitazation
