@@ -7,23 +7,49 @@ const profile_get = async (req, res) => {
 
     try {
 
+        // just pagination
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 3;
+
+        // Calculate the offset (skip) for the database query
+        const skip = (page - 1) * limit;
+
+        const totalPosts = await ForumPost.countDocuments();
+        const totalPages = Math.ceil(totalPosts / limit);
+
+        const pagination = getPagination(page, limit, totalPages);
 
         if(req.params.username === res.locals.user.username) {
 
-            const posts = await ForumPost.find({ author: res.locals.user._id });
+            const posts = await ForumPost.find({ author: res.locals.user._id }).sort({ createdAt: -1 }).skip(skip).limit(limit);
             const aggregateStats = await getAggragateUserStat(res.locals.user._id);
             const promotionRequest = await PromotionRequest.findOne({user : res.locals.user._id});
 
-            res.render('profile', { title: `Profile - ${res.locals.user.username}`, posts, aggregateStats, promotionRequest, currentUser: true });
+            res.render('profile', {
+                 title: `Profile - ${res.locals.user.username}`, 
+                 posts, 
+                 aggregateStats, 
+                 promotionRequest, 
+                 currentUser: true,
+                 pagination
+            });
         } else {
             const username = req.params.username;
             const user = await User.findOne({ username });
 
             if(!user) return res.redirect('../404');
     
-            const posts = await ForumPost.find({ author: user._id });
+            const posts = await ForumPost.find({ author: user._id }).sort({ createdAt: -1 }).skip(skip).limit(limit);
             const aggregateStats = await getAggragateUserStat(user._id);
-            res.render('profile', { title: `Profile - ${user.username}`, posts, otherUser: user, aggregateStats,  currentUser: false });
+
+            console.log(posts)
+            res.render('profile', { title: `Profile - ${user.username}`, 
+                posts, 
+                otherUser: user, 
+                aggregateStats,  
+                currentUser: false,
+                pagination
+            });
         }
 
     } catch (err) {
@@ -159,6 +185,22 @@ const getAggragateUserStat = async (userId) => {
     } catch (err) {
         console.error(err);
         return null;
+    }
+}
+
+const getPagination = (page, limit, totalPages) => {
+
+    const maxPagesToShow = 3;
+    // Determine the range of pages to display
+    const currentSetStart = Math.floor((page - 1) / maxPagesToShow) * maxPagesToShow + 1;
+    const currentSetEnd = Math.min(currentSetStart + maxPagesToShow - 1, totalPages);
+
+    return {
+        currentPage: page,
+        totalPages,
+        currentSetStart,
+        currentSetEnd,
+        limit
     }
 }
 
