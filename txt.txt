@@ -22,6 +22,7 @@
 >> upvote/like comment
 >> report/flag comment, topics, users
 >> use more error handling(UI) for admin side
+>> notification feature
 
 >> start video sharing 
 >> integrate payment sys for video monitazation
