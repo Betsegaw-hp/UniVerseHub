@@ -14,16 +14,16 @@ const profile_get = async (req, res) => {
         // Calculate the offset (skip) for the database query
         const skip = (page - 1) * limit;
 
-        const totalPosts = await ForumPost.countDocuments();
-        const totalPages = Math.ceil(totalPosts / limit);
-
-        const pagination = getPagination(page, limit, totalPages);
-
         if(req.params.username === res.locals.user.username) {
+
+            const totalPosts = await ForumPost.countDocuments({ author: res.locals.user._id });
+            const totalPages = Math.ceil(totalPosts / limit);
+            const pagination = getPagination(page, limit, totalPages);
 
             const posts = await ForumPost.find({ author: res.locals.user._id }).sort({ createdAt: -1 }).skip(skip).limit(limit);
             const aggregateStats = await getAggragateUserStat(res.locals.user._id);
             const promotionRequest = await PromotionRequest.findOne({user : res.locals.user._id});
+
 
             res.render('profile', {
                  title: `Profile - ${res.locals.user.username}`, 
@@ -38,6 +38,10 @@ const profile_get = async (req, res) => {
             const user = await User.findOne({ username });
 
             if(!user) return res.redirect('../404');
+
+            const totalPosts = await ForumPost.countDocuments({ author: user._id });
+            const totalPages = Math.ceil(totalPosts / limit);
+            const pagination = getPagination(page, limit, totalPages);
     
             const posts = await ForumPost.find({ author: user._id }).sort({ createdAt: -1 }).skip(skip).limit(limit);
             const aggregateStats = await getAggragateUserStat(user._id);

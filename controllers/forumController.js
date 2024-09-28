@@ -3,15 +3,29 @@ const Category = require('../model/category');
 const User = require('../model/user');
 const handleErrors = require('../utils/errorHandler');
 
-const forum_get =  (req, res) => {
+const forum_get = async (req, res) => {
 
-    Promise.all([
-        ForumPost.find().sort({ createdAt: -1 }) 
-        .populate('author', "username email avatarUrl"),  // limit is also set on frontend
-        
-        Category.find().sort({ createdAt: -1 })
-    ])
-    .then(async ([posts, categories]) => {
+    try {
+
+        // just pagination
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 4;
+
+        // Calculate the offset (skip) for the database query
+        const skip = (page - 1) * limit;
+
+        const totalCategories = await Category.countDocuments();
+        const totalPages = Math.ceil(totalCategories / limit);
+
+        const pagination = getPagination(page, limit, totalPages);
+
+        // actual data
+        const [ posts, categories ] = await Promise.all([
+            ForumPost.find().sort({ createdAt: -1 }) 
+            .populate('author', "username email avatarUrl"),  // limit is also set on frontend
+            
+            Category.find().sort({ createdAt: -1 }).skip(skip).limit(limit)
+        ]);
 
         const categoriesWithPostCount = 
             await Promise.all(categories.map(async (category) => {
@@ -25,18 +39,19 @@ const forum_get =  (req, res) => {
 
         const data = {
             posts,
-            categories: categoriesWithPostCount
+            categories: categoriesWithPostCount,
         };
         
         res.render('forum/index', { 
             title: "UniVerseHub Forum - Connect and Discuss", 
-            data: data 
+            data: data,
+            pagination
         });
-    })
-    .catch(err => {
+
+    } catch (err) {
         console.error(err);
         res.status(500).send('An error occurred while loading the forum.');
-    });
+    }
 
 }
 
@@ -270,11 +285,11 @@ const forum_category_get = async (req, res) => {
     const { name } = req.params;
 
     try {
+
         let data = null;
-        let categoryName = "Category";
+        let categoryName = "All Topics";
         // special case
         if(name === "All Topics") {
-            categoryName = name;
             data = {
                 posts:  await ForumPost.find()    
                                        .populate('author', 'username email avatarUrl') 
@@ -292,12 +307,14 @@ const forum_category_get = async (req, res) => {
                 return res.status(404).redirect('../404');
             }
     
+
             const posts = await getPostsByCategory(categoryDoc.name);
 
             // console.log(posts)
             data = {posts,  category: categoryDoc};
 
             categoryName = categoryDoc.name;
+
         }
         
 
@@ -407,6 +424,22 @@ const getPostsByCategory = async (categoryName, field = null ) => {
         return [];
     }
 };
+
+const getPagination = (page, limit, totalPages) => {
+
+    const maxPagesToShow = 3;
+    // Determine the range of pages to display
+    const currentSetStart = Math.floor((page - 1) / maxPagesToShow) * maxPagesToShow + 1;
+    const currentSetEnd = Math.min(currentSetStart + maxPagesToShow - 1, totalPages);
+
+    return {
+        currentPage: page,
+        totalPages,
+        currentSetStart,
+        currentSetEnd,
+        limit
+    }
+}
 
 const getTopContributors = async (limit=5) => {
     // just top posters

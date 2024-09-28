@@ -5,6 +5,14 @@
         categories = data.categories;
         posts = data.posts;
     }
+
+    const {
+            currentPage,
+            totalPages,
+            currentSetStart,
+            currentSetEnd,
+            limit,
+        } = pagination;
 %>
 
 <!DOCTYPE html>
@@ -33,7 +41,7 @@
                         </button>
                     <% } %>
                 </div>
-                <div class="list-group">
+                <div class="list-group mb-4">
                     <a href="forum/category/All Topics" class="list-group-item list-group-item-action forum-card" >
                         <div class="d-flex w-100 justify-content-between">
                             <h5 class="mb-1 capitalize">All Topics</h5>
@@ -57,6 +65,27 @@
                         <p>There is no category to display...</p>
                       <% } %>
                 </div>
+                 <!-- Pagination -->
+                 <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center">
+                    <!-- Previous Set Button -->
+                    <li class="page-item <%= currentSetStart === 1 ? 'disabled' : '' %>">
+                        <a class="page-link" href="/forum?page=<%= currentSetStart - 1 %>&limit=<%= limit %>">Previous</a>
+                    </li>
+
+                    <!-- Page Numbers -->
+                    <% for (let i = currentSetStart; i <= currentSetEnd; i++) { %>
+                        <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                        <a class="page-link" href="/forum?page=<%= i %>&limit=<%= limit %>"><%= i %></a>
+                        </li>
+                    <% } %>
+
+                    <!-- Next Set Button -->
+                    <li class="page-item <%= currentSetEnd === totalPages ? 'disabled' : '' %>">
+                        <a class="page-link" href="forum?page=<%= currentSetEnd + 1 %>&limit=<%= limit %>">Next</a>
+                    </li>
+                    </ul>
+                </nav>
             </div>
             <div class="col-md-4 sidebar-sticky">
                 <div class="card mb-4">
@@ -80,7 +109,7 @@
                         <% } %>
                     </ul>
                 </div>
-                <!-- <div class="card">
+                <div class="card">
                     <div class="card-header">
                         Forum Statistics
                     </div>
@@ -88,7 +117,7 @@
                         <p>Total Members: 15,678</p>
                         <p>Total Topics: 53</p>
                     </div>
-                </div> -->
+                </div>
             </div>
         </div>
     </div>
