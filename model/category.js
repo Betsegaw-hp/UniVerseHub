@@ -12,7 +12,7 @@ const categorySchema = new Schema({
     description: String,
     type: {
         type: String,
-        enum: ['forum', 'video'],
+        enum: ['forum', 'video', 'blog'],
         required: true
     }
 });

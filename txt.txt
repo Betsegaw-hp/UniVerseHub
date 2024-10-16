@@ -12,7 +12,7 @@
    make sure forum dlt and update only accesseble to the author of that forum and admin/moderator
    (exception to editing for admin/moderators) - done
 
->> do pagination
+>> do pagination - half done
 >> do search feature (consider both category and topic)
 >> add tags
 >> work on blogs(UI and functionality)

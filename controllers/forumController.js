@@ -14,7 +14,7 @@ const forum_get = async (req, res) => {
         // Calculate the offset (skip) for the database query
         const skip = (page - 1) * limit;
 
-        const totalCategories = await Category.countDocuments();
+        const totalCategories = await Category.countDocuments({type: 'forum'});
         const totalPages = Math.ceil(totalCategories / limit);
 
         const pagination = getPagination(page, limit, totalPages);
@@ -24,7 +24,7 @@ const forum_get = async (req, res) => {
             ForumPost.find().sort({ createdAt: -1 }) 
             .populate('author', "username email avatarUrl"),  // limit is also set on frontend
             
-            Category.find().sort({ createdAt: -1 }).skip(skip).limit(limit)
+            Category.find({type: 'forum'}).sort({ createdAt: -1 }).skip(skip).limit(limit)
         ]);
 
         const categoriesWithPostCount = 
@@ -60,7 +60,7 @@ const forum_post = async (req, res) => {
     try {
         const { title, body_content, category } = req.body;
 
-        const categoryDoc = await Category.findOne({ name: category });
+        const categoryDoc = await Category.findOne({ name: category, type: 'forum' });
 
         if (!categoryDoc) {
             return res.status(400).json({ errors: { category: "Category not found" } });
@@ -148,7 +148,7 @@ const forum_detail_get = async (req, res) => {
             
             const categoryName = result.category.name;
             const relatedPosts = await getPostsByCategory(categoryName, "title");
-            const categoryCollec = await Category.find({}, 'name');
+            const categoryCollec = await Category.find({type: 'forum'}, 'name');
 
             // checking if the user liked the post
             const hasLiked = result.likedBy.includes(res.locals.user._id);
@@ -181,7 +181,7 @@ const forum_update = async (req, res) => {
             return res.status(403).json({ errors : { msg: "Permision denied! You are not the author of this post!" } })
         }
         
-        const categoryDoc = await Category.findOne({ name: category });
+        const categoryDoc = await Category.findOne({ name: category, type: 'forum' });
         if (!categoryDoc) {
             return res.status(400).json({ errors: { category: "Category not found" } });
         }
@@ -301,7 +301,7 @@ const forum_category_get = async (req, res) => {
             }
         } else {
 
-            const categoryDoc = await Category.findOne({ name });
+            const categoryDoc = await Category.findOne({ name, type: 'forum' });
     
             if (!categoryDoc) {
                 return res.status(404).redirect('../404');
@@ -328,7 +328,7 @@ const forum_category_post = async (req, res) => {
     const { name, description } = req.body;
 
     try {
-        const categoryDoc = await Category.findOne({ name });
+        const categoryDoc = await Category.findOne({ name, type: 'forum' });
         if(categoryDoc) return res.status(400).json({ errors: { msg : "Category exists with that name!"} });
 
         // type is enum. so it's value is case sensetive
@@ -394,7 +394,7 @@ const forum_category_dlt = async (req, res) => {
 // utils
 const getPostsByCategory = async (categoryName, field = null ) => {
     try {
-        const category = await Category.findOne({ name: categoryName });
+        const category = await Category.findOne({ name: categoryName, type: 'forum' });
 
         if (!category) {
             console.log('Category not found');

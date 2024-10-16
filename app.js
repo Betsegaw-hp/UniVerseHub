@@ -23,7 +23,7 @@ mongoose.connect(process.env.DB_URI)
             app.listen(port, () => console.log(`listening at port ${port}`))
         }).catch(err => {
             console.log(err)
-        })
+        });
 
 app.set('view engine', 'ejs')
 app.use(express.static('public'))
@@ -48,7 +48,7 @@ app.get('/about', requireAuth, (req, res) => {
 app.use('/profile', requireAuth,  profileRoutes);
 
 // blog routes
-app.use('/blogs', requireAuth,  blogRoutes)
+app.use('/blog', requireAuth,  blogRoutes)
 
 //forum routes
 app.use('/forum', requireAuth, forumRoutes)

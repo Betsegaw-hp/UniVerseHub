@@ -1,3 +1,33 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+   
+</head>
+<body>
+    <div class="blogs content">
+        <h2>Blog collections</h2>
+
+          <% if (data.length > 0) { %>
+            <% data.forEach(blog => { %>
+              <a class="single" href="/blogs/<%= blog._id %>">
+                  <h3 class="title"><%= blog.title %></h3>
+                  <p class="snippet"><%= blog.snippet %></p>
+                  <code>by @ <%= blog.author %> </code>
+              </a>
+            <% }) %>
+          <% } else { %>
+            <p>There are no blogs to display...</p>
+          <% } %>
+
+      </div>
+
+</body>
+</html>
+
+<!-- detail -->
+
 <!DOCTYPE html>
 <html lang="en">
     <head>

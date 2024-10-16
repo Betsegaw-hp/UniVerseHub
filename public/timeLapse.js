@@ -38,6 +38,3 @@ const  timePassed = (fromDate) => {
         return 'Less than an hour ago';
     }
 }
-
-
-module.exports = timePassed;

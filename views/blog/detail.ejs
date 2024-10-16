@@ -1,0 +1,122 @@
+<% 
+    console.log(relatedBlogs)
+%>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../partials/head')  %> 
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f9fa;
+        }
+        .navbar {
+            box-shadow: 0 2px 4px rgba(0,0,0,.1);
+        }
+        .blog-content {
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,.1);
+            padding: 2rem;
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+        }
+        .blog-header {
+            background-color: #3498db;
+            color: white;
+            padding: 4rem 0;
+            margin-bottom: 2rem;
+        }
+        .blog-image {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+        }
+        .author-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .author-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-right: 1rem;
+        }
+        .related-post {
+            transition: transform 0.3s ease-in-out;
+        }
+        .related-post:hover {
+            transform: translateY(-5px);
+        }
+        .related-post img {
+            height: 200px;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body>
+    <%- include('../partials/nav')  %> 
+
+    <header class="blog-header">
+        <div class="container text-center">
+            <h1 class="display-4 fw-bold"><%= blog.title %></h1>
+            <p class="lead"><%= blog.snippet %></p>
+        </div>
+    </header>
+
+    <main class="container">
+        <article class="blog-content">
+            <img src="<%= blog.thumbnail %>" alt="Online Learning" class="blog-image">
+            <div class="author-info">
+                <img src="<%= blog.author.avatarUrl %>" alt="Author Avatar" class="author-avatar">
+                <div>
+                    <h6 class="mb-0"><%= blog.author.name %></h6>
+                    <small class="text-muted">Published on <%= blog.createdAt.toUTCString() %> • <%= blog.readTime %> min read</small>
+                </div>
+            </div>
+            <div class="blog-text">
+                <%- blog.body %>
+            </div>
+            <div class="mt-4">
+                <h5>Tags:</h5>
+                <div class="d-flex flex-wrap gap-2">
+                    <% if(blog.tags.length > 0) { %>
+                        <% blog.tags.map(tag => { %>
+                            <span class="badge bg-primary"><%= tag %></span>
+                        <% }) %>
+                    <% } %>
+                </div>
+            </div>
+        </article>
+
+        <section class="my-5">
+            <h2 class="mb-4">Related Posts</h2>
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                <% if(relatedBlogs.length > 0) {%>
+                    <% relatedBlogs.map(anotherBlog => { %>
+                        <div class="col">
+                            <div class="card h-100 related-post">
+                                <img src="<%= anotherBlog.thumbnail %>" class="card-img-top" alt="Related post thumbnail">
+                                <div class="card-body">
+                                    <h5 class="card-title"><%= anotherBlog.title %></h5>
+                                    <p class="card-text"><%= anotherBlog.snippet %></p>
+                                </div>
+                                <div class="card-footer bg-transparent border-top-0">
+                                    <a href="/blog/<%= anotherBlog.slug %>" class="btn btn-outline-primary btn-sm">Read More</a>
+                                </div>
+                            </div>
+                        </div>
+                    <% }) %>
+                <% } %>
+            </div>
+        </section>
+    </main>
+
+    <%- include('../partials/footer')  %> 
+</body>
+</html>

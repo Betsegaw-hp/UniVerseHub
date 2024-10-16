@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../../partials/admin/head')  %> 
+
+    <title>Manage Blog Post - UniVerseHub Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f2f2f3;
+        }
+        .form-container {
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,.1);
+            padding: 2rem;
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+        }
+        #editor {
+            height: 300px;
+        }
+        .form-check-input:checked {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+        }
+    </style>
+</head>
+<body>
+    <%- include('../../partials/admin/nav')  %> 
+
+    <div class="container-fluid">
+        <div class="row">
+            <%- include('../../partials/admin/sidebar') %>
+
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+                <div class="row justify-content-center">
+                    <div class="col-lg-10">
+                        <div class="form-container">
+                            <h1 class="mb-4">New Blog Post</h1>
+                            <form id="blogForm">
+                                <div class="mb-3">
+                                    <label for="blogTitle" class="form-label">Blog Title</label>
+                                    <input type="text" class="form-control" id="blogTitle" name="title" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="blogSlug" class="form-label">Slug</label>
+                                    <input type="text" class="form-control" id="blogSlug" name="slug" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="blogCategory" class="form-label">Category</label>
+                                    <select class="form-select" id="blogCategory" name="category" required>
+                                        <option value="">Select a category</option>
+                                        <% if(categories.length > 0) { %>
+                                            <% categories.map(category => { %>
+                                                <option value="<%= category.name %>"><%= category.name %></option>
+                                            <% }) %>
+                                        <% } %>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="featuredImage" class="form-label">Featured Image</label>
+                                    <input type="file" class="form-control" id="featuredImage" name="image" accept="image/*">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="featuredImage" class="form-label">Snippet</label>
+                                    <textarea type="text" class="form-control" name="snippet" id="blogSnippet" rows="2"></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="editor" class="form-label">Blog Content</label>
+                                    <div id="editor"></div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="blogTags" class="form-label">Tags (comma-separated)</label>
+                                    <input type="text" class="form-control" id="blogTags" name="tags" placeholder="e.g., online learning, technology, education">
+                                </div>
+                                <div class="mb-3 form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" name="featured" id="featuredToggle">
+                                    <label class="form-check-label" for="featuredToggle">Featured Post</label>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <button type="submit" class="btn btn-primary me-2">Publish</button>
+                                        <!-- <button type="button" class="btn btn-outline-secondary" id="saveDraft">Save as Draft</button> -->
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+    <script>
+        const toolbarOptions = [
+            [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+            ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+            ['blockquote', 'code-block'],
+            ['link', 'image', 'video', 'formula'],
+
+            [{ 'list': 'ordered'}, { 'list': 'bullet' }, { 'list': 'check' }],
+            [{ 'script': 'sub'}, { 'script': 'super' }],      // superscript/subscript
+            [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
+            [{ 'direction': 'rtl' }],                         // text direction
+
+            [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
+            [{ 'align': [] }],
+
+            ['clean']                                         // remove formatting button
+        ];
+
+        const quill = new Quill('#editor', {
+            modules: {
+                toolbar: toolbarOptions
+            },
+            theme: 'snow'
+        });
+
+        const blogForm = document.getElementById('blogForm');
+
+        blogForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const formData = new FormData();
+            formData.append('title', blogForm.title.value);
+            formData.append('slug', blogForm.slug.value);
+            formData.append('category', blogForm.category.value);
+            formData.append('featured', blogForm.featured.checked);
+            formData.append('content', quill.root.innerHTML);
+            formData.append('snippet', blogForm.snippet.value);
+            formData.append('tags', blogForm.tags.value);
+            formData.append('image', blogForm.image.files[0]);  // Correctly handle the image file
+
+            fetch('/blog/create', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => console.log(data))
+            .catch(err => console.error(err));
+
+        });
+
+        // Function to generate slug from title
+        function generateSlug(title) {
+            return title.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
+        }
+
+        // Auto-generate slug when title changes
+        document.getElementById('blogTitle').addEventListener('input', function() {
+            document.getElementById('blogSlug').value = generateSlug(this.value);
+        });
+
+        document.getElementById('blogSlug').addEventListener('input', function() {
+            document.getElementById('blogSlug').value = generateSlug(this.value);
+        });
+    </script>
+</body>
+</html>
