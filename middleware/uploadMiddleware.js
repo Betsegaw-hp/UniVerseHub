@@ -21,34 +21,97 @@ const storage = multer.diskStorage({
 });
 
 
-const upload = multer({ storage: storage });
+const upload = multer({ 
+  storage: storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB limit
+  fileFilter: function (req, file, cb) {
+      // Accept only image files
+      const fileTypes = /jpeg|jpg|png|gif/;
+      const extname = fileTypes.test(path.extname(file.originalname).toLowerCase());
+      const mimetype = fileTypes.test(file.mimetype);
 
-// Utility function to generate a hash from a file
-const generateFileHash = (filePath) => {
-    const fileBuffer = fs.readFileSync(filePath);  // Read the file content
-    const hashSum = crypto.createHash('sha256');   // Create SHA256 hash
-    hashSum.update(fileBuffer);                    // Update hash with file content
-    return hashSum.digest('hex');                  // Return the resulting hash
-  };
+      if (mimetype && extname) {
+          return cb(null, true);
+      } else {
+          //a custom MulterError with a custom message
+          const error = new multer.MulterError('LIMIT_UNEXPECTED_FILE');
+          error.message = 'Invalid file type. Only ( jpeg , jpg , png ,gif ) are allowed!';
+          cb(error);
+      }
+  }
+ });
 
-const isDuplicate = (filename) => {
-    const newFilePath = uploadsDir + '/' + filename;
-    const newFileHash = generateFileHash(newFilePath);
+// Function to hash the image content
+const hashImage = (filePath) => {
+  return new Promise((resolve, reject) => {
+    const hash = crypto.createHash('md5');
+    const stream = fs.createReadStream(filePath);
 
-    const existingFiles = fs.readdirSync(uploadsDir);  // Get list of existing files
-  
-    for (const file of existingFiles) {
-      const existingFilePath = path.join(uploadsDir, file);
-      const existingFileHash = generateFileHash(existingFilePath);
-  
-      // Compare the hash of the new file with each existing file
-      if (newFileHash === existingFileHash) {
-        return file.filename;  // Duplicate found
+    stream.on('data', (data) => {
+      hash.update(data);
+    });
+
+    stream.on('end', () => {
+      resolve(hash.digest('hex'));
+    });
+
+    stream.on('error', (err) => {
+      reject(err);
+    });
+  });
+};
+
+
+const checkDuplicateImage = async (req, res, next) => {
+  const uploadDir = path.join(__dirname, '../public/uploads');
+  const uploadedFile = req.file; 
+  const uploadedFilePath = path.join(uploadDir, uploadedFile.filename);
+
+  try {
+    const uploadedFileHash = await hashImage(uploadedFilePath);
+    const existingFiles = fs.readdirSync(uploadDir);
+
+    for (let file of existingFiles) {
+      const existingFilePath = path.join(uploadDir, file);
+      
+      if (existingFilePath === uploadedFilePath || !fs.statSync(existingFilePath).isFile()) {
+        continue;
+      }
+
+      const existingFileHash = await hashImage(existingFilePath);
+
+      if (uploadedFileHash === existingFileHash) {
+        // If the file is a duplicate, delete the uploaded file and forward the existing file path
+        fs.unlinkSync(uploadedFilePath);
+
+        req.imagePath = `/uploads/${file}`;
+        
+        console.log('Duplicate image found, forwarding existing file:', req.imagePath);
+        
+        // Proceed to the next middleware/handler
+        return next();
       }
     }
-  
-    return null;  // No duplicate found
+
+    // If no duplicate is found, proceed with the uploaded file
+    req.imagePath = `/uploads/${uploadedFile.filename}`;
+    next();
+
+  } catch (err) {
+    console.error('Error while checking duplicate image:', err);
+    res.status(500).json({ message: 'Error while checking duplicate image' });
+  }
+};
+
+const multerErrorHandler = (err, req, res, next) => {
+  // Handle multer errors or any other errors passed to next
+  if (err instanceof multer.MulterError) {
+      console.log(err)
+      return res.status(400).json({ errors: { msg : err.message } });
+  } else {
+      return res.status(500).json({ errors: { err }});
+  }
 }
 
 
-module.exports = { upload, isDuplicate };
+module.exports = { upload, checkDuplicateImage, multerErrorHandler };

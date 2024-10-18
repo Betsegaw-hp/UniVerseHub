@@ -370,10 +370,13 @@
                 }
                 if(data.errors) {
                     CategoryForm_alert.classList.add('show');
-                    let msg = "error occured";
-                    if(data.errors.name != '') msg = data.errors.name;
-                    else if(data.errors.description != '') msg = data.errors.description;
-                    else if(data.errors.msg != '') msg = data.errors.msg;
+                    let msg = null;
+                    Object.entries(data.errors).map(entry => {
+                        let key = entry[0];
+                        let value = entry[1];
+
+                        if(value != '') msg = value;
+                    })
                     
                     if(!msg) msg = "Unexpected Error occured. ";
                     CategoryForm_alert_msg.textContent = msg;

@@ -1,5 +1,5 @@
 <% 
-    console.log(relatedBlogs)
+    // consoles.log(relatedBlogs)
 %>
 
 <!DOCTYPE html>
@@ -7,64 +7,14 @@
 <head>
     <%- include('../partials/head')  %> 
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #f8f9fa;
-        }
-        .navbar {
-            box-shadow: 0 2px 4px rgba(0,0,0,.1);
-        }
-        .blog-content {
-            background-color: #ffffff;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,.1);
-            padding: 2rem;
-            margin-top: 2rem;
-            margin-bottom: 2rem;
-        }
-        .blog-header {
-            background-color: #3498db;
-            color: white;
-            padding: 4rem 0;
-            margin-bottom: 2rem;
-        }
-        .blog-image {
-            width: 100%;
-            height: 400px;
-            object-fit: cover;
-            border-radius: 10px;
-            margin-bottom: 2rem;
-        }
-        .author-info {
-            display: flex;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-        .author-avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            margin-right: 1rem;
-        }
-        .related-post {
-            transition: transform 0.3s ease-in-out;
-        }
-        .related-post:hover {
-            transform: translateY(-5px);
-        }
-        .related-post img {
-            height: 200px;
-            object-fit: cover;
-        }
-    </style>
+    <link href="/blog.css" rel="stylesheet">
 </head>
 <body>
     <%- include('../partials/nav')  %> 
 
     <header class="blog-header">
         <div class="container text-center">
-            <h1 class="display-4 fw-bold"><%= blog.title %></h1>
+            <h1 class="display-4 fw-bold capitalize"><%= blog.title %></h1>
             <p class="lead"><%= blog.snippet %></p>
         </div>
     </header>
@@ -99,24 +49,37 @@
             <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
                 <% if(relatedBlogs.length > 0) {%>
                     <% relatedBlogs.map(anotherBlog => { %>
-                        <div class="col">
-                            <div class="card h-100 related-post">
-                                <img src="<%= anotherBlog.thumbnail %>" class="card-img-top" alt="Related post thumbnail">
-                                <div class="card-body">
-                                    <h5 class="card-title"><%= anotherBlog.title %></h5>
-                                    <p class="card-text"><%= anotherBlog.snippet %></p>
-                                </div>
-                                <div class="card-footer bg-transparent border-top-0">
-                                    <a href="/blog/<%= anotherBlog.slug %>" class="btn btn-outline-primary btn-sm">Read More</a>
+                        <% if(anotherBlog._id.toString() !== blog._id.toString() ) { %>
+                            <div class="col">
+                                <div class="card h-100 related-post">
+                                    <img src="<%= anotherBlog.thumbnail %>" class="card-img-top" alt="Related post thumbnail">
+                                    <div class="card-body">
+                                        <h5 class="card-title"><%= anotherBlog.title %></h5>
+                                        <p class="card-text"><%= anotherBlog.snippet %></p>
+                                    </div>
+                                    <div class="card-footer bg-transparent border-top-0">
+                                        <a href="/blog/<%= anotherBlog.slug %>" class="btn btn-outline-primary btn-sm">Read More</a>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        <% } %>
                     <% }) %>
+                <% } else { %>
+                    <i> No related blogs yet.</i>
                 <% } %>
             </div>
         </section>
     </main>
 
     <%- include('../partials/footer')  %> 
+
+    <script>
+        // fallback for compatiblity with older browsers
+        document.querySelectorAll('p').forEach(function(p) {
+            if (p.querySelector('img')) {
+                p.classList.toggle('p-with-img', true);
+            }
+        });
+    </script>
 </body>
 </html>

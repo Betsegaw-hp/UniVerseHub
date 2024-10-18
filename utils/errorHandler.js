@@ -2,18 +2,24 @@
 const handleErrors = (err) => {
     // console.log(err.message, err.code);
     let errors = null;
+
     let user_errors = { 
       email: '', password: '', name: '', username: '', role: '' // auth
-     };
+    }
+
     let formPost_errors = {
       content: '', title:'', category: '' // forum
     }
+
     let comment_errors = {
       content: '', author: '', post: ''
     }
 
     let category_errors = {
       name: '', description: '', type: ''
+    }
+    let blog_errors = {
+      title: '', body: '', snippet: '', tags: '', category: ''
     }
 
     //by default 
@@ -34,6 +40,7 @@ const handleErrors = (err) => {
       if(err.keyValue.email) errors.email = 'that email is already registered';
       if(err.keyValue.username) errors.username = `The username <em>${err.keyValue.username}</em> is taken!`;
       if(err.keyValue.name) errors.name =  `That category already exists`;
+      if(err.keyValue.slug) errors.slug = `The slug (${err.keyValue.slug}) is already in use. try different!`;
       return errors;
     }
   
@@ -62,6 +69,12 @@ const handleErrors = (err) => {
 
           category_errors[properties.path] = properties.message;
           errors = category_errors;
+        });
+    } else if (err.message.includes('Blog validation failed')) {
+        Object.values(err.errors).forEach(({ properties }) => {
+
+          blog_errors[properties.path] = properties.message;
+          errors = blog_errors;
         });
     } 
 

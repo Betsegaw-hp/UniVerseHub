@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const adminController = require('../controllers/adminController');
 const blogController = require('../controllers/blogController');
-const {upload} = require('../middleware/uploadMiddleware');
+const { upload, checkDuplicateImage, multerErrorHandler } = require('../middleware/uploadMiddleware');
 
 const {
     admin_page_get,
@@ -19,7 +19,8 @@ const  {
     blog_create_get,
     blog_create_post,
     blog_update_get,
-    blog_update_put
+    blog_update_put,
+    image_upload_post
 }  = blogController;
 
 
@@ -36,10 +37,12 @@ router.post('/force-edit-user', force_edit_user);
 
 // blog routes given admin previlage
 router.get('/blog/create', blog_create_get);
-router.post('/blog/create', upload.single('image') , blog_create_post);
+router.post('/blog/create', upload.single('image') , checkDuplicateImage, blog_create_post, multerErrorHandler);
 
 router.get('/blog/update/:slug', blog_update_get);
-router.put('/blog/update/:slug', upload.single('image'),  blog_update_put);
+router.put('/blog/update/:slug', upload.single('image'), checkDuplicateImage, blog_update_put, multerErrorHandler);
+
+router.post('/upload-image', upload.single('image'), checkDuplicateImage, image_upload_post, multerErrorHandler);
 
 
 module.exports = router;

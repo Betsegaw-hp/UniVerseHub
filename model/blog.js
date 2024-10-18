@@ -13,7 +13,8 @@ const blogSchema = new Schema({
         required: true
     },
     thumbnail: {
-        type: String, 
+        type: String,
+        required: true 
     },
     snippet: {
         type: String,

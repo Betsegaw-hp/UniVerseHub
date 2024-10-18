@@ -1,4 +1,3 @@
-<% console.log(blogs, featuredBlogs) %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -93,7 +92,7 @@
                     </div>
                     <div class="col-md-6 d-flex flex-column justify-content-center p-4">
                         <span class="badge bg-primary mb-2">Featured</span>
-                        <h2 class="fw-bold"><%= blog.title %></h2>
+                        <h2 class="fw-bold capitalize"><%= blog.title %></h2>
                         <p class="text-muted"><%= blog.snippet %></p>
                         <p><small class="text-muted">By <%= blog.author.name %> | May 20, 2023</small></p>
                         <a href="/blog/<%= blog.slug %>" class="btn btn-primary align-self-start">Read More</a>
@@ -110,9 +109,9 @@
                     <div class="col">
                         <div class="card h-100">
                             <img src="<%= blog.thumbnail %>" class="card-img-top" alt="Blog post thumbnail">
-                            <span class="category-badge"><%= blog.category.name %></span>
+                            <span class="category-badge capitalize"><%= blog.category.name %></span>
                             <div class="card-body">
-                                <h5 class="card-title"><%= blog.title %></h5>
+                                <h5 class="card-title capitalize"><%= blog.title %></h5>
                                 <p class="card-text"><%= blog.snippet %></p>
                             </div>
                             <div class="card-footer bg-transparent border-top-0">

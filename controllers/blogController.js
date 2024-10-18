@@ -1,6 +1,8 @@
 const { isDuplicate } = require('../middleware/uploadMiddleware');
+const fs = require('fs');
 const Blog = require('../model/blog');
 const Category = require('../model/category');
+const handleErrors = require('../utils/errorHandler');
 
 
 const blog_get = async (req, res) => {
@@ -22,7 +24,9 @@ const blog_get = async (req, res) => {
 
         res.render('blog/index', { title : 'UniVerseHub Blog', blogs, featuredBlogs })
     } catch (err) {
-        console.error(err);
+        const errors = handleErrors(err);
+        res.status(400).json({ errors });
+        console.log(err);
     }
 
 }
@@ -86,16 +90,8 @@ const blog_create_post = async (req, res) => {
         }
 
         const seralizedTags = tags.split(',');
-
-        let filename = '';
-
-        if(!isDuplicate(req.file.filename)) {
-            filename = req.file.filename ;
-        } else {
-            filename = isDuplicate(req.file.filename);
-        }
         
-        ImageURI = `/uploads/${filename}`;
+        ImageURI = req.imagePath;
 
         const savedBlog = await Blog.create({
             title, slug, featured, snippet,
@@ -106,11 +102,13 @@ const blog_create_post = async (req, res) => {
             thumbnail: ImageURI
         });
 
-        console.log("savedBlog", savedBlog);
+        console.log("savedBlog");
 
-        res.status(200).json(savedBlog);
+        res.status(200).json({savedBlog});
     } catch (err) {
-        console.error(err);
+        const errors = handleErrors(err);
+        res.status(400).json({ errors });
+        console.log(err);
     }
 }
 
@@ -120,6 +118,42 @@ const blog_update_get = (req, res) => {
 
 const blog_update_put = (req, res) => {
 
+}
+
+const image_upload_post = (req, res) => {
+     // Access the uploaded file
+     const image = req.file;
+
+     if (!image) {
+         return res.status(400).json({ error: 'No image uploaded' });
+     }
+ 
+     // Get the image URL
+     const imageUrl = req.imagePath ;
+ 
+     // Send the URL back to the client
+     res.json({ imageUrl });
+}
+
+const blog_slug_availablity_get = async (req, res) => {
+    const { slug } = req.query;
+
+    try {
+        const blog = await Blog.findOne({ slug });
+        
+        let isAvailable = false;
+
+        if (!blog) {
+            isAvailable = true;
+        }
+
+        return res.status(200).json({ available: isAvailable });
+        
+    } catch (err) {
+        const errors = handleErrors(err);
+        res.status(400).json({errors});
+        console.error(errors);
+    }
 }
 
 
@@ -163,5 +197,7 @@ module.exports = {
     blog_update_get,
     blog_update_put,
     blog_dlt,
-    blog_detail_get
+    blog_detail_get,
+    blog_slug_availablity_get,
+    image_upload_post
 }

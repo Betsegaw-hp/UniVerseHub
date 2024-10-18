@@ -40,7 +40,7 @@
                     <div class="col-lg-10">
                         <div class="form-container">
                             <h1 class="mb-4">New Blog Post</h1>
-                            <form id="blogForm">
+                            <form id="blogForm" class="needs-validation" novalidate>
                                 <div class="mb-3">
                                     <label for="blogTitle" class="form-label">Blog Title</label>
                                     <input type="text" class="form-control" id="blogTitle" name="title" required>
@@ -48,6 +48,13 @@
                                 <div class="mb-3">
                                     <label for="blogSlug" class="form-label">Slug</label>
                                     <input type="text" class="form-control" id="blogSlug" name="slug" required>
+                                    <div id="slugCheckFeedback" class="form-text">Changing your slug may affect how others find the blog on the platform.</div>
+                                    <div id="slugInvalidFeedback" class="invalid-feedback">
+                                        slug can't be empty!
+                                    </div>
+                                    <div id="slugValidFeedback" class="valid-feedback">
+                                        Available.
+                                    </div>
                                 </div>
                                 <div class="mb-3">
                                     <label for="blogCategory" class="form-label">Category</label>
@@ -90,6 +97,16 @@
                         </div>
                     </div>
                 </div>
+                <div class="toast align-items-center text-bg-danger border-0" 
+                     role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="10000"
+                     style="position: fixed; top: 7rem; right: 2rem;">
+                    <div class="d-flex">
+                      <div class="toast-body">
+                        Hello, world! This is a toast message.
+                      </div>
+                      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                </div>
             </main>
         </div>
     </div>
@@ -122,30 +139,116 @@
         });
 
         const blogForm = document.getElementById('blogForm');
+        const toast = document.querySelector('.toast');
+        const toastBody = document.querySelector('.toast-body');
 
-        blogForm.addEventListener('submit', function(e) {
+        blogForm.addEventListener('submit', async function(e) {
             e.preventDefault();
-
+            let allImagesUploaded = true;
             const formData = new FormData();
-            formData.append('title', blogForm.title.value);
-            formData.append('slug', blogForm.slug.value);
-            formData.append('category', blogForm.category.value);
-            formData.append('featured', blogForm.featured.checked);
-            formData.append('content', quill.root.innerHTML);
-            formData.append('snippet', blogForm.snippet.value);
-            formData.append('tags', blogForm.tags.value);
-            formData.append('image', blogForm.image.files[0]);  // Correctly handle the image file
+            // Extract content from Quill
+            let content = quill.root.innerHTML;
 
-            fetch('/blog/create', {
-                method: 'POST',
-                body: formData
-            })
-            .then(res => res.json())
-            .then(data => console.log(data))
-            .catch(err => console.error(err));
+            // Function to upload the image and return the URL
+            async function uploadImage(base64Image) {
+                const formData = new FormData();
+                if (isBase64Image(base64Image)) {
+                    // Handle base64 image
+                    const blob = await fetch(base64Image).then(res => res.blob());
+                    formData.append('image', blob, 'image.png');
+                }
+
+                const response = await fetch('/admin/upload-image', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if(!response.ok) {
+                    allImagesUploaded = false;
+                    displayError(data.errors);
+                }
+
+                return data.imageUrl;
+            }
+
+            function isBase64Image(data) {
+                return data.startsWith('data:image/');
+            }
+
+
+            // Regex to match base64 images in the content
+            const base64ImageRegex = /<img src="data:image\/[^;]+;base64[^"]+"[^>]*>/g;
+
+            // Find all base64 images in the content
+            const base64Images = content.match(base64ImageRegex) || [];
+
+            for (let base64ImageTag of base64Images) {
+                const base64Image = base64ImageTag.match(/src="([^"]+)"/)[1];
+
+                // Upload the image and get the URL
+                const imageUrl = await uploadImage(base64Image);
+
+                // Replace the base64 image with the image URL in the content
+                content = content.replace(base64Image, imageUrl);
+            }
+
+            if(allImagesUploaded) {
+                formData.append('title', blogForm.title.value);
+                formData.append('slug', blogForm.slug.value);
+                formData.append('category', blogForm.category.value);
+                formData.append('featured', blogForm.featured.checked);
+                formData.append('content', content);
+                formData.append('snippet', blogForm.snippet.value);
+                formData.append('tags', blogForm.tags.value);
+                formData.append('image', blogForm.image.files[0]);  // Correctly handle the image file
+    
+                fetch('/admin/blog/create', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if(data.errors) {
+                        console.log(data.errors)
+                        let msg = null;
+
+                        displayError(data.errors);
+    
+                     } else if(data.savedBlog) {
+                        toastBody.innerHTML = `Successfully Published. View at <a class="link-body-emphasis link-offset-2 link-underline-opacity-25 link-underline-opacity-75-hover" href="/blog/${data.savedBlog.slug}">${data.savedBlog.title}</a>`;
+                        toast.classList.toggle('hide', false);
+                        toast.classList.toggle('show', true);
+    
+                        //styling
+                        toast.classList.toggle('text-bg-danger', false);
+                        toast.classList.toggle('text-bg-success', true);
+                    }
+                })
+                .catch(err => console.error(err));
+            }
+
 
         });
 
+        function displayError(errors) {
+            Object.entries(errors).map(entry => {
+                let key = entry[0];
+                let value = entry[1];
+
+                if(value != '') msg = value;
+            })
+            
+            if(!msg) msg = "Unexpected Error occured. ";
+            toastBody.textContent = msg;
+            toast.classList.toggle('hide', false);
+            toast.classList.toggle('show', true);
+
+            //styling
+            toast.classList.toggle('text-bg-success', false);
+            toast.classList.toggle('text-bg-danger', true);
+        }
         // Function to generate slug from title
         function generateSlug(title) {
             return title.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
@@ -156,9 +259,75 @@
             document.getElementById('blogSlug').value = generateSlug(this.value);
         });
 
-        document.getElementById('blogSlug').addEventListener('input', function() {
-            document.getElementById('blogSlug').value = generateSlug(this.value);
+        // check slug availability
+        const slugEle = document.getElementById('blogSlug');
+        let debounceTimer;
+        [document.getElementById('blogTitle'), document.getElementById('blogSlug')].forEach(ele => {
+
+            ele.addEventListener('input', function(e) {
+
+            const slug = slugEle.value.trim();
+
+            slugInvalidFeedback.textContent = "";
+            slugValidFeedback.textContent = "";
+
+            // Clear any previous debounce timer
+            clearTimeout(debounceTimer);
+
+
+            if (slug.length > 0) {
+                slugCheckFeedback.style.display = "block";
+                slugCheckFeedback.textContent = "Checking availability...";
+
+                debounceTimer = setTimeout(() => {
+                    // Make the AJAX request after the user stops typing
+                    fetch(`/blog/check-slug?slug=${slug}`)
+                        .then(response => response.json())
+                        .then(data => {
+
+                            slugCheckFeedback.style.display = "none";
+
+                            if (data.available) {
+                                slugEle.classList.toggle("is-invalid", false); // Removes the class if it exists
+                                slugEle.classList.toggle("is-valid", true); // adds the class if it doesn't exists
+                                slugValidFeedback.textContent = "Available!";
+                            } else {
+                                slugEle.classList.toggle("is-valid", false);  
+                                slugEle.classList.toggle("is-invalid", true);
+                                slugInvalidFeedback.textContent = "Unavailable. try different!";
+                            }
+                        })
+                        .catch(error => {
+                            slugCheckFeedback.style.display = "none";
+                            console.error('Error checking slug:', error);
+                        });
+                }, 1000);
+            } else {
+                slugCheckFeedback.style.display = "none";
+            }
+            });
         });
+    </script>
+
+    <script>
+        (() => {
+            'use strict'
+
+            // Fetch all the forms we want to apply custom Bootstrap validation styles to
+            const forms = document.querySelectorAll('.needs-validation')
+
+            // Loop over them and prevent submission
+            Array.from(forms).forEach(form => {
+                form.addEventListener('submit', event => {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+
+                form.classList.add('was-validated')
+                }, false)
+            })
+        })()
     </script>
 </body>
 </html>
