@@ -92,13 +92,14 @@ const blog_create_post = async (req, res) => {
         const seralizedTags = tags.split(',');
         
         ImageURI = req.imagePath;
+        const seralizedContent = contentSerializer(content);
 
         const savedBlog = await Blog.create({
             title, slug, featured, snippet,
             author: res.locals.user._id,
             category: categoryDoc._id,
             tags: seralizedTags,
-            body: content,
+            body: seralizedContent,
             thumbnail: ImageURI
         });
 
@@ -188,6 +189,16 @@ const getBlogsByCategory = async (categoryName, field = null ) => {
         console.error('Error fetching blogs:', err);
         return [];
     }
+};
+
+const contentSerializer = (content) => {
+    // General regex to match any base64 data in tags (e.g., img, text, etc.)
+    const base64DataRegex = /<[^>]+src="data:[^;]+;base64[^"]*"[^>]*>/g;
+
+    // Remove all tags containing base64 data from the content
+    content = content.replace(base64DataRegex, "");
+
+    return content;
 };
 
 module.exports = {
