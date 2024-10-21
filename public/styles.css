@@ -34,14 +34,20 @@ html, body {
     text-transform: uppercase;
 }
 
-.clamp-text {
+.clamp-text, .clamp-text-3, .clamp-text-4 {
     display: -webkit-box;
     -webkit-line-clamp: 2; /* Number of lines to show */
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
   }
+.clamp-text-3 {
+    -webkit-line-clamp: 3; /* Number of lines to show */
+  }
   
+.clamp-text-4 {
+    -webkit-line-clamp: 4; /* Number of lines to show */
+}
 
 .sidebar-sticky {
     flex: 1;

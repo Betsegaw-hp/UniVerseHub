@@ -34,7 +34,7 @@ const blog_dlt = (req, res) => {
 
     Blog.findOneAndDelete({ slug })
     .then(result => {
-        res.status(200).json({ redirect : '/blog'});
+        res.status(200).json({ redirect : '/admin/blog'});
     }).catch( err => {
         console.log(err);
     });
@@ -231,7 +231,19 @@ const blog_publish_get = async (req, res) => {
 }
 
 const admin_blog_get = async (req, res) => {
-    res.render('admin/blog/index', { title: "blog list"});
+    try {
+        
+        const blogs = await Blog.find()
+                                .populate('author', "username email name avatarUrl")
+                                .populate("category", "name");
+
+        res.render('admin/blog/index', { title: "Content Manager - UniVerseHub", blogs});
+    } catch (err) {
+        const errors = handleErrors(err);
+        res.status(400).json({ errors });
+        console.log(err);
+    }
+    
 }
 
 

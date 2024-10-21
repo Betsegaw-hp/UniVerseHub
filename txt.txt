@@ -13,16 +13,17 @@
    (exception to editing for admin/moderators) - done
 
 >> do pagination - half done
+>> add tags - done
+>> work on blogs(UI and functionality) - done
+>> make content body markdown supported - done
 >> do search feature (consider both category and topic)
->> add tags
->> work on blogs(UI and functionality)
->> make content body markdown supported
 >> bookmark functionality
 >> delete comment
 >> upvote/like comment
 >> report/flag comment, topics, users
 >> use more error handling(UI) for admin side
 >> notification feature
+>> retain url path when redirecting to auth
 
 >> start video sharing 
 >> integrate payment sys for video monitazation

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../../partials/admin/head') %>
+    <style>
+        .table-responsive {
+            overflow-x: auto;
+        }
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body>
+    <%- include('../../partials/admin/nav') %>
+    <div class="container-fluid">
+        <div class="row">
+            <%- include('../../partials/admin/sidebar') %>
+            <!-- Main content -->
+            <div class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h1>Article</h1>
+                    <div>
+                        <a role="link" href="/admin/blog/create" class="btn btn-primary"><i class="bi bi-plus-circle me-2"></i>Create new entry</a>
+                        <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#newCategoryModal">
+                            <i class="bi bi-plus-circle"></i> New Category
+                        </button>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="input-group w-auto">
+                        <input type="text" class="form-control" placeholder="Search..." aria-label="Search">
+                        <button class="btn btn-outline-secondary" type="button"><i class="bi bi-search"></i></button>
+                    </div>
+                    <div class="d-flex">
+                        <div class="dropdown me-2">
+                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="dropdownFilters" data-bs-toggle="dropdown" aria-expanded="false">
+                                Filters
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownFilters">
+                                <li><a class="dropdown-item" href="#">Action</a></li>
+                                <li><a class="dropdown-item" href="#">Another action</a></li>
+                                <li><a class="dropdown-item" href="#">Something else here</a></li>
+                            </ul>
+                        </div>
+                        <div class="dropdown">
+                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="dropdownLanguage" data-bs-toggle="dropdown" aria-expanded="false">
+                                English (en)
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownLanguage">
+                                <li><a class="dropdown-item" href="#">English (en)</a></li>
+                                <li><a class="dropdown-item" href="#">Français (fr)</a></li>
+                                <li><a class="dropdown-item" href="#">Español (es)</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <input class="form-check-input" type="checkbox">
+                                </th>
+                                <th>Title</th>
+                                <th>Author</th>
+                                <th>CreatedAt</th>
+                                <th>Status</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% if(blogs.length > 0) { %>
+                                <% blogs.map(blog => { %>
+                                    <tr>
+                                        <td>
+                                            <input class="form-check-input" type="checkbox">
+                                        </td>
+                                        <td class="capitalize"><%= blog.title %></td>
+                                        <td class="capitalize">
+                                            <a href="/profile/<%= blog.author.username %>" class="link-body-emphasis link-offset-2 link-underline-opacity-25 link-underline-opacity-75-hover">
+                                                <img src="<%= blog.author.avatarUrl %>" alt="<%= blog.author.name %>" class="avatar me-2"><%= blog.author.name %>
+                                            </a>
+                                        </td>
+                                        <td><%= blog.createdAt.toUTCString() %></td>
+                                        <td><span class="badge <%= blog.status === 'draft' ? 'bg-info' : 'bg-success' %>"><%= blog.status %></span></td>
+                                        <td class="">
+                                            <div class="privilages">
+                                                <a class="edit-btn" href="/admin/blog/<%= blog.slug %>" target="_blank"><i class="bi bi-pencil"></i></a>
+                                                <button class="dlt-btn" role="button" data-slug="<%= blog.slug %>"><i class="bi bi-trash"></i></button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <% }) %>
+                            <% } else { %>
+                                <a role="link" href="/admin/blog/create" class="btn btn-primary-outline"><i class="bi bi-plus-circle me-2"></i>Create new entry</a>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- New category modal (for admins) -->
+    <div class="modal fade" id="newCategoryModal" tabindex="-1" aria-labelledby="newCategoryModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="newCategoryModalLabel">Add new blog category</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="category_post_form">
+                        <div class="mb-3">
+                            <label for="categoryName" class="form-label">Category Name</label>
+                            <input type="text" class="form-control" id="categoryName" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="categoryDiscription" class="form-label">Description</label>
+                            <input type="text" class="form-control" id="categoryDiscription" name="description" required>
+                        </div>
+                    </form>
+                    <div id="category_form_alert" style="cursor:not-allowed;" class="alert alert-danger fade" role="alert">
+                        <p id="category_alert_msg"></p> 
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" form="category_post_form" class="btn btn-primary">Add</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const deleteBtns = document.querySelectorAll('.dlt-btn');
+
+        deleteBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const slug = btn.dataset.slug;
+                if (confirm('Are you sure you want to delete this blog? This action cannot be undone.')) {
+                    
+                    fetch(`/blog/${slug}`, { method: 'DELETE'})
+                    .then(res => res.json())
+                    .then(data => {
+                        if(data.redirect) {
+                            window.location = data.redirect;
+                            alert('Blog deleted successfully!');
+                        }
+                    })
+                    .catch(err => console.error(err));
+                }
+
+            });
+        });
+
+        categoryForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+
+            const name = categoryForm.name.value;
+            const description = categoryForm.description.value;
+
+            const options = {
+               method: "POST",
+               headers: { 'Content-Type': 'application/json' },
+               body: JSON.stringify({
+                 name, 
+                 description
+               })
+            }
+
+            fetch("/forum/category", options)
+            .then(res => res.json())
+            .then(data => {
+                if(data.errors) {
+                    CategoryForm_alert.classList.add('show');
+                    let msg = null;
+                    Object.entries(data.errors).map(entry => {
+                        let key = entry[0];
+                        let value = entry[1];
+
+                        if(value != '') msg = value;
+                    })
+                    
+                    if(!msg) msg = "Unexpected Error occured. ";
+                    CategoryForm_alert_msg.textContent = msg;
+                    console.log(msg)
+                }
+                if (data.category) {
+                    // window.location.href = `/admin/category/${data.category.name}`;
+                }
+            })
+            .catch(err => console.error(err));
+        });
+    </script>
+</body>
+</html>
