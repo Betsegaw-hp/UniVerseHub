@@ -65,6 +65,8 @@ const hashImage = (filePath) => {
 const checkDuplicateImage = async (req, res, next) => {
   const uploadDir = path.join(__dirname, '../public/uploads');
   const uploadedFile = req.file; 
+  if(!uploadedFile) return next();
+
   const uploadedFilePath = path.join(uploadDir, uploadedFile.filename);
 
   try {

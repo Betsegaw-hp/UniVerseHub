@@ -152,11 +152,9 @@
             // Function to upload the image and return the URL
             async function uploadImage(base64Image) {
                 const formData = new FormData();
-                if (isBase64Image(base64Image)) {
-                    // Handle base64 image
-                    const blob = await fetch(base64Image).then(res => res.blob());
-                    formData.append('image', blob, 'image.png');
-                }
+                const blob = await fetch(base64Image).then(res => res.blob());
+                formData.append('image', blob, 'image.png');
+
 
                 const response = await fetch('/admin/upload-image', {
                     method: 'POST',
@@ -171,10 +169,6 @@
                 }
 
                 return data.imageUrl;
-            }
-
-            function isBase64Image(data) {
-                return data.startsWith('data:image/');
             }
 
 

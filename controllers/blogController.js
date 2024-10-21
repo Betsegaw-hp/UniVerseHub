@@ -1,5 +1,3 @@
-const { isDuplicate } = require('../middleware/uploadMiddleware');
-const fs = require('fs');
 const Blog = require('../model/blog');
 const Category = require('../model/category');
 const handleErrors = require('../utils/errorHandler');
@@ -36,14 +34,13 @@ const blog_dlt = (req, res) => {
 
     Blog.findOneAndDelete({ slug })
     .then(result => {
-        res.json({ redirect : '/blog'})
+        res.status(200).json({ redirect : '/blog'});
     }).catch( err => {
-        console.log(err)
-    })
+        console.log(err);
+    });
 }
 
 const blog_detail_get = async (req, res) => {
-    // TODO: add related blogs
 
     const slug = req.params.slug;
 
@@ -52,7 +49,10 @@ const blog_detail_get = async (req, res) => {
         const blog = await Blog.findOne({ slug })
                                 .populate('author', "username email name avatarUrl")
                                 .populate("category", "name");
-        
+        if(!blog) {
+            return res.redirect('../404');
+        }
+
         const relatedBlogs = await getBlogsByCategory(blog.category.name, "title snippet thumbnail slug");
         
         res.render('blog/detail', { title : `${blog.title} - UniVerseHub Blog`, blog, relatedBlogs })
@@ -90,8 +90,6 @@ const blog_create_post = async (req, res) => {
         }
 
         const seralizedTags = tags.split(',');
-        
-        ImageURI = req.imagePath;
         const seralizedContent = contentSerializer(content);
 
         const savedBlog = await Blog.create({
@@ -100,7 +98,7 @@ const blog_create_post = async (req, res) => {
             category: categoryDoc._id,
             tags: seralizedTags,
             body: seralizedContent,
-            thumbnail: ImageURI
+            thumbnail: req.imagePath
         });
 
         console.log("savedBlog");
@@ -113,12 +111,73 @@ const blog_create_post = async (req, res) => {
     }
 }
 
-const blog_update_get = (req, res) => {
+const blog_update_get = async (req, res) => {
+    const slug = req.params.slug;
 
+    try {
+        const blog = await Blog.findOne({ slug })
+                                .populate('author', "username email name avatarUrl")
+                                .populate("category", "name");
+        if(!blog) {
+            return res.redirect('../404');
+        }
+
+        const relatedBlogs = await getBlogsByCategory(blog.category.name, "title snippet thumbnail slug");
+        const categories = await Category.find({ type: "blog" });
+        
+        res.render('admin/blog/manage', { title : `${blog.title} - UniVerseHub Blog Manager`, blog, relatedBlogs, categories }) 
+    } catch (err) {
+        console.error(err);
+    }
 }
 
-const blog_update_put = (req, res) => {
+const blog_update_put = async (req, res) => {
+    const {
+        title, slug, category, content, 
+        tags, featured, snippet
+    } = req.body;
 
+    const originalSlug = req.params.slug;
+
+    try {
+        const categoryDoc = await Category.findOne( { category, type: 'blog' });
+        if(!categoryDoc) {
+            return res.status(400).json({ errors: { category: "Category not found" } });
+        }
+
+        const seralizedTags = tags.split(',');
+        const seralizedContent = contentSerializer(content);
+
+        const data = {
+            title, featured, snippet,
+            category: categoryDoc._id,
+            tags: seralizedTags,
+            body: seralizedContent,
+            status: 'draft'
+        };
+
+        if(req.imagePath) data.thumbnail = req.imagePath ;
+        if(slug !== originalSlug && slug !== '') data.slug = slug;
+
+        // console.info("data to be drafted: ", data, originalSlug);
+
+        const draftedBlog = await Blog.findOneAndUpdate(
+            { slug: originalSlug }, data, {runValidators: true, new: true}
+        );
+
+        if(!draftedBlog) {
+            return res.status(400).json({ errors: { msg: "Unable to make a save. Try refreshing the page!" }});
+        }
+
+        console.log("blog drafted?: ", draftedBlog.status);
+
+        res.status(200).json({draftedBlog});
+        
+    } catch (err) {
+        const errors = handleErrors(err);
+        res.status(400).json({ errors });
+        console.log(err);
+    }
 }
 
 const image_upload_post = (req, res) => {
@@ -155,6 +214,24 @@ const blog_slug_availablity_get = async (req, res) => {
         res.status(400).json({errors});
         console.error(errors);
     }
+}
+
+const blog_publish_get = async (req, res) => {
+    const slug = req.params.slug;
+    try {
+       const savedBlog =  await Blog.findOneAndUpdate({ slug }, { status: 'published' }, {runValidators: true, new: true});
+
+       if(!savedBlog) return res.status(400).json({ errors: { msg: "Unable to publish. Try refreshing the page!" }});
+
+       console.log("published?: ", savedBlog.status);
+       res.status(200).json({savedBlog});
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+const admin_blog_get = async (req, res) => {
+    res.render('admin/blog/index', { title: "blog list"});
 }
 
 
@@ -210,5 +287,7 @@ module.exports = {
     blog_dlt,
     blog_detail_get,
     blog_slug_availablity_get,
-    image_upload_post
+    image_upload_post,
+    blog_publish_get,
+    admin_blog_get
 }

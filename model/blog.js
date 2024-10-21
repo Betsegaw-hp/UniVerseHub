@@ -10,6 +10,7 @@ const blogSchema = new Schema({
     slug : {
         type: String,
         unique: true,
+        minlength: 3,
         required: true
     },
     thumbnail: {

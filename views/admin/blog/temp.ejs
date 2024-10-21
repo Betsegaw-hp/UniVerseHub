@@ -1,0 +1,23 @@
+document.getElementById('saveDraft').addEventListener('click', function() {
+    // Here you would save the current state of the form as a draft
+    console.log('Saving draft...');
+    alert('Draft saved successfully!');
+});
+
+document.getElementById('deletePost').addEventListener('click', function() {
+    if (confirm('Are you sure you want to delete this post? This action cannot be undone.')) {
+        // Here you would send a request to your backend to delete the post
+        console.log('Deleting post...');
+        alert('Post deleted successfully!');
+        // Redirect to post list or clear form
+    }
+});
+
+
+<div class="d-flex justify-content-between">
+    <div>
+        <button type="submit" class="btn btn-primary me-2">Publish</button>
+        <button type="button" class="btn btn-outline-secondary" id="saveDraft">Save as Draft</button>
+    </div>
+        <button type="button" class="btn btn-danger" id="deletePost">Delete Post</button>
+</div>

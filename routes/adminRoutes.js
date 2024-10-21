@@ -20,7 +20,9 @@ const  {
     blog_create_post,
     blog_update_get,
     blog_update_put,
-    image_upload_post
+    image_upload_post,
+    blog_publish_get,
+    admin_blog_get
 }  = blogController;
 
 
@@ -36,11 +38,16 @@ router.put('/reactivate-user/:id', reactivate_user_put);
 router.post('/force-edit-user', force_edit_user);
 
 // blog routes given admin previlage
+router.get('/blog', admin_blog_get);
+
 router.get('/blog/create', blog_create_get);
 router.post('/blog/create', upload.single('image') , checkDuplicateImage, blog_create_post, multerErrorHandler);
 
-router.get('/blog/update/:slug', blog_update_get);
-router.put('/blog/update/:slug', upload.single('image'), checkDuplicateImage, blog_update_put, multerErrorHandler);
+
+router.get('/blog/:slug', blog_update_get);
+router.put('/blog/:slug', upload.single('image'), checkDuplicateImage, blog_update_put, multerErrorHandler);
+
+router.get('/blog/:slug/publish', blog_publish_get);
 
 router.post('/upload-image', upload.single('image'), checkDuplicateImage, image_upload_post, multerErrorHandler);
 
