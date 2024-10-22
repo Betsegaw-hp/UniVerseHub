@@ -350,13 +350,13 @@
 
             const name = categoryForm.name.value;
             const description = categoryForm.description.value;
+            const type = 'forum';
 
             const options = {
                method: "PUT",
                headers: { 'Content-Type': 'application/json' },
                body: JSON.stringify({
-                 name, 
-                 description,
+                 name, type, description,
                  categoryId : categoryIdParent.dataset.categoryid
                })
             }

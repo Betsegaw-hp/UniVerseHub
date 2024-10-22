@@ -324,72 +324,6 @@ const forum_category_get = async (req, res) => {
     }
 }
 
-const forum_category_post = async (req, res) => {
-    const { name, description } = req.body;
-
-    try {
-        const categoryDoc = await Category.findOne({ name, type: 'forum' });
-        if(categoryDoc) return res.status(400).json({ errors: { msg : "Category exists with that name!"} });
-
-        // type is enum. so it's value is case sensetive
-        const category = await Category.create({ name, description, type: "forum"});
-
-        res.status(200).json({ category });
-
-    } catch (err) {
-        const errors = handleErrors(err);
-        res.status(400).json({ errors });
-        console.log(err); 
-    }
-}
-
-const forum_category_update = async (req, res) => {
-
-    try {
-        const { name, description, categoryId } = req.body;
-        
-
-        const categoryDoc = await Category.findById(categoryId);
-        if (!categoryDoc) {
-            return res.status(400).json({ errors: { msg: "Category not found" } });
-        }
-
-
-        const updatedCategory = await Category.findByIdAndUpdate(
-            categoryId ,
-            {
-                name, description
-            },
-            { new : true, runValidators: true}
-        ).exec();
-
-        console.log("category updated: ", updatedCategory)
-
-        res.status(200).json({ category: updatedCategory });
-
-    } catch (err) {
-        const errors = handleErrors(err);
-        res.status(400).json({ errors });
-        console.log(err);    
-    }
-}
-
-const forum_category_dlt = async (req, res) => {
-    const { id } = req.params;
-    
-    const category = await Category.findById(id);
-
-    // Attempt to delete the category
-    try {
-        await category.remove();
-        console.info("deleted!", category._id);
-        res.status(200).json({ redirect: "/forum" });
-    } catch (err) {
-        console.log(err);
-        res.status(400).json({ error: err.message });
-    }
-}
-
 
 // utils
 const getPostsByCategory = async (categoryName, field = null ) => {
@@ -467,9 +401,6 @@ module.exports = {
     forum_update,
     likePost,
     comment_post,
-    forum_category_get,
-    forum_category_post,
-    forum_category_update,
-    forum_category_dlt
+    forum_category_get
 }
 

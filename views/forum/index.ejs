@@ -260,14 +260,12 @@
 
             const name = categoryForm.name.value;
             const description = categoryForm.description.value;
+            const type = 'forum';
 
             const options = {
                method: "POST",
                headers: { 'Content-Type': 'application/json' },
-               body: JSON.stringify({
-                 name, 
-                 description
-               })
+               body: JSON.stringify({ name, description, type })
             }
 
             fetch("/forum/category", options)
