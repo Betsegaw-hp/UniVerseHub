@@ -49,7 +49,7 @@
 
 <style>
     body {
-        padding-top: 56px; /* Adjust this value based on your navbar height */
+        /* padding-top: 56px; Adjust this value based on your navbar height */
     }
 
     #sidebar {
@@ -101,6 +101,18 @@
             top: 56px;
             padding-top: 0;
         }
+
+        .sidebar-hidden {
+            margin-left: -100%;
+        }
+    }
+
+    /* Media query for larger screens */
+    @media (min-width: 768px) {
+        #sidebar {
+            left: 0 !important; /* Ensure the sidebar is always visible */
+            transition: none; /* Disable transition for larger screens */
+        }
     }
 
     .sidebar-sticky {
@@ -110,10 +122,6 @@
         padding-top: .5rem;
         overflow-x: hidden;
         overflow-y: auto;
-    }
-
-    .sidebar-hidden {
-        margin-left: -100%;
     }
 
     main {
