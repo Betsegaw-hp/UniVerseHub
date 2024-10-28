@@ -1,3 +1,4 @@
+const Category = require('../model/category');
 const PromotionRequest = require('../model/promotionRequest');
 const User = require('../model/user');
 const handleErrors = require('../utils/errorHandler');
@@ -10,10 +11,59 @@ const admin_page_get = async (req, res) => {
                                                         .populate('user', 'name username role');
         const allUsers = await User.find();
         
-        res.render('admin', { title: "Admin Dashboard | UniVerseHub", promotionRequests, allUsers});
+        res.render('admin', { title: "Admin Dashboard | UniVerseHub", currentPage: "dashboard", promotionRequests, allUsers});
     } catch (err) {
         console.error(err);
         res.status(500).json({ errors: err});
+    }
+}
+
+const admin_category_get = async (req, res) => {
+    try {
+        const categoriesWithCounts = await Category.aggregate([
+            {
+                $lookup: {
+                    from: 'forumposts',
+                    localField: '_id',
+                    foreignField: 'category',
+                    as: 'forums'
+                }
+            },
+            {
+                $lookup: {
+                    from: 'blogs',
+                    localField: '_id',
+                    foreignField: 'category',
+                    as: 'blogs'
+                }
+            },
+            {
+                $project: {
+                    _id: 1,
+                    name: 1,
+                    type: 1,
+                    description: 1,
+                    forumCount: { $size: '$forums' },
+                    blogCount: { $size: '$blogs' }
+                }
+            }
+        ]);
+        const categoriesWithType = {};
+
+        // fill based on types
+        categoriesWithCounts.forEach((category) => {
+            
+            if (!categoriesWithType[category.type]) {
+                categoriesWithType[category.type] = [];
+            }
+            categoriesWithType[category.type].push(category);
+        });
+
+        // console.log(categoriesWithType);
+
+        res.render('admin/category', { title: "Category Management - UniVerseHub", currentPage: 'category', categories: categoriesWithType });
+    } catch (err) {
+        console.log(err);
     }
 }
 
@@ -65,7 +115,7 @@ const role_requests_get = async  (req, res) => {
                                                         .populate('user', 'name username role')
                                                         .populate('handledBy', 'username');
         
-        res.render('admin/role-request', { title: "Role Requests | UniVerseHub ", promotionRequests});
+        res.render('admin/role-request', { title: "Role Requests | UniVerseHub ", currentPage: "role-requests", promotionRequests});
     } catch (err) {
         console.error(err);
         res.status(500).json({ errors: err});
@@ -123,7 +173,7 @@ const users_get = async (req, res ) => {
     try {
         const allUsers = await User.find();
 
-        res.render('admin/users', { title: "All Users | UniVerseHub", users: allUsers});
+        res.render('admin/users', { title: "All Users | UniVerseHub", currentPage: "users", users: allUsers});
 
     } catch (err) {
         console.error(err);
@@ -175,6 +225,7 @@ const force_edit_user = async (req, res) => {
 
 module.exports = {
     admin_page_get,
+    admin_category_get,
     suspend_user_put,
     reactivate_user_put,
     role_requests_get,
