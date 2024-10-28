@@ -41,7 +41,7 @@ const  category_post = async (req, res) => {
     }
 }
 
-const  category_update = async (req, res) => {
+const  category_update_put = async (req, res) => {
     const { name, description, categoryId, type } = req.body;
 
     try {
@@ -52,6 +52,10 @@ const  category_update = async (req, res) => {
             return res.status(400).json({ errors: { msg: "Category not found" } });
         }
 
+        if(name === '' && description === '') {
+            return res.status(400).json({ errors: { msg: "Provide at least one field!" } });
+        }
+        
         const data = { name, description};
         if(type !== categoryDoc.type && type !== '' ) data.type = type.toLowerCase();
 
@@ -74,7 +78,9 @@ const  category_dlt = async (req, res) => {
     const { id } = req.params;
     
     try {
-        const category = await Category.findByIdAndDelete(id);
+        // this method used intentionally to triger ""remove" pre hook
+        const category = await Category.findById(id);
+        await category.remove();
 
         console.info("deleted!", category._id);
         res.status(200).json({ redirect: `/${category.type}` });
@@ -87,6 +93,6 @@ const  category_dlt = async (req, res) => {
 module.exports = {
     category_get,
     category_post,
-    category_update,
+    category_update_put,
     category_dlt
 };

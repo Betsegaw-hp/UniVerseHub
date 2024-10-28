@@ -1,36 +1,165 @@
-<nav id="sidebar" class="col-md-3 col-lg-2 d-md-block sidebar collapse">
-    <div class="position-sticky">
+<nav id="sidebar" class="col-md-3 col-lg-2 d-md-block bg-light sidebar">
+    <div class="position-sticky pt-3">
         <ul class="nav flex-column">
             <li class="nav-item">
-                <a class="nav-link active" href="/admin">
-                    <i class="bi bi-speedometer2"></i> Dashboard
+                <a class="nav-link <%= currentPage === 'dashboard' ? 'active' : '' %>" href="/admin">
+                    <i class="bi bi-speedometer2 me-2"></i> Dashboard
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/admin/role-requests">
-                    <i class="bi bi-person-plus"></i> Role Requests
+                <a class="nav-link <%= currentPage === 'role-requests' ? 'active' : '' %>" href="/admin/role-requests">
+                    <i class="bi bi-person-plus me-2"></i> Role Requests
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/admin/blog">
-                    <i class="bi bi-markdown"></i> Content Managment
+                <a class="nav-link dropdown-toggle" href="#contentSubmenu" data-bs-toggle="collapse" role="button" aria-expanded="false">
+                    <i class="bi bi-markdown me-2"></i> Content
+                </a>
+                <ul class="collapse nav flex-column ms-3" id="contentSubmenu">
+                    <li class="nav-item">
+                        <a class="nav-link <%= currentPage === 'blog' ? 'active' : '' %>" href="/admin/blog">
+                            <i class="bi bi-pencil me-2"></i> Blog
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link <%= currentPage === 'category' ? 'active' : '' %>" href="/admin/category">
+                            <i class="bi bi-tag me-2"></i> Category
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link <%= currentPage === 'users' ? 'active' : '' %>" href="/admin/users">
+                    <i class="bi bi-people me-2"></i> All Users
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/admin/users">
-                    <i class="bi bi-people"></i> All Users
+                <a class="nav-link <%= currentPage === 'analytics' ? 'active' : '' %>" href="/admin/analytics">
+                    <i class="bi bi-graph-up me-2"></i> Analytics
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="#analytics">
-                    <i class="bi bi-graph-up"></i> Analytics
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#settings">
-                    <i class="bi bi-gear"></i> Settings
+                <a class="nav-link <%= currentPage === 'settings' ? 'active' : '' %>" href="/admin/settings">
+                    <i class="bi bi-gear me-2"></i> Settings
                 </a>
             </li>
         </ul>
     </div>
 </nav>
+
+<style>
+    body {
+        padding-top: 56px; /* Adjust this value based on your navbar height */
+    }
+
+    #sidebar {
+        min-height: 100vh;
+        transition: all 0.3s;
+    }
+
+    #sidebar {
+        position: fixed;
+        top: 25px;
+        bottom: 0;
+        left: 0;
+        z-index: 100;
+        padding: 48px 0 0;
+        box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+        transition: all 0.3s;
+    }
+
+    #sidebar .nav-link {
+        padding: 0.5rem 1rem;
+        color: #333;
+        transition: all 0.3s;
+    }
+
+    #sidebar .nav-link:hover {
+        background-color: #e9ecef;
+    }
+
+    #sidebar .nav-link.active {
+        background-color: #007bff;
+        color: #fff;
+    }
+
+    #sidebar .nav-link.active:hover {
+        background-color: #0056b3;
+    }
+
+    #contentSubmenu {
+        background-color: #f8f9fa;
+    }
+
+    #contentSubmenu .nav-link {
+        padding-left: 2rem;
+    }
+    
+
+    @media (max-width: 767.98px) {
+        #sidebar {
+            top: 56px;
+            padding-top: 0;
+        }
+    }
+
+    .sidebar-sticky {
+        position: relative;
+        top: 0;
+        height: calc(100vh - 48px);
+        padding-top: .5rem;
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+
+    .sidebar-hidden {
+        margin-left: -100%;
+    }
+
+    main {
+        transition: margin-left 0.3s;
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const sidebar = document.getElementById('sidebar');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const content = document.querySelector('.main-content');
+    
+    sidebarToggle.addEventListener('click', function() {
+        sidebar.classList.toggle('sidebar-hidden');
+        content.style.marginLeft = sidebar.classList.contains('sidebar-hidden') ? '0' : '25%';
+    });
+
+    // Handle the Content submenu
+    const contentSubmenu = document.getElementById('contentSubmenu');
+    const contentDropdown = document.querySelector('[data-bs-toggle="collapse"]');
+
+    contentDropdown.addEventListener('click', function(e) {
+        e.preventDefault();
+        contentSubmenu.classList.toggle('show');
+        this.setAttribute('aria-expanded', contentSubmenu.classList.contains('show'));
+    });
+
+    // Check if any submenu item is active and expand the submenu if so
+    if (contentSubmenu.querySelector('.active')) {
+        contentSubmenu.classList.add('show');
+        contentDropdown.setAttribute('aria-expanded', 'true');
+    }
+
+    // Handle responsive behavior
+    function checkWidth() {
+        if (window.innerWidth <= 767.98) {
+            sidebar.classList.add('sidebar-hidden');
+            content.style.marginLeft = '0';
+        } else {
+            sidebar.classList.remove('sidebar-hidden');
+            content.style.marginLeft = '25%';
+        }
+    }
+
+    window.addEventListener('resize', checkWidth);
+    checkWidth(); // Call on initial load
+});
+</script>

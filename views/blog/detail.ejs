@@ -8,13 +8,40 @@
     <%- include('../partials/head')  %> 
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link href="/blog.css" rel="stylesheet">
+    <style>
+        .custom-shape-divider-bottom-1684680749 {
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          width: 100%;
+          overflow: hidden;
+          line-height: 0;
+        }
+      
+        .custom-shape-divider-bottom-1684680749 svg {
+          position: relative;
+          display: block;
+          width: calc(100% + 1.3px);
+          height: 50px;
+        }
+      
+        .custom-shape-divider-bottom-1684680749 .shape-fill {
+          fill: #FFFFFF;
+        }
+      </style>
 </head>
 <body>
     <%- include('../partials/nav')  %> 
 
     <header class="blog-header">
         <div class="container text-center">
-            <h1 class="display-4 fw-bold capitalize"><%= blog.title %></h1>
+            <div class="mb-3">
+                <% if(blog.featured) { %>
+                    <span class="badge bg-warning text-dark me-2 text-capitalize"><i class="bi bi-bookmark-star"></i> Featured</span>
+                <% } %>
+                <span class="badge bg-light text-dark text-capitalize"><%= blog.category.name %></span>
+            </div>
+            <h1 class="display-4 fw-bold text-capitalize"><%= blog.title %></h1>
             <p class="lead"><%= blog.snippet %></p>
         </div>
     </header>
@@ -45,20 +72,25 @@
         </article>
 
         <section class="my-5">
-            <h2 class="mb-4">Related Posts</h2>
+            <h2 class="mb-4">Related Blogs</h2>
             <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
                 <% if(relatedBlogs.length > 0) {%>
                     <% relatedBlogs.map(anotherBlog => { %>
                         <% if(anotherBlog._id.toString() !== blog._id.toString() ) { %>
                             <div class="col">
-                                <div class="card h-100 related-post">
-                                    <img src="<%= anotherBlog.thumbnail %>" class="card-img-top" alt="Related post thumbnail">
+                                <div class="card h-100">
+                                    <img src="<%= anotherBlog.thumbnail %>" class="card-img-top" alt="Blog post thumbnail">
+                                    <!-- blog used below intentionally. b/c I am not getting category from relatedBlog -->
+                                    <span class="category-badge capitalize"><%= blog.category.name %></span> 
                                     <div class="card-body">
-                                        <h5 class="card-title clamp-text"><%= anotherBlog.title %></h5>
-                                        <p class="card-text clamp-text-3"><%= anotherBlog.snippet %></p>
+                                        <h5 class="card-title capitalize clamp-text"><%= anotherBlog.title %></h5>
+                                        <p class="card-text clamp-text-4"><%= anotherBlog.snippet %></p>
                                     </div>
                                     <div class="card-footer bg-transparent border-top-0">
-                                        <a href="/blog/<%= anotherBlog.slug %>" class="btn btn-outline-primary btn-sm">Read More</a>
+                                        <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center">
+                                            <small class="text-muted flex-grow-1"><%= anotherBlog.createdAt?.toDateString() %> • <%= anotherBlog.readTime %> min read</small>
+                                            <a href="/blog/<%= anotherBlog.slug %>" class="btn btn-outline-primary btn-sm">Read More</a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

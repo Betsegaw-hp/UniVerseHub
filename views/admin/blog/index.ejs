@@ -135,9 +135,22 @@
             </div>
         </div>
     </div>
+    <div class="toast align-items-center text-bg-danger border-0" 
+            role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="10000"
+            style="position: fixed; top: 7rem; right: 2rem;">
+        <div class="d-flex">
+            <div class="toast-body">
+            Hello, world! This is a toast message.
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
 
     <script>
         const deleteBtns = document.querySelectorAll('.dlt-btn');
+        const categoryForm = document.querySelector("#category_post_form");
+        const toast = document.querySelector('.toast');
+        const toastBody = document.querySelector('.toast-body');
 
         deleteBtns.forEach(btn => {
             btn.addEventListener('click', () => {
@@ -163,39 +176,62 @@
 
             const name = categoryForm.name.value;
             const description = categoryForm.description.value;
+            const type = 'blog';
 
             const options = {
                method: "POST",
                headers: { 'Content-Type': 'application/json' },
                body: JSON.stringify({
                  name, 
-                 description
+                 description,
+                 type
                })
             }
 
-            fetch("/forum/category", options)
+            fetch("/blog/category", options)
             .then(res => res.json())
             .then(data => {
                 if(data.errors) {
-                    CategoryForm_alert.classList.add('show');
-                    let msg = null;
-                    Object.entries(data.errors).map(entry => {
-                        let key = entry[0];
-                        let value = entry[1];
-
-                        if(value != '') msg = value;
-                    })
-                    
-                    if(!msg) msg = "Unexpected Error occured. ";
-                    CategoryForm_alert_msg.textContent = msg;
-                    console.log(msg)
+                    displayError(data.errors)
                 }
                 if (data.category) {
+                    displaySucess(data.category.name)
                     // window.location.href = `/admin/category/${data.category.name}`;
                 }
             })
             .catch(err => console.error(err));
         });
+
+
+        function displayError(errors) {
+            let msg = null;
+            Object.entries(errors).map(entry => {
+                let key = entry[0];
+                let value = entry[1];
+
+                if(value != '') msg = value;
+            })
+            
+            if(!msg) msg = "Unexpected Error occured. ";
+            toastBody.innerHTML = '<i class="bi bi-exclamation-triangle"></i> '+ msg;
+            toast.classList.toggle('hide', false);
+            toast.classList.toggle('show', true);
+
+            //styling
+            toast.classList.toggle('text-bg-success', false);
+            toast.classList.toggle('text-bg-danger', true);
+        }
+
+        function displaySucess(msg) {
+            toastBody.innerHTML = '<i class="bi bi-check-circle-fill"></i> '+ msg;
+            toast.classList.toggle('hide', false);
+            toast.classList.toggle('show', true);
+
+            //styling
+            toast.classList.toggle('text-bg-danger', false);
+            toast.classList.toggle('text-bg-success', true);
+        }
+        
     </script>
 </body>
 </html>

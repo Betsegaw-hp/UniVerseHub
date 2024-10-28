@@ -17,7 +17,7 @@ const {
 
 const {
     category_post,
-    category_update,
+    category_update_put,
     category_dlt
 } = categoryController;
 
@@ -32,7 +32,7 @@ router.post('/:id/comment', comment_post);
 
 // category routes
 router.post('/category', requireRole(['admin', 'moderator']), category_post);
-router.put('/category', requireRole(['admin', 'moderator']), category_update);
+router.put('/category', requireRole(['admin', 'moderator']), category_update_put);
 router.get('/category/:name', forum_category_get);
 router.delete('/category/:id', requireRole(['admin', 'moderator']) , category_dlt);
 

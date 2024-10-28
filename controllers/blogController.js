@@ -7,7 +7,7 @@ const blog_get = async (req, res) => {
 
     try {
         
-        const rawBlogs = await Blog.find()
+        const rawBlogs = await Blog.find({ status: 'published'})
                                 .populate('author', "username email name avatarUrl")
                                 .populate("category", "name");
         const { blogs, featuredBlogs } = rawBlogs.reduce((acc, blog) => {
@@ -46,14 +46,14 @@ const blog_detail_get = async (req, res) => {
 
     try {
         
-        const blog = await Blog.findOne({ slug })
+        const blog = await Blog.findOne({ slug, status: 'published' })
                                 .populate('author', "username email name avatarUrl")
                                 .populate("category", "name");
         if(!blog) {
             return res.redirect('../404');
         }
 
-        const relatedBlogs = await getBlogsByCategory(blog.category.name, "title snippet thumbnail slug");
+        const relatedBlogs = await getBlogsByCategory(blog.category.name, "title snippet thumbnail slug readTime createdAt");
         
         res.render('blog/detail', { title : `${blog.title} - UniVerseHub Blog`, blog, relatedBlogs })
         } catch (err) {
@@ -66,7 +66,7 @@ const blog_create_get = async (req, res) => {
     try {
         const categories = await Category.find({ type: "blog" });
         
-        res.render('admin/blog/create', { title: 'Create New Blog Post - UniVerseHub', categories });
+        res.render('admin/blog/create', { title: 'Create New Blog Post - UniVerseHub', currentPage: "blog", categories });
     } catch (err) {
         console.error(err);
     }
@@ -125,7 +125,7 @@ const blog_update_get = async (req, res) => {
         const relatedBlogs = await getBlogsByCategory(blog.category.name, "title snippet thumbnail slug");
         const categories = await Category.find({ type: "blog" });
         
-        res.render('admin/blog/manage', { title : `${blog.title} - UniVerseHub Blog Manager`, blog, relatedBlogs, categories }) 
+        res.render('admin/blog/manage', { title : `${blog.title} - UniVerseHub Blog Manager`, currentPage: "blog", blog, relatedBlogs, categories }) 
     } catch (err) {
         console.error(err);
     }
@@ -140,7 +140,7 @@ const blog_update_put = async (req, res) => {
     const originalSlug = req.params.slug;
 
     try {
-        const categoryDoc = await Category.findOne( { category, type: 'blog' });
+        const categoryDoc = await Category.findOne( { name: category, type: 'blog' });
         if(!categoryDoc) {
             return res.status(400).json({ errors: { category: "Category not found" } });
         }
@@ -237,11 +237,11 @@ const admin_blog_get = async (req, res) => {
                                 .populate('author', "username email name avatarUrl")
                                 .populate("category", "name");
 
-        res.render('admin/blog/index', { title: "Content Manager - UniVerseHub", blogs});
+        res.render('admin/blog/index', { title: "Content Manager - UniVerseHub", currentPage: "blog", blogs});
     } catch (err) {
         const errors = handleErrors(err);
         res.status(400).json({ errors });
-        console.log(err);
+        console.error(err);
     }
     
 }

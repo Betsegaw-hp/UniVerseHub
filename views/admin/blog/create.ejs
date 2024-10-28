@@ -89,8 +89,8 @@
                                 </div>
                                 <div class="d-flex justify-content-between">
                                     <div>
-                                        <button type="submit" class="btn btn-primary me-2">Publish</button>
-                                        <!-- <button type="button" class="btn btn-outline-secondary" id="saveDraft">Save as Draft</button> -->
+                                        <!-- <button type="submit" class="btn btn-primary me-2">Publish</button> -->
+                                        <button type="submit" class="btn btn-outline-secondary" id="saveDraft">Save as Draft</button>
                                     </div>
                                 </div>
                             </form>
@@ -211,13 +211,14 @@
                         displayError(data.errors);
     
                      } else if(data.savedBlog) {
-                        toastBody.innerHTML = `Successfully Published. View at <a class="link-body-emphasis link-offset-2 link-underline-opacity-25 link-underline-opacity-75-hover" href="/blog/${data.savedBlog.slug}">${data.savedBlog.title}</a>`;
+                        toastBody.innerHTML = `Successfully saved.`;
                         toast.classList.toggle('hide', false);
                         toast.classList.toggle('show', true);
     
                         //styling
                         toast.classList.toggle('text-bg-danger', false);
                         toast.classList.toggle('text-bg-success', true);
+                        window.location = `/admin/blog/${data.savedBlog.slug}`;
                     }
                 })
                 .catch(err => console.error(err));

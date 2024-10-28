@@ -2,10 +2,12 @@ const express = require('express');
 const router = express.Router();
 const adminController = require('../controllers/adminController');
 const blogController = require('../controllers/blogController');
+const categoryController = require('../controllers/categoryController');
 const { upload, checkDuplicateImage, multerErrorHandler } = require('../middleware/uploadMiddleware');
 
 const {
     admin_page_get,
+    admin_category_get,
     suspend_user_put,
     role_requests_get,
     users_get,
@@ -25,6 +27,9 @@ const  {
     admin_blog_get
 }  = blogController;
 
+const {
+    category_get, category_post, category_update_put, category_dlt
+} = categoryController;
 
 router.get('/', admin_page_get);
 router.get('/role-requests', role_requests_get);
@@ -50,6 +55,13 @@ router.put('/blog/:slug', upload.single('image'), checkDuplicateImage, blog_upda
 router.get('/blog/:slug/publish', blog_publish_get);
 
 router.post('/upload-image', upload.single('image'), checkDuplicateImage, image_upload_post, multerErrorHandler);
+
+// category routes
+router.get('/category', admin_category_get);
+router.post('/category', category_post);
+router.put('/category', category_update_put);
+router.delete('/category/:id', category_dlt);
+
 
 
 module.exports = router;

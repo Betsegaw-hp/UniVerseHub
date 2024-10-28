@@ -3,68 +3,7 @@
 <head>
     <%- include('../partials/head')  %> 
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #f2f2f3;
-        }
-        .navbar {
-            box-shadow: 0 2px 4px rgba(0,0,0,.1);
-        }
-        .blog-header {
-            background-color: #3498db;
-            color: white;
-            padding: 4rem 0;
-            margin-bottom: 3rem;
-        }
-        .card {
-            border: none;
-            box-shadow: 0 4px 6px rgba(0,0,0,.1);
-            transition: transform 0.3s ease-in-out;
-        }
-        .card:hover {
-            transform: translateY(-5px);
-        }
-        .card-img-top {
-            height: 200px;
-            object-fit: cover;
-        }
-        .card-title {
-            font-weight: 600;
-        }
-        .card-text {
-            color: #6c757d;
-        }
-        .btn-primary {
-            background-color: #3498db;
-            border-color: #3498db;
-        }
-        .btn-primary:hover {
-            background-color: #2980b9;
-            border-color: #2980b9;
-        }
-        .featured-post {
-            background-color: #fff;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0,0,0,.1);
-            margin-bottom: 3rem;
-        }
-        .featured-post img {
-            height: 400px;
-            object-fit: cover;
-        }
-        .category-badge {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            padding: 5px 10px;
-            background-color: rgba(52, 152, 219, 0.8);
-            color: white;
-            border-radius: 20px;
-            font-size: 0.8rem;
-        }
-    </style>
+    <link href="/blog.css" rel="stylesheet" >
 </head>
 <body>
   <%- include('../partials/nav')  %> 
@@ -82,26 +21,39 @@
             </form>
         </div>
     </header>
-
     <main class="container">
         <% if(featuredBlogs.length > 0) { %>
             <% featuredBlogs.map(blog => { %>
-                <div class="featured-post row">
-                    <div class="col-md-6">
-                        <img src="<%= blog.thumbnail %>" class="img-fluid" alt="Featured post thumbnail">
-                    </div>
-                    <div class="col-md-6 d-flex flex-column justify-content-center p-4">
-                        <span class="badge bg-primary mb-2">Featured</span>
-                        <h2 class="fw-bold capitalize"><%= blog.title %></h2>
-                        <p class="text-muted"><%= blog.snippet %></p>
-                        <p><small class="text-muted">By <%= blog.author.name %> | May 20, 2023</small></p>
-                        <a href="/blog/<%= blog.slug %>" class="btn btn-primary align-self-start">Read More</a>
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="row g-0">
+                      <div class="col-md-6 col-lg-5 position-relative">
+                        <img src="<%= blog.thumbnail %>" class="img-fluid rounded-start h-100 object-fit-cover" alt="Featured post image">
+                        <div class="position-absolute top-0 start-0 m-3">
+                            <span class="badge bg-info px-3 py-2"><%= blog.category.name %></span>
+                        </div>
+                      </div>
+                      <div class="col-md-6 col-lg-7">
+                        <div class="card-body d-flex flex-column h-100 py-4 px-md-4">
+                          <!-- <span class="badge bg-secondary h5 font-monospace mb-2">Featured</span> -->
+                           <span class="fs-5 text-info font-monospace mb-2"><i class="bi bi-bookmark-star-fill fs-4"></i> Featured</span>
+                          <h3 class="card-title text-capitalize h3 mb-3"><%= blog.title %></h3>
+                          <p class="card-text mb-5 clamp-text-4"><%= blog.snippet %></p>
+                          <div class="author-info">
+                            <img src="<%= blog.author.avatarUrl %>" alt="Author Avatar" class="author-avatar-md">
+                            <div>
+                                <h6 class="mb-0 text-capitalize"><a href="/profile/<%= blog.author.username %>" class="text-decoration-none"><%= blog.author.name %></a></h6>
+                                <small class="text-muted"><%= blog.createdAt.toDateString() %> • <%= blog.readTime %> min read</small>
+                            </div>
+                          </div>
+                          <a href="/blog/<%= blog.slug %>" class="btn btn-primary px-4 py-2">Read More</a>
+                        </div>
+                      </div>
                     </div>
                 </div>
             <% }) %>
         <% } %>
 
-        <h2 class="mb-4">Latest Posts</h2>
+        <h2 class="mb-4">Latest Blogs</h2>
 
         <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
             <% if( blogs.length > 0) { %>
@@ -115,8 +67,8 @@
                                 <p class="card-text clamp-text-4"><%= blog.snippet %></p>
                             </div>
                             <div class="card-footer bg-transparent border-top-0">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <small class="text-muted"><%= blog.createdAt?.toDateString() %></small>
+                                <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center">
+                                    <small class="text-muted flex-grow-1"><%= blog.createdAt?.toDateString() %> • <%= blog.readTime %> min read</small>
                                     <a href="/blog/<%= blog.slug %>" class="btn btn-outline-primary btn-sm">Read More</a>
                                 </div>
                             </div>

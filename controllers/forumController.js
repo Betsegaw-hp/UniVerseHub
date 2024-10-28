@@ -324,7 +324,6 @@ const forum_category_get = async (req, res) => {
     }
 }
 
-
 // utils
 const getPostsByCategory = async (categoryName, field = null ) => {
     try {
