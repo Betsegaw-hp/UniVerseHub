@@ -12,16 +12,16 @@
    make sure forum dlt and update only accesseble to the author of that forum and admin/moderator
    (exception to editing for admin/moderators) - done
 
->> do pagination - half done
+>> do pagination - almost done
 >> add tags - done
 >> work on blogs(UI and functionality) - done
 >> make content body markdown supported - done
->> do search feature (consider both category and topic)
+>> do search feature (consider both category and topic) - done
+>> use more error handling(UI) for admin side - done?
 >> bookmark functionality
 >> delete comment
 >> upvote/like comment
 >> report/flag comment, topics, users
->> use more error handling(UI) for admin side
 >> notification feature
 >> retain url path when redirecting to auth
 

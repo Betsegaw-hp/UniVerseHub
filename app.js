@@ -9,7 +9,6 @@ const authRoutes = require('./routes/authRoutes')
 const profileRoutes = require('./routes/profileRoutes')
 const homeRoutes = require('./routes/homeRoutes')
 const adminRoutes = require('./routes/adminRoutes')
-const searchRoutes = require('./routes/searchRoutes')
 const {requireAuth, checkUser, requireRole} = require('./middleware/authMiddleware');
 
 dotenv.config();
@@ -52,9 +51,6 @@ app.use('/blog', requireAuth,  blogRoutes)
 
 //forum routes
 app.use('/forum', requireAuth, forumRoutes)
-
-// search routes
-app.use('/search', requireAuth, searchRoutes)
 
 
 // admin routes

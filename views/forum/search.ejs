@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../partials/head')  %> 
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="/blog.css" rel="stylesheet" >
+</head>
+<body>
+    <%- include('../partials/nav')  %> 
+
+    <header class="blog-header py-5">
+        <div class="container">
+            <h1 class="display-4 fw-bold text-center mb-4">Forum Search Results</h1>
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <form class="row g-3 justify-content-center">
+                        <div class="col-md-8">
+                            <div class="input-group" style="max-width: 650px;">
+                                <input type="text" class="form-control" value="<%= query.title %>" placeholder="Search forum topics..." aria-label="Search forum topics">
+                                <select class="form-select" style="max-width: 180px;" name="category">
+                                    <option value="all">All Categories</option>
+                                    <% if(categories.length > 0) { %>
+                                        <% categories.map(category => { %>
+                                            <option value="<%= category.name %>" <%= query.category === category.name ? 'selected' : '' %>><%= category.name %></option>
+                                        <% }) %>
+                                    <% } %>
+                                </select>
+                                <button id="searchBtn" class="btn btn-light" type="submit">Search</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container my-5">
+        <div class="row">
+            <div class="col-md-3 mb-4">
+                <h2 class="h4 mb-3">Filter Results</h2>
+                <div class="mb-3">
+                    <label for="sortBy" class="form-label">Sort by</label>
+                    <select class="form-select" id="sortBy" name="sort">
+                        <option>Relevance</option>
+                        <option value="date" <%= query.sortBy === 'date' ? 'selected' : '' %> >Date (Latest)</option>
+                        <option value="popularity" <%= query.sortBy === 'popularity' ? 'selected' : '' %>>Popularity</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="dateRange" class="form-label">Date Range</label>
+                    <select class="form-select" id="dateRange" name="dateRange">
+                        <option>Any time</option>
+                        <option value="day" <%= query.date === 'day' ? 'selected' : '' %> > Past 24 hours</option>
+                        <option value="week" <%= query.date === 'week' ? 'selected' : '' %>>Past week</option>
+                        <option value="month" <%= query.date === 'month' ? 'selected' : '' %>>Past month</option>
+                        <option value="year" <%= query.date === 'year' ? 'selected' : '' %>>Past year</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="dateRange" class="form-label">Tags</label>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <div class="mb-4">
+                    <p class="text-muted">Showing results(<%= posts.length %> of <%= postCount %>) for: <strong>"<%= query.title %>"</strong> in <strong><%= query.category %> <%= query.category.toUpperCase() === "all" ? "Categories" : "Category" %></strong></p>
+                    <% if(query.sortBy || query.date) { %>
+                        <small class="text-muted">Filters applied: sorted By <strong><%= query.sortBy ? query.sortBy : "Relevence" %></strong> and Date Range: <strong><%= query.date ? query.date : "Any time" %></strong></small>
+                    <% } %>
+                </div>
+                <% if(posts.length > 0) { %>
+                    <% posts.map(post => { %>
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <span class="badge bg-secondary category-badge text-capitalize pb-1"><%= post.category.name %></span>
+                                <h2 class="card-title h4 pt-4 clamp-text"><%= post.title %></h2>
+                                <p class="card-text clamp-text"><%= post.content %></p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center">
+                                        <img src="<%= post.author.avatarUrl %>" class="rounded-circle me-2" alt="Author avatar" width="40" height="40">
+                                        <div>
+                                            <h6 class="mb-0 text-capitalize"><a href="/profile/<%= post.author.username %>" class="text-decoration-none"><%= post.author.name %></a></h6>
+                                            <small class="text-muted"><%= post.createdAt.toDateString() %></small>
+                                        </div>
+                                    </div>
+                                    <a href="/forum/<%= post.slug %>" target="_blank" class="btn btn-primary btn-sm">Read More</a>
+                                </div>
+                            </div>
+                        </div>
+                    <% }) %>
+                    <div class="d-flex justify-content-center">
+                        <button role="button" class="btn btn-outline-secondary" id="showMoreButton" <%= posts.length === postCount && 'disabled' %>>Show More</button>
+                    </div>
+                <% } else { %>
+                    <p class="text-center">No result</p>
+                <% } %>
+                
+            </div>
+        </div>
+    </div>
+
+    <%- include('../partials/footer')  %> 
+
+
+    <script>
+        const searchBtn = document.getElementById('searchBtn');
+        let currentLimit = parseInt("<%= query.limit %>") || 0;
+
+        function doSearch(limit) {
+            const searchInput = document.querySelector('input[type="text"]');
+            const categorySelect = document.querySelector('.form-select[name="category"]');
+            const sortSelect = document.querySelector('.form-select[name="sort"]');
+            const dateSelect = document.querySelector('.form-select[name="dateRange"]');
+            const searchQuery = searchInput.value;
+            const category = categorySelect.value;
+            let url = `/forum/search?title=${searchQuery}&category=${category}&limit=${limit}`;
+            if(sortSelect.value) url = url.concat(`&sortBy=${sortSelect.value}`);
+            if(dateSelect.value) url = url.concat(`&date=${dateSelect.value}`);
+            window.location.href = url;
+        }
+        searchBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            doSearch(currentLimit);
+        });
+
+        document.getElementById('showMoreButton').addEventListener('click', () => {
+            currentLimit += 3; // Increase limit by 10 or any preferred number
+            doSearch(currentLimit);
+        });
+    </script>
+    </body>
+</html>

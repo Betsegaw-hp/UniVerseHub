@@ -22,15 +22,43 @@
 
         <!-- Include the timeLapse.js file -->
         <script src="/timeLapse.js"></script>
+        <style>
+            .blog-header {
+                background-color: #3498db;
+                color: white;
+                padding: 4rem 0;
+                margin-bottom: 3rem;
+            }
+        </style>
     </head>
     
 <body>
     <%- include('../partials/nav')  %>
 
+    <header class="blog-header">
+        <div class="container text-center">
+            <h1 class="display-4 fw-bold">UniVerseHub Forums</h1>
+            <p class="lead">Discuss on latest insights, tips, and stories from our community.</p>
+            <form class="d-flex justify-content-center mt-4" action="/forum/search">
+                <div class="input-group" style="max-width: 650px;">
+                    <input type="text" class="form-control" name="title" placeholder="Search forum topics..." aria-label="Search forum topics">
+                    <select class="form-select" style="max-width: 180px;" name="category">
+                        <option selected value="all">All Categories</option>
+                        <% if(categories.length > 0) { %>
+                            <% categories.map(category => { %>
+                                <option value="<%= category.name %>"><%= category.name %></option>
+                            <% }) %>
+                        <% } %>
+                    </select>
+                    <button id="searchBtn" class="btn btn-light" type="submit">Search</button>
+                </div>
+            </form>
+        </div>
+    </header>
     <div class="container mt-4">
         <div class="row">
             <div class="col-md-8">
-                <h1 class="mb-4">UniVerseHub Forums</h1>
+                <!-- <h1 class="mb-4">UniVerseHub Forums</h1> -->
                 <div class="mb-4">
                     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newTopicModal">
                         <i class="bi bi-plus-circle"></i> Start New Topic
