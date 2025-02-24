@@ -15,14 +15,6 @@
                     <a class="nav-link" href="/blog"><i class="bi bi-journal-text"></i> Blog</a>
                 </li>
             </ul>
-            <form id="search_form" class="d-flex me-2">
-                <input class="form-control me-1" list="datalistOptions" type="search" name="searchText" placeholder="Search for topics..." aria-label="Search">
-                <button class="btn btn-outline-success" type="submit"><i class="bi bi-search"></i></button>
-                <!-- https://getbootstrap.com/docs/5.3/forms/input-group/#segmented-buttons (for ref) -->
-                <datalist id="datalistOptions">
-                    <option value="San Francisco">
-                </datalist>
-            </form>
             <div class="dropdown">
                 <% if(user) { %>
                     <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">

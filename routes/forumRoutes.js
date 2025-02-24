@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const forumControllers = require('../controllers/forumController');
 const categoryController = require('../controllers/categoryController');
+const searchControllers = require('../controllers/searchController');
 const { requireRole } = require('../middleware/authMiddleware');
 
 const {
@@ -21,10 +22,19 @@ const {
     category_dlt
 } = categoryController;
 
+const {
+    search_forum_get
+} = searchControllers;
+
 // forum routes
 router.get('/', forum_get);
 router.post('/', forum_post);
 router.put('/', forum_update);
+
+// search
+router.get('/search', search_forum_get);
+
+
 router.delete('/:id', forum_dlt);
 router.get('/:id', forum_detail_get);
 router.put('/:id/like', likePost);
@@ -35,6 +45,7 @@ router.post('/category', requireRole(['admin', 'moderator']), category_post);
 router.put('/category', requireRole(['admin', 'moderator']), category_update_put);
 router.get('/category/:name', forum_category_get);
 router.delete('/category/:id', requireRole(['admin', 'moderator']) , category_dlt);
+
 
 
 module.exports = router;

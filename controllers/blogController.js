@@ -4,23 +4,31 @@ const handleErrors = require('../utils/errorHandler');
 
 
 const blog_get = async (req, res) => {
-
     try {
+        // paggination
+        let limit = parseInt(req.query.limit) || 6;
         
-        const rawBlogs = await Blog.find({ status: 'published'})
+        const blogCount = await Blog.countDocuments();
+        if(limit > blogCount) limit = blogCount;
+
+        // bussiness logic
+        const rawBlogs = await Blog.find({ status: 'published'}).sort({ createdAt: -1 })
                                 .populate('author', "username email name avatarUrl")
-                                .populate("category", "name");
+                                .populate("category", "name")
+                                .limit(limit);
         const { blogs, featuredBlogs } = rawBlogs.reduce((acc, blog) => {
             if( blog.featured) {
                 acc.featuredBlogs.push(blog);
             } else {
-                acc.blogs.push(blog)
+                acc.blogs.push(blog);
             }
 
             return acc;
         }, { blogs: [], featuredBlogs: []});
 
-        res.render('blog/index', { title : 'UniVerseHub Blog', blogs, featuredBlogs })
+        const categories = await Category.find({ type: 'blog' });
+
+        res.render('blog/index', { title : 'UniVerseHub Blog', blogs, featuredBlogs, categories, limit })
     } catch (err) {
         const errors = handleErrors(err);
         res.status(400).json({ errors });
@@ -80,7 +88,7 @@ const blog_create_post = async (req, res) => {
 
     try {
 
-        const categoryDoc = await Category.findOne( { category, type: 'blog' });
+        const categoryDoc = await Category.findOne( { name: category, type: 'blog' });
         if(!categoryDoc) {
             return res.status(400).json({ errors: { category: "Category not found" } });
         }

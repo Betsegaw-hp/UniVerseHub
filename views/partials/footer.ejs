@@ -27,7 +27,34 @@
             </div>
         </div>
     </div>
+    <nav style="position: relative;">
+        <a href="#" class="btn btn-warning" id="scrollTopBtn" title="Go to top" style="display:none; position: fixed;bottom: 4rem;right: 3rem;">
+            <i class="bi bi-arrow-up"></i>
+        </a>
+    </nav>
     <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.2);">
         © 2024 UniVerseHub. All rights reserved.
     </div>
 </footer>
+<script>
+    // Get the button
+    let mybutton = document.getElementById("scrollTopBtn");
+
+    // When the user scrolls down 20px from the top of the document, show the button
+    window.onscroll = function() {scrollFunction()};
+
+    function scrollFunction() {
+        console.log(document.body.scrollTop, document.documentElement.scrollTop)
+        if (document.body.scrollTop > 50 || document.documentElement.scrollTop > 50) {
+            mybutton.style.display = "block";
+        } else {
+            mybutton.style.display = "none";
+        }
+    }
+
+    // When the user clicks on the button, scroll to the top of the document
+    mybutton.onclick = function() {
+        document.body.scrollTop = 0;
+        document.documentElement.scrollTop = 0;
+    }
+</script>
