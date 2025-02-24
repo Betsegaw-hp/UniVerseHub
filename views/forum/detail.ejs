@@ -112,7 +112,10 @@
                                 <div class="d-flex">
                                     <img src="<%= comment.author.avatarUrl %>" alt="<%= comment.author.name %>" class="comment-avatar border border-warning me-3">
                                     <div class="flex-grow-1">
-                                        <h5 class="mb-0 capitalize"><%= comment.author.name %></h5>
+                                        <div class="d-flex justify-content-between">
+                                            <h5 class="mb-0 capitalize"><%= comment.author.name %></h5>
+                                            <button class="btn " data-conmment-id="<%= comment._id %>"><i class="bi bi-dots">...</i></button>
+                                        </div>
                                         <a class="text-decoration-none" href="/profile/<%= comment.author.username %>">
                                             <small class="text-muted">@<%= comment.author.username %> 
                                         </a>
