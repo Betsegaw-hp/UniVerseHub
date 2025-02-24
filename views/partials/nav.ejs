@@ -3,7 +3,8 @@
         <a class="navbar-brand" href="/">
             <i class="bi bi-globe"></i> UniVerseHub
         </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
@@ -17,30 +18,36 @@
             </ul>
             <div class="dropdown">
                 <% if(user) { %>
-                    <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
-                        <img src="<%= user.avatarUrl %>" alt="avatar" class="avatar-sm" /> welcome, <span class="capitalize"><%= user.name %></span>
+                    <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        <img src="<%= user.avatarUrl %>" alt="avatar" class="avatar-sm" /> welcome, <span
+                            class="capitalize">
+                            <%= user.name %>
+                        </span>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuLink">
-                        <li><a class="dropdown-item" href="/profile/<%= user?.username || "404" %>">Profile</a></li>
+                        <li><a class="dropdown-item" href="/profile/<%= user?.username || " 404" %>">Profile</a></li>
                         <li><a class="dropdown-item" href="/profile/setting">Settings</a></li>
-                        <% if(user?.role === 'admin') {%>
+                        <% if(user?.role==='admin' ) {%>
                             <li><a class="dropdown-item" href="/admin">Admin Dashboard</a></li>
-                        <% } %>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="/auth/logout">Log out</a></li>
+                            <% } %>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li><a class="dropdown-item" href="/auth/logout">Log out</a></li>
                     </ul>
-                <% } else { %>
-                    <a href="/auth" class="btn btn-primary">Join Us</a>
-                <% } %>
+                    <% } else { %>
+                        <a href="/auth" class="btn btn-primary">Join Us</a>
+                        <% } %>
             </div>
         </div>
     </div>
 </nav>
-<script>
+<!-- <script>
     const searchForm = document.getElementById("search_form");
     let debounceTimer;
 
-    searchForm.addEventListener('input', (e) => {
+    searchForm?.addEventListener('input', (e) => {
 
         const searchText = searchForm.searchText.value;
 
@@ -62,4 +69,4 @@
         }
     })
 
-</script>
+</script> -->
