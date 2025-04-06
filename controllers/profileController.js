@@ -87,7 +87,7 @@ const profile_update_put = async (req,res) => {
             {new : true, runValidators: true}
         ).exec();
 
-        console.log("updated:" , updatedUser);
+        updatedUser.password = "";
 
         res.status(200).json({ user: updatedUser });
 

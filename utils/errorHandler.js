@@ -76,7 +76,13 @@ const handleErrors = (err) => {
           blog_errors[properties.path] = properties.message;
           errors = blog_errors;
         });
-    } 
+    } else if(err.message.includes('Validation failed')) {
+        Object.values(err.errors).forEach(({ properties }) => {
+          // console.log(properties);
+          errors[properties.path] = properties.message;
+          console.log(errors);
+        });
+    }
 
     return errors;
   }

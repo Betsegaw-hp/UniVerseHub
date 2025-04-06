@@ -10,10 +10,11 @@ const profileRoutes = require('./routes/profileRoutes')
 const homeRoutes = require('./routes/homeRoutes')
 const adminRoutes = require('./routes/adminRoutes')
 const {requireAuth, checkUser, requireRole} = require('./middleware/authMiddleware');
+const path = require('path');
 
 dotenv.config();
 const app = express()
-const port = process.env.PORT
+const port = process.env.PORT || 3000;
 
 // db connection
 mongoose.connect(process.env.DB_URI)  

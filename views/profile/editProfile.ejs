@@ -219,8 +219,14 @@
                     if (data.errors) {
                         form_alert.classList.toggle("alert-success", false);
                         form_alert.classList.toggle("alert-danger", true);
-                        alertMsg.innerHTML = data.errors.username;
-                        console.log(data.errors)
+                        let errorContents = "";
+                        for(let err of Object.keys(data.errors)) {
+                            console.log(data.errors[err]);
+                            if (data.errors[err] !== "")
+                                errorContents += `${data.errors[err]} <br>`;
+                        }
+                        alertMsg.innerHTML = errorContents;
+                        console.log(data.errors.bio);
                     }
                     if(data.error) {
                         alertMsg.textContent = data.error;
