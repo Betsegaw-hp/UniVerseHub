@@ -1,89 +1,307 @@
 <% 
+    let stats = {
+        users: 0,
+        topics: 0,
+        categories: 0
+    };
     let categories = [];
     let posts = [];
+    let featuredBlogs = [];
     if(data) {
         categories = data.categories;
         posts = data.posts;
+        stats = data.stats;
+        featuredBlogs = data.featuredBlogs;
     }
+
 %>
 <!DOCTYPE html>
 <html lang="en">
     <head>
         <%- include('./partials/head')  %> 
-       
+        <link rel="stylesheet" href="/css/home.css">
     </head>
 <body>
     <%- include('./partials/nav')  %> 
 
     <div class="container mt-4">
-        <div class="jumbotron bg-light p-5 rounded">
-            <h1 class="display-4">Welcome to UniVerseHub</h1>
-            <p class="lead">Connect with fellow students, share ideas, and explore a world of knowledge through forums and videos.</p>
-            <hr class="my-4">
-            <p>Join discussions, watch educational content, and expand your university experience.</p>
-            <a class="btn btn-primary btn-lg" href="/forum" role="button">Join the Discussion</a>
-            <!-- <a class="btn btn-secondary btn-lg" href="/video" role="button">Explore Videos</a> -->
+        <!-- Hero Section -->
+        <div class="hero-section p-5 mb-5 animate-fade-in">
+            <div class="content-wrapper">
+                <h1 class="display-4">Welcome to UniVerseHub</h1>
+                <p class="lead">Connect with fellow students, share ideas, and explore a world of knowledge through forums and videos.</p>
+                <hr class="my-4">
+                <p>Join discussions, watch educational content, and expand your university experience.</p>
+                <div class="d-flex gap-2 mt-4">
+                    <a class="btn btn-primary btn-lg" href="/forum" role="button">
+                        <i class="bi bi-chat-dots me-2"></i>Join the Discussion
+                    </a>
+                    <!-- <a class="btn btn-outline-primary btn-lg" href="/video" role="button">
+                        <i class="bi bi-camera-video me-2"></i>Explore Videos
+                    </a> -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Popular Categories -->
+        <h4 class="mb-3 animate-fade-in delay-1">Popular Categories</h4>
+        <div class="category-pills animate-fade-in delay-1">
+            <% if(categories.length > 0) { %>
+                <% categories.slice(0,10).forEach(category => { %>
+                    <a href="/forum/category/<%= category.name %>" class="category-pill">
+                        <%= category.name %>
+                    </a>
+                <% }) %>
+            <% } else { %>
+               <p>No categories available.</p>
+            <% } %>
         </div>
 
-        <h2 class="mt-5 mb-4">What's Trending</h2>
+        <!-- Stats Counter -->
+        <div class="stats-counter animate-fade-in delay-2">
+            <div class="row">
+                <div class="col-6 col-md-3">
+                    <div class="counter-item">
+                        <div class="counter-value countable"><%= stats.totalUsers %>+</div>
+                        <div class="counter-label">Active Users</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="counter-item">
+                        <div class="counter-value countable"><%= stats.totalPosts %>+</div>
+                        <div class="counter-label">Forum Topics</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="counter-item">
+                        <div class="counter-value countable"><%= stats.totalCategories %>+</div>
+                        <div class="counter-label">Categories</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="counter-item">
+                        <div class="counter-value">24/7</div>
+                        <div class="counter-label">Community Support</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- What's Trending Section -->
+        <h2 class="mt-5 mb-4 animate-fade-in delay-3">What's Trending</h2>
         <div class="row">
-            <div class="col-md-4 mb-4">
-                <div class="card">
+            <!-- Hot Forum Topics -->
+            <div class="col-md-4 mb-4 animate-fade-in delay-3">
+                <div class="feature-card card h-100">
                     <div class="card-body">
-                        <h5 class="card-title"><i class="bi bi-chat-dots"></i> Hot Forum Topics</h5>
+                        <div class="icon-wrapper">
+                            <i class="bi bi-chat-dots text-primary"></i>
+                        </div>
+                        <h5 class="card-title">
+                            <i class="bi bi-fire me-2"></i>Hot Forum Topics
+                        </h5>
                         <ul class="list-group list-group-flush">
                             <% if(posts.length > 0) { %>
-                                <% posts.slice(0,3).map(post => { %>
-                                    <a class="text-decoration-none" href="/forum/<%= post._id %>" ><li class="list-group-item"><%= post.title %></li></a>
+                                <% posts.slice(0,3).forEach(post => { %>
+                                    <a href="/forum/<%= post._id %>">
+                                        <li class="list-group-item border-0">
+                                            <%= post.title %>
+                                            <div class="d-flex align-items-center mt-1">
+                                                <small class="text-muted me-2">
+                                                    <i class="bi bi-chat"></i> 
+                                                    <%= post.commentCount %> replies
+                                                </small>
+                                                <small class="text-muted">
+                                                    <i class="bi bi-hand-thumbs-up"></i> 
+                                                    <%= post.likeCount %> likes
+                                                </small>
+                                            </div>
+                                        </li>
+                                    </a>
                                 <% }) %>
+                            <% } else { %>
+                               <p>No posts available.</p>
                             <% } %>
                         </ul>
+                        <a href="/forum" class="btn btn-sm btn-outline-primary mt-3">View All Topics</a>
                     </div>
                 </div>
             </div>
-            <div class="col-md-4 mb-4">
-                <div class="card">
+            
+            <!-- Popular Videos -->
+            <div class="col-md-4 mb-4 animate-fade-in delay-3">
+                <div class="feature-card card h-100">
                     <div class="card-body">
-                        <h5 class="card-title"><i class="bi bi-camera-video"></i> Popular Videos <small>(coming soon)</small></h5>
+                        <div class="icon-wrapper">
+                            <i class="bi bi-camera-video text-primary"></i>
+                        </div>
+                        <h5 class="card-title">
+                            <i class="bi bi-play-circle me-2"></i>Popular Videos <small>(coming soon)</small>
+                        </h5>
                         <ul class="list-group list-group-flush">
-                            <li class="list-group-item">DIY dorm room decor</li>
-                            <li class="list-group-item">Study with me: 4-hour session</li>
-                            <li class="list-group-item">A day in the life of a med student</li>
+                            <li class="list-group-item border-0">
+                                DIY dorm room decor
+                                <div class="progress mt-1" style="height: 5px;">
+                                    <div class="progress-bar bg-primary" role="progressbar" style="width: 75%"></div>
+                                </div>
+                                <small class="text-muted">15:24</small>
+                            </li>
+                            <li class="list-group-item border-0">
+                                Study with me: 4-hour session
+                                <div class="progress mt-1" style="height: 5px;">
+                                    <div class="progress-bar bg-primary" role="progressbar" style="width: 90%"></div>
+                                </div>
+                                <small class="text-muted">4:00:00</small>
+                            </li>
+                            <li class="list-group-item border-0">
+                                A day in the life of a med student
+                                <div class="progress mt-1" style="height: 5px;">
+                                    <div class="progress-bar bg-primary" role="progressbar" style="width: 60%"></div>
+                                </div>
+                                <small class="text-muted">22:45</small>
+                            </li>
                         </ul>
+                        <a href="#" class="btn btn-sm btn-outline-primary mt-3">Coming Soon</a>
                     </div>
                 </div>
             </div>
-            <div class="col-md-4 mb-4">
-                <div class="card">
+            
+            <!-- Active Communities -->
+            <div class="col-md-4 mb-4 animate-fade-in delay-3">
+                <div class="feature-card card h-100">
                     <div class="card-body">
-                        <h5 class="card-title"><i class="bi bi-people"></i> Active Communities</h5>
+                        <div class="icon-wrapper">
+                            <i class="bi bi-people text-primary"></i>
+                        </div>
+                        <h5 class="card-title">
+                            <i class="bi bi-star me-2"></i>Active Communities
+                        </h5>
                         <ul class="list-group list-group-flush">
                             <% if(categories.length > 0) { %>
-                                <% categories.slice(0,3).map(category => { %>
-                                    <a class="text-decoration-none" href="/forum/category/<%= category.name %>"><li class="list-group-item"><%= category.name %></li></a>
+                                <% categories.slice(0,3).forEach(category => { %>
+                                    <a href="/forum/category/<%= category.name %>">
+                                        <li class="list-group-item border-0">
+                                            <%= category.name %>
+                                            <div class="d-flex align-items-center justify-content-between mt-1">
+                                                <small class="text-muted">
+                                                    <i class="bi bi-people-fill"></i> 
+                                                     <%= category.postCount%> topics
+                                                </small>
+                                                <span class="badge bg-primary rounded-pill">Active</span>
+                                            </div>
+                                        </li>
+                                    </a>
                                 <% }) %>
+                            <% } else { %>
+                                <p>No categories available.</p>
                             <% } %>
                         </ul>
+                        <a href="/forum" class="btn btn-sm btn-outline-primary mt-3">Explore Communities</a>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="bg-light p-5 rounded mt-5">
-            <h2>Join Our Community</h2>
-            <p class="lead">Get the latest updates, forum highlights, and featured videos delivered to your inbox.</p>
-            <form class="row g-3">
-                <div class="col-auto">
+        <!-- Featured Content -->
+        <div class="row mt-4 mb-5 animate-fade-in delay-4">
+            <div class="col-md-8 mb-4">
+                <div class="feature-card card">
+                    <div class="card-body">
+                        <h4 class="mb-3">Featured Blog</h4>
+                        <% if(featuredBlogs.length > 0) { %> 
+                            <% featuredBlogs.forEach(blog => { %>
+                                <div class="featured-post p-3 border-start border-primary border-3 bg-light rounded">
+                                    <span class="badge bg-primary"><%= blog.category.name %></span>
+                                    <h5><%= blog.title %></h5>
+                                    <p class="text-muted mb-2">Posted by <a href="/profile/<%= blog.author.username %>" class="fw-bold text-primary"><%= blog.author.name %></a></p>
+                                    <p class="clamp-text-3">College life can be overwhelming with classes, assignments, and social activities. Here are some practical tips to help you maintain a healthy balance between your academic responsibilities and social life...</p>
+                                    <div class="d-flex align-items-center gap-3 mt-3">
+                                        <span class="text-muted"><i class="bi bi-chat"></i> 42 replies</span>
+                                        <span class="text-muted"><i class="bi bi-eye"></i> 156 views</span>
+                                        <span class="text-muted"><i class="bi bi-hand-thumbs-up"></i> 78 likes</span>
+                                    </div>
+                                    <a href="/blog/<%= blog.slug %>" class="btn btn-primary mt-3 text-white">Read More</a>
+                                </div>
+                            <% }) %>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="feature-card card">
+                    <div class="card-body">
+                        <h4 class="mb-3">Upcoming Events</h4>
+                        <div class="event-item mb-3 p-3 border-start border-primary border-3 bg-light rounded">
+                            <div class="d-flex justify-content-between">
+                                <h5 class="mb-1">Career Fair</h5>
+                                <span class="badge bg-primary">Apr 15</span>
+                            </div>
+                            <p class="mb-0">Connect with top employers and explore internship opportunities.</p>
+                        </div>
+                        <div class="event-item mb-3 p-3 border-start border-primary border-3 bg-light rounded">
+                            <div class="d-flex justify-content-between">
+                                <h5 class="mb-1">Study Group</h5>
+                                <span class="badge bg-primary">Apr 10</span>
+                            </div>
+                            <p class="mb-0">Join the finals prep study group for Computer Science.</p>
+                        </div>
+                        <a href="#" class="btn btn-outline-primary">View All Events</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Newsletter Section -->
+        <div class="newsletter-section p-5 mt-5 animate-fade-in delay-4">
+            <h2 class="mb-2">Join Our Community</h2>
+            <p class="lead mb-4">Get the latest updates, forum highlights, and featured videos delivered to your inbox.</p>
+            
+            <form class="newsletter-form row g-3">
+                <div class="col-md-8">
                     <input type="email" class="form-control" id="inputEmail" placeholder="Enter your email">
                 </div>
-                <div class="col-auto">
-                    <button type="submit" class="btn btn-primary mb-3">Subscribe</button>
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-envelope me-2"></i>Subscribe
+                    </button>
+                </div>
+                <div class="col-12">
+                    <p class="text-muted mt-2"><small>By subscribing, you agree to our Terms of Service and Privacy Policy.</small></p>
                 </div>
             </form>
-            <p class="text-muted"><small>By subscribing, you agree to our Terms of Service and Privacy Policy.</small></p>
         </div>
     </div>
 
     <%- include('./partials/footer')  %> 
+    
+    <script>
+        // Simple animation for counters
+        document.addEventListener('DOMContentLoaded', function() {
+            const counterElements = document.querySelectorAll('.countable');
+            
+            counterElements.forEach(counter => {
+                const target = counter.innerText;
+                const suffix = target.includes('+') ? '+' : '';
+                const numTarget = parseInt(target.replace(/\D/g, ''));
+                
+                if (isNaN(numTarget)) return;
+                
+                let count = 0;
+                const duration = 2000; // 2 seconds
+                const interval = 50; 
+                const increment = Math.ceil(numTarget / (duration / interval));
+                
+                const timer = setInterval(() => {
+                    count += increment;
+                    if (count >= numTarget) {
+                        counter.innerText = numTarget + suffix;
+                        clearInterval(timer);
+                    } else {
+                        counter.innerText = count + suffix;
+                    }
+                }, interval);
+            });
+        });
+    </script>
 </body>
 </html>

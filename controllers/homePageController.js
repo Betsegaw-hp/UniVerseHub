@@ -1,5 +1,7 @@
 const {ForumPost} = require('../model/forum');
 const Category = require('../model/category');
+const User = require('../model/user');
+const Blog = require('../model/blog');
 
 const home_data_get = (req, res ) => {
 
@@ -17,10 +19,19 @@ const home_data_get = (req, res ) => {
             }
         ]) ,
         
-        Category.find().sort({ createdAt: -1 })
+        Category.find().sort({ createdAt: -1 }),
+        User.countDocuments({ status: 'active' }),
+        Blog.find({ featured: true }).sort({ createdAt: -1 })
+            .populate('author', 'name profileImage username')
+            .populate('category', 'name')
+            .limit(3),
     ])
-    .then(async ([posts, categories]) => {
-
+    .then(async ([posts, categories, usersCount, featuredBlogs]) => {
+        let stats = {
+            totalPosts: posts.length,
+            totalCategories: categories.length,
+            totalUsers: usersCount, 
+        };
         const categoriesWithPostCount = 
             await Promise.all(categories.map(async (category) => {
                 // Get the count of posts for this category
@@ -33,6 +44,8 @@ const home_data_get = (req, res ) => {
 
         const data = {
             posts,
+            stats,
+            featuredBlogs,
             categories: categoriesWithPostCount.sort((a, b) => b.postCount - a.postCount)
         };
         
