@@ -22,11 +22,13 @@
             padding: 2rem 0;
             margin-bottom: 2rem;
         }
+
         .profile-avatar {
             width: 150px;
             height: 150px;
             object-fit: cover;
         }
+
     </style>
     <!-- Include the timeLapse.js file -->
     <script src="/timeLapse.js"></script>
@@ -36,24 +38,23 @@
 
     <div class="profile-header bg-light-subtle">
         <div class="container">
-            <div class="row align-items-center">
-                <div class="col-md-3 text-center">
-                    <img src="<%= userData.avatarUrl %>" alt="<%= userData.name %>" class="rounded-circle border border-5 border-dark  profile-avatar">
+            <div class="profile-header-content row align-items-center">
+                <div class="col-12 col-md-3 text-center">
+                    <img src="<%= userData.avatarUrl %>" alt="<%= userData.name %>" class="rounded-circle border border-5 border-dark profile-avatar">
                 </div>
-                <div class="col-md-9">
+                <div class="col-12 col-md-9 text-center text-md-start">
                     <h1 class="capitalize"><%= userData.name %></h1>
                     <p class="text-muted small pl-3">@<%= userData.username %></p>
                     <p class="lead"><%= userData.occupation || "Community Member" %></p> 
-                    <div class="row">
-                        <div class="col-md-3">
-                            <i class="bi bi-envelope"></i> <%= userData.email  %></p>
+                    <div class="row text-center text-md-start">
+                        <div class="col-6 col-md-3">
+                            <p><i class="bi bi-envelope"></i> <%= userData.email  %></p>
                             <p><i class="bi bi-calendar3"></i> Joined <%= userData.createdAt.toLocaleDateString('en-UK', { year: 'numeric', month: 'long' }) %></p>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-6 col-md-3">
                             <p><i class="bi bi-geo-alt"></i> <%= userData.address || "unknown"  %></p>
                         </div>
                     </div>
-                    <!-- <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#newProfileModal"><i class="bi bi-pencil"></i> Edit Profile</button> -->
                 </div>
             </div>
         </div>

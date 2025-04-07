@@ -25,7 +25,7 @@
                             <%= user.name %>
                         </span>
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuLink">
+                    <ul class="dropdown-menu dropdown-menu-start" aria-labelledby="dropdownMenuLink">
                         <li><a class="dropdown-item" href="/profile/<%= user?.username || " 404" %>">Profile</a></li>
                         <li><a class="dropdown-item" href="/profile/setting">Settings</a></li>
                         <% if(user?.role==='admin' ) {%>
@@ -34,7 +34,7 @@
                                 <li>
                                     <hr class="dropdown-divider">
                                 </li>
-                                <li><a class="dropdown-item" href="/auth/logout">Log out</a></li>
+                                <li><a class="dropdown-item text-danger" href="/auth/logout"><i class="bi bi-box-arrow-right"></i> Log out</a></li>
                     </ul>
                     <% } else { %>
                         <a href="/auth" class="btn btn-primary">Join Us</a>
