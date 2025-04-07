@@ -1,5 +1,5 @@
 <% 
-    console.log(blog.thumbnail)
+    console.log(relatedBlogs[0])
 %>
 
 <!DOCTYPE html>
@@ -28,6 +28,7 @@
         .custom-shape-divider-bottom-1684680749 .shape-fill {
           fill: #FFFFFF;
         }
+
       </style>
 </head>
 <body>
@@ -112,6 +113,32 @@
                 p.classList.toggle('p-with-img', true);
             }
         });
+
+        // function addCopyButtonsToCodeBlocks() {
+        //     const codeBlocks = document.querySelectorAll(".ql-editor pre code");
+        //     codeBlocks.forEach(codeBlock => {
+        //         const wrapper = document.createElement('div');
+        //         wrapper.classList.add('code-container');
+        //         const pre = codeBlock.parentElement;
+        //         pre.parentNode.insertBefore(wrapper, pre);
+        //         wrapper.appendChild(pre);
+
+        //         const button = document.createElement('button');
+        //         button.className = 'copy-btn';
+        //         button.innerText = 'Copy';
+        //         button.addEventListener('click', () => {
+        //             navigator.clipboard.writeText(codeBlock.textContent).then(() => {
+        //                 button.innerText = 'Copied!';
+        //                 setTimeout(() => button.innerText = 'Copy', 1500);
+        //             });
+        //         });
+        //         wrapper.appendChild(button);
+        //     });
+        // }
+
+        // document.addEventListener("DOMContentLoaded", function() {
+        //     addCopyButtonsToCodeBlocks();
+        // });
     </script>
 </body>
 </html>

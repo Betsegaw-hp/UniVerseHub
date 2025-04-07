@@ -15,7 +15,7 @@ const blog_get = async (req, res) => {
         const rawBlogs = await Blog.find({ status: 'published'}).sort({ createdAt: -1 })
                                 .populate('author', "username email name avatarUrl")
                                 .populate("category", "name")
-                                .populate("thumbnail", "s3location, s3key, hash")
+                                .populate("thumbnail", "s3location s3key hash")
                                 .limit(limit);
         const { blogs, featuredBlogs } = rawBlogs.reduce((acc, blog) => {
             if( blog.featured) {
@@ -58,7 +58,7 @@ const blog_detail_get = async (req, res) => {
         const blog = await Blog.findOne({ slug, status: 'published' })
                                 .populate('author', "username email name avatarUrl")
                                 .populate("category", "name")
-                                .populate("thumbnail", "s3location, s3key, hash");
+                                .populate("thumbnail", "s3location s3key hash");
         if(!blog) {
             return res.redirect('../404');
         }
@@ -140,7 +140,7 @@ const blog_update_get = async (req, res) => {
         const blog = await Blog.findOne({ slug })
                                 .populate('author', "username email name avatarUrl")
                                 .populate("category", "name")
-                                .populate("thumbnail", "s3location, s3key, hash");
+                                .populate("thumbnail", "s3location s3key hash");
         if(!blog) {
             return res.redirect('../404');
         }
@@ -295,21 +295,21 @@ const getBlogsByCategory = async (categoryName, field = null ) => {
             return [];
         }
 
-        let blogs = null;
-        // Fetch blogs for the found category
-        if(field) {
+        const query = {
+            category: category._id,
+            status: 'published'
+        };
 
-            blogs = await Blog.find({ category: category._id }, field)
-                // .populate('author', 'username email') 
-                // .populate('category', 'name') 
-                .exec();
-        } else {
-            blogs = await Blog.find({ category: category._id })
-                .populate('author', 'username email avatarUrl') 
-                .populate('category', 'name') 
-                .exec();
+        let blogsQuery = Blog.find(query)
+            .populate('author', 'username email avatarUrl')
+            .populate('category', 'name')
+            .populate('thumbnail', 's3location s3key hash');
+
+        if (field) {
+            blogsQuery = blogsQuery.select(field);
         }
 
+        const blogs = await blogsQuery.exec();
         return blogs;
 
     } catch (err) {

@@ -5,7 +5,7 @@
 
     <title>Manage Blog Post - UniVerseHub Admin</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
     <style>
         body {
             font-family: 'Poppins', sans-serif;
@@ -26,6 +26,7 @@
             background-color: #0d6efd;
             border-color: #0d6efd;
         }
+  
     </style>
 </head>
 <body>
@@ -120,87 +121,82 @@
         </div>
     </div>
 
-    
-    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
     <script>
         const toolbarOptions = [
             [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-            ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+            ['bold', 'italic', 'underline', 'strike'],
             ['blockquote', 'code-block'],
             ['link', 'image', 'video', 'formula'],
-
-            [{ 'list': 'ordered'}, { 'list': 'bullet' }, { 'list': 'check' }],
-            [{ 'script': 'sub'}, { 'script': 'super' }],      // superscript/subscript
-            [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
-            [{ 'direction': 'rtl' }],                         // text direction
-
-            [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
+            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+            [{ 'script': 'sub' }, { 'script': 'super' }],
+            [{ 'indent': '-1' }, { 'indent': '+1' }],
+            [{ 'direction': 'rtl' }],
+            [{ 'color': [] }, { 'background': [] }],
             [{ 'align': [] }],
-
-            ['clean']                                         // remove formatting button
+            ['clean']
         ];
 
         const quill = new Quill('#editor', {
+            theme: 'snow',
             modules: {
-                toolbar: toolbarOptions
-            },
-            theme: 'snow'
+                toolbar: toolbarOptions,
+                history: {
+                    delay: 1000,
+                    maxStack: 100,
+                    userOnly: false
+                },
+                clipboard: {
+                    matchVisual: false
+                },
+                syntax: false
+            }
         });
 
         const slug = "<%= blog.slug %>";
-        
         const blogForm = document.getElementById('blogForm');
         const toast = document.querySelector('.toast');
         const toastBody = document.querySelector('.toast-body');
-        const blogBody = blogForm.blogBodyHolder.value;
+        const blogBody = blogForm.blogBodyHolder?.value || "";
         quill.root.innerHTML = blogBody;
+
+
 
         blogForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             let allImagesUploaded = true;
             const formData = new FormData();
-            // Extract content from Quill
             let content = quill.root.innerHTML;
 
-            // Function to upload the image and return the URL
-            async function uploadImage(base64Image) {
+            function uploadImage(base64Image) {
                 const formData = new FormData();
-                const blob = await fetch(base64Image).then(res => res.blob());
-                formData.append('image', blob, 'image.png');
-
-
-                const response = await fetch('/admin/upload-image', {
-                    method: 'POST',
-                    body: formData
-                });
-
-                const data = await response.json();
-
-                if(!response.ok) {
-                    allImagesUploaded = false;
-                    displayError(data.errors);
-                }
-
-                console.log(data);
-                return data.fileInfo.hash;
+                return fetch(base64Image)
+                    .then(res => res.blob())
+                    .then(blob => {
+                        formData.append('image', blob, 'image.png');
+                        return fetch('/admin/upload-image', {
+                            method: 'POST',
+                            body: formData
+                        });
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (!data.fileInfo) throw data.errors;
+                        return data.fileInfo.hash;
+                    })
+                    .catch(err => {
+                        allImagesUploaded = false;
+                        displayError(err);
+                    });
             }
 
-
-            // Regex to match base64 images in the content
             const base64ImageRegex = /<img src="data:image\/[^;]+;base64[^"]+"[^>]*>/g;
-
-            // Find all base64 images in the content
             const base64Images = content.match(base64ImageRegex) || [];
 
             for (let base64ImageTag of base64Images) {
                 const base64Image = base64ImageTag.match(/src="([^"]+)"/)[1];
-
-                // Upload the image and get the URL
                 const imagehash = await uploadImage(base64Image);
                 const imageUrl = `/image/${imagehash}`; 
-                console.log(imageUrl);
-
-                // Replace the base64 image with the image URL in the content
                 content = content.replace(base64Image, imageUrl);
             }
 
@@ -212,8 +208,8 @@
                 formData.append('content', content);
                 formData.append('snippet', blogForm.snippet.value);
                 formData.append('tags', blogForm.tags.value);
-                formData.append('image', blogForm.image.files[0]);  // Correctly handle the image file
-    
+                formData.append('image', blogForm.image.files[0]);
+
                 fetch(`/admin/blog/${slug}`, {
                     method: 'PUT',
                     body: formData
@@ -221,69 +217,52 @@
                 .then(res => res.json())
                 .then(data => {
                     if(data.errors) {
-                        console.log(data.errors)
                         displayError(data.errors);
-    
-                     } else if(data.draftedBlog) {
-                        const msg = `Saved as draft. Preview at <a class="link-body-emphasis link-offset-2 link-underline-opacity-25 link-underline-opacity-75-hover" href="/blog/${data.draftedBlog.slug}">${data.draftedBlog.title}</a>`;
+                    } else if(data.draftedBlog) {
+                        const msg = `Saved as draft. Preview at <a class="link-body-emphasis" href="/blog/${data.draftedBlog.slug}">${data.draftedBlog.title}</a>`;
                         displaySucess(msg);
                         window.location = `/admin/blog/${data.draftedBlog.slug}`;
                     }
-
                 })
                 .catch(err => console.error(err));
             }
-
-
         });
 
         function displayError(errors) {
             let msg = null;
-            Object.entries(errors).map(entry => {
-                let key = entry[0];
-                let value = entry[1];
-
-                if(value != '') msg = value;
-            })
-            
-            if(!msg) msg = "Unexpected Error occured. ";
+            Object.entries(errors).map(([_, value]) => {
+                if(value) msg = value;
+            });
+            if(!msg) msg = "Unexpected Error occurred.";
             toastBody.innerHTML = '<i class="bi bi-exclamation-triangle"></i> '+ msg;
-            toast.classList.toggle('hide', false);
-            toast.classList.toggle('show', true);
-
-            //styling
-            toast.classList.toggle('text-bg-success', false);
-            toast.classList.toggle('text-bg-danger', true);
+            toast.classList.replace('hide', 'show');
+            toast.classList.add('text-bg-danger');
+            toast.classList.remove('text-bg-success');
         }
 
         function displaySucess(msg) {
             toastBody.innerHTML = '<i class="bi bi-check-circle-fill"></i> '+ msg;
-            toast.classList.toggle('hide', false);
-            toast.classList.toggle('show', true);
-
-            //styling
-            toast.classList.toggle('text-bg-danger', false);
-            toast.classList.toggle('text-bg-success', true);
+            toast.classList.replace('hide', 'show');
+            toast.classList.add('text-bg-success');
+            toast.classList.remove('text-bg-danger');
         }
-        
+
         document.getElementById('publish').addEventListener('click', function() {
             fetch(`/admin/blog/${slug}/publish`)
             .then(res => res.json())
             .then(data => {
-               if(data.errors) {
-                displayError(data.errors);
-               } else {
-                const msg = `Published. Preview at <a class="link-body-emphasis link-offset-2 link-underline-opacity-25 link-underline-opacity-75-hover" href="/blog/${data.savedBlog.slug}">${data.savedBlog.title}</a>`;
-                displaySucess(msg);
-                location.reload();
-               }
-            })
-            .catch(err => console.error(err));
+                if(data.errors) {
+                    displayError(data.errors);
+                } else {
+                    const msg = `Published. Preview at <a class="link-body-emphasis" href="/blog/${data.savedBlog.slug}">${data.savedBlog.title}</a>`;
+                    displaySucess(msg);
+                    location.reload();
+                }
+            });
         });
 
         document.getElementById('deleteBlog').addEventListener('click', function() {
-            if (confirm('Are you sure you want to delete this blog? This action cannot be undone.')) {
-                
+            if (confirm('Are you sure you want to delete this blog?')) {
                 fetch(`/blog/${slug}`, { method: 'DELETE'})
                 .then(res => res.json())
                 .then(data => {
@@ -291,86 +270,21 @@
                         window.location = data.redirect;
                         alert('Blog deleted successfully!');
                     }
-                })
-                .catch(err => console.error(err));
+                });
             }
-        });
-
-        // Function to generate slug from title
-        function generateSlug(title) {
-            return title.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
-        }
-
-        // Auto-generate slug when title changes
-        document.getElementById('blogTitle').addEventListener('input', function() {
-            document.getElementById('blogSlug').value = generateSlug(this.value);
-        });
-
-        // check slug availability
-        const slugEle = document.getElementById('blogSlug');
-        let debounceTimer;
-        [document.getElementById('blogTitle'), document.getElementById('blogSlug')].forEach(ele => {
-
-            ele.addEventListener('input', function(e) {
-
-            const slug = slugEle.value.trim();
-
-            slugInvalidFeedback.textContent = "";
-            slugValidFeedback.textContent = "";
-
-            // Clear any previous debounce timer
-            clearTimeout(debounceTimer);
-
-
-            if (slug.length > 0) {
-                slugCheckFeedback.style.display = "block";
-                slugCheckFeedback.textContent = "Checking availability...";
-
-                debounceTimer = setTimeout(() => {
-                    // Make the AJAX request after the user stops typing
-                    fetch(`/blog/check-slug?slug=${slug}`)
-                        .then(response => response.json())
-                        .then(data => {
-
-                            slugCheckFeedback.style.display = "none";
-
-                            if (data.available) {
-                                slugEle.classList.toggle("is-invalid", false); // Removes the class if it exists
-                                slugEle.classList.toggle("is-valid", true); // adds the class if it doesn't exists
-                                slugValidFeedback.textContent = "Available!";
-                            } else {
-                                slugEle.classList.toggle("is-valid", false);  
-                                slugEle.classList.toggle("is-invalid", true);
-                                slugInvalidFeedback.textContent = "Unavailable. try different!";
-                            }
-                        })
-                        .catch(error => {
-                            slugCheckFeedback.style.display = "none";
-                            console.error('Error checking slug:', error);
-                        });
-                }, 1000);
-            } else {
-                slugCheckFeedback.style.display = "none";
-            }
-            });
         });
     </script>
     <script>
         (() => {
             'use strict'
-
-            // Fetch all the forms we want to apply custom Bootstrap validation styles to
             const forms = document.querySelectorAll('.needs-validation')
-
-            // Loop over them and prevent submission
             Array.from(forms).forEach(form => {
                 form.addEventListener('submit', event => {
-                if (!form.checkValidity()) {
-                    event.preventDefault()
-                    event.stopPropagation()
-                }
-
-                form.classList.add('was-validated')
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+                    form.classList.add('was-validated')
                 }, false)
             })
         })()

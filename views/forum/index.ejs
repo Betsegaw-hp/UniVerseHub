@@ -22,6 +22,7 @@
 
         <!-- Include the timeLapse.js file -->
         <script src="/timeLapse.js"></script>
+        <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
         <style>
             .blog-header {
                 background-color: #3498db;
@@ -173,13 +174,15 @@
                                         <option value="<%= category.name %>"><%= category.name %></option>
                                     <% }) %>
                                 <% } else { %>
-                                    <option value="" disabled>here is no category to display...</option>
+                                    <option value="" disabled>There are no categories to display...</option>
                                 <% } %>
                             </select>
                         </div>
+
+                        <!-- Quill Editor for Content -->
                         <div class="mb-3">
                             <label for="topicContent" class="form-label">Content</label>
-                            <textarea class="form-control" id="topicContent" rows="5" name="body_content" required></textarea>
+                            <div id="topicContentEditor" style="height: 300px;"></div>
                         </div>
                     </form>
                     <div id="form_alert" style="cursor:not-allowed;" class="alert alert-danger fade" role="alert">
@@ -193,6 +196,7 @@
             </div>
         </div>
     </div>
+
 
     <!-- New category modal (for admins) -->
     <div class="modal fade" id="newCategoryModal" tabindex="-1" aria-labelledby="newCategoryModalLabel" aria-hidden="true">
@@ -227,7 +231,7 @@
 
     <%- include('../partials/footer')  %> 
 
-
+    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
     <script>
         const form = document.querySelector("#post_form");
         const form_alert = document.querySelector("#form_alert");
@@ -236,11 +240,29 @@
         const CategoryForm_alert = document.querySelector("#category_form_alert");
         const CategoryForm_alert_msg = document.querySelector("#category_alert_msg");
 
+        const topicContentEditor = document.getElementById('topicContentEditor');
+
+        const quill = new Quill('#topicContentEditor', {
+            theme: 'snow',
+            modules: {
+                toolbar: [
+                    [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    ['blockquote', 'code-block'],
+                    ['link', 'video'],
+                    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                    [{ 'align': [] }],
+                    ['clean']
+                ]
+            }
+        });
+
+
         form.addEventListener("submit", (e) => {
             e.preventDefault();
 
             const title = form.title.value;
-            const body_content = form.body_content.value;
+            const body_content = quill.root.innerHTML;
             const category = form.category.value;
 
             const options = {

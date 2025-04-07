@@ -25,7 +25,7 @@
             object-fit: cover;
         }
     </style>
-
+    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
     <!-- Include the timeLapse.js file -->
     <script src="/timeLapse.js"></script>
 </head>
@@ -230,7 +230,7 @@
                         </div>
                         <div class="mb-3">
                             <label for="topicContent" class="form-label">Content</label>
-                            <textarea class="form-control" id="topicContent" name="body_content" rows="5" required></textarea>
+                            <div id="topicContentEditor" style="height: 300px;"></div>
                         </div>
                         <div class="mb-3">
                             <!-- <label for="topicTags" class="form-label">Tags</label>
@@ -282,7 +282,7 @@
 
     <%- include('../partials/footer')  %>
 
-
+    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
     <script>
         const form = document.querySelector("#post_form");
         const form_alert = document.querySelector("#form_alert");
@@ -296,13 +296,29 @@
         const categoryAlert = document.querySelector("#general_category_alert");
         const categoryAlertMsg = document.querySelector("#general_category_alert_msg");
 
+        
+        const topicContentEditor = document.getElementById('topicContentEditor');
 
+        const quill = new Quill('#topicContentEditor', {
+            theme: 'snow',
+            modules: {
+                toolbar: [
+                    [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    ['blockquote', 'code-block'],
+                    ['link', 'video'],
+                    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                    [{ 'align': [] }],
+                    ['clean']
+                ]
+            }
+        });
 
         form.addEventListener("submit", (e) => {
             e.preventDefault();
 
             const title = form.title.value;
-            const body_content = form.body_content.value;
+            const body_content = quill.root.innerHTML;
             const category = form.dataset.category;
 
             const options = {
