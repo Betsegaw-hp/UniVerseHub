@@ -4,158 +4,219 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Welcome to UniVerseHub</title>
+	<!-- Standard Favicon -->
+	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+	<link rel="shortcut icon" href="/favicon.ico">
+
+	<!-- Apple Touch Icon -->
+	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+
+	<!-- Android Chrome -->
+	<link rel="icon" type="image/png" sizes="192x192" href="/android-chrome-192x192.png">
+	<link rel="icon" type="image/png" sizes="512x512" href="/android-chrome-512x512.png">
+
+	<!-- Web App Manifest -->
+	<link rel="manifest" href="/site.webmanifest">
+
     <link href="/authStyle.css" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" rel="stylesheet"/>
-
 </head>
 <body>
-    <!-- <h2>Sign in/up Form</h2> -->
-<div class="container" id="container">
-	<div class="form-container sign-up-container">
-		<form method="#" id="signupForm">
-			<h1 style="margin-bottom: 0.3rem;">UniVerseHub</h1>
-			<h2>Create Account</h2>
-			<div class="social-container">
-				<a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
-				<a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
-				<a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
-			</div>
-			<span>or use your email for registration</span>
-			<input type="text" placeholder="Name" name="name" required/>
-			<div class="signup name error"></div>
-			<input type="email" placeholder="Email" name="email" required />
-			<div class="signup email error"></div>
-			<input type="password" placeholder="Password" name="password" required/>
-			<div class="signup password error"></div>
-			<button id="signupBtn" type="submit">Sign Up</button>
-		</form>
-	</div>
-	<div class="form-container sign-in-container">
-		<form method="#" id="loginForm">
-			<h1 style="margin-bottom: 0.3rem;">UniVerseHub</h1>
-			<h2>Sign in</h2>
-			<div class="social-container">
-				<a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
-				<a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
-				<a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
-			</div>
-			<span>or use your account</span>
-			<input type="email" placeholder="Email" name="email" required />
-			<div class="login email error"></div>
-			<input type="password" placeholder="Password" name="password" required />
-			<div class="login password error"></div>
-			<div class="login accountStatus error"></div>
-			<a href="#">Forgot your password?</a>
-			<button id="loginBtn" type="submit">Sign In</button>
-		</form>
-	</div>
-	<div class="overlay-container">
-		<div class="overlay">
-			<div class="overlay-panel overlay-left">
-				<h1>Welcome Back!</h1>
-				<p>To keep connected with us please login with your personal info</p>
-				<a href="#login"><button class="ghost" id="signIn">Sign In</button></a>
+    <div class="container" id="container">
+        <div class="form-container sign-up-container">
+            <form method="#" id="signupForm">
+                <div class="logo-container">
+                    <img src="/logo.svg" alt="UniVerseHub Logo" class="logo-image">
+                    <h1 class="logo">UniVerseHub</h1>
+                </div>
+                <h2>Create Account</h2>
+                <div class="social-container">
+                    <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
+                    <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+                <span>or use your email for registration</span>
+                <input type="text" placeholder="Name" name="name" required/>
+                <div class="signup name error"></div>
+                <input type="email" placeholder="Email" name="email" required />
+                <div class="signup email error"></div>
+                <input type="password" placeholder="Password" name="password" required/>
+                <div class="signup password error"></div>
+                <button id="signupBtn" type="submit">Sign Up</button>
+                <div class="mobile-toggle">
+                    <p>Already have an account? <a href="#" id="signInMobile">Sign In</a></p>
+                </div>
+            </form>
+        </div>
+        <div class="form-container sign-in-container">
+            <form method="#" id="loginForm">
+                <div class="logo-container">
+                    <img src="/logo.svg" alt="UniVerseHub Logo" class="logo-image">
+                    <h1 class="logo">UniVerseHub</h1>
+                </div>
+                <h2>Sign in</h2>
+                <div class="social-container">
+                    <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
+                    <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+                <span>or use your account</span>
+                <input type="email" placeholder="Email" name="email" required />
+                <div class="login email error"></div>
+                <input type="password" placeholder="Password" name="password" required />
+                <div class="login password error"></div>
+                <div class="login accountStatus error"></div>
+                <a href="#" class="forgot-password">Forgot your password?</a>
+                <button id="loginBtn" type="submit">Sign In</button>
+                <div class="mobile-toggle">
+                    <p>Don't have an account? <a href="#" id="signUpMobile">Sign Up</a></p>
+                </div>
+            </form>
+        </div>
+        <div class="overlay-container">
+            <div class="overlay">
+                <div class="overlay-panel overlay-left">
+                    <div class="logo-container overlay-logo">
+                        <img src="/logo-admin.svg" alt="UniVerseHub Logo" class="logo-image">
+                        <h1>Welcome Back!</h1>
+                    </div>
+                    <p>To keep connected with us please login with your personal info</p>
+                    <button class="ghost" id="signIn">Sign In</button>
+                </div>
+                <div class="overlay-panel overlay-right">
+                    <div class="logo-container overlay-logo">
+                        <img src="/logo-admin.svg" alt="UniVerseHub Logo" class="logo-image">
+                        <h1>Hello, Friend!</h1>
+                    </div>
+                    <p>Enter your personal details and start journey with us</p>
+                    <button class="ghost" id="signUp">Sign Up</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-			</div>
-			<div class="overlay-panel overlay-right">
-				<h1>Hello, Friend!</h1>
-				<p>Enter your personal details and start journey with us</p>
-				<a href="#signup"><button class="ghost" id="signUp">Sign Up</button></a>
-				
-			</div>
-		</div>
-	</div>
-</div>
+    <footer class="auth-footer">
+        <img src="/logo-admin.svg" alt="UniVerseHub Logo" class="footer-logo">
+        © <%= new Date().getFullYear() %> <i>UniVerseHub</i>. All rights reserved.
+    </footer>
 
-<footer class="auth-footer text-center p-3">
-	© 2024 <i>UniVerseHub.</i> All rights reserved.
-</footer>
-<script src="/authScript.js"></script>
-<script>
-	const loginForm = document.querySelector('#loginForm');
-	const signupForm = document.querySelector('#signupForm');
+    <script>
+        const signUpButton = document.getElementById('signUp');
+        const signInButton = document.getElementById('signIn');
+        const signUpMobileButton = document.getElementById('signUpMobile');
+        const signInMobileButton = document.getElementById('signInMobile');
+        const container = document.getElementById('container');
 
-	const signupEmailError = document.querySelector('.signup.email.error');
-    const signupPasswordError = document.querySelector('.signup.password.error');
-	const signupNameError = document.querySelector('.signup.name.error');
+        // Desktop panel switching
+        if (signUpButton) {
+            signUpButton.addEventListener('click', () => {
+                container.classList.add('right-panel-active');
+            });
+        }
 
-	const loginEmailError = document.querySelector('.login.email.error');
-	const loginPasswordError = document.querySelector('.login.password.error');
-	const loginAccountStatusError = document.querySelector('.login.accountStatus.error');
+        if (signInButton) {
+            signInButton.addEventListener('click', () => {
+                container.classList.remove('right-panel-active');
+            });
+        }
 
-	
-	loginForm.addEventListener("submit", (e) => {
-		e.preventDefault();
+        // Mobile toggle functionality
+        if (signUpMobileButton) {
+            signUpMobileButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                container.classList.add('right-panel-active');
+            });
+        }
 
-		// reset errors
-		loginEmailError.textContent = '';
-    	loginPasswordError.textContent = '';
-		loginAccountStatusError.textContent = '';
-		
-		const email = loginForm.email.value;
-		const password = loginForm.password.value;
-		
-		const URI = "/auth/login";
-		const others = {
-			method: 'POST',
-			body: JSON.stringify({ email, password }),
-			headers: { 'Content-Type': 'application/json' },
-		};
+        if (signInMobileButton) {
+            signInMobileButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                container.classList.remove('right-panel-active');
+            });
+        }
 
-		fetch(URI,others)
-		.then((res) => res.json())
-		.then(data => {
-			if (data.errors) {
-				loginEmailError.textContent = data.errors.email;
-				loginPasswordError.textContent = data.errors.password;
-				loginAccountStatusError.textContent = data.errors.status;
-			}
+        const loginForm = document.querySelector('#loginForm');
+        const signupForm = document.querySelector('#signupForm');
 
-			if (data.email) {
-				location.assign('/');
-			}
-		})
-		.catch(err => console.error(err))
-		.finally(e => console.log("finished"));
-	});
+        const signupEmailError = document.querySelector('.signup.email.error');
+        const signupPasswordError = document.querySelector('.signup.password.error');
+        const signupNameError = document.querySelector('.signup.name.error');
 
-	signupForm.addEventListener("submit", (e) => {
-		e.preventDefault();
+        const loginEmailError = document.querySelector('.login.email.error');
+        const loginPasswordError = document.querySelector('.login.password.error');
+        const loginAccountStatusError = document.querySelector('.login.accountStatus.error');
 
-		// reset errors
-		signupEmailError.textContent = '';
-    	signupPasswordError.textContent = '';
-		signupNameError.textContent = '';
-		
-		const email = signupForm.email.value;
-		const password = signupForm.password.value;
-		const name = signupForm.name.value;
-		//TODO: const username = signupForm.username.value;
-		
-		const URI = "/auth/signup";
-		const others = {
-			method: 'POST',
-			body: JSON.stringify({ email, password, name }),
-			headers: { 'Content-Type': 'application/json' },
-		};
+        
+        loginForm.addEventListener("submit", (e) => {
+            e.preventDefault();
 
-		fetch(URI,others)
-		.then((res) => res.json())
-		.then(data => {
+            // reset errors
+            loginEmailError.textContent = '';
+            loginPasswordError.textContent = '';
+            loginAccountStatusError.textContent = '';
+            
+            const email = loginForm.email.value;
+            const password = loginForm.password.value;
+            
+            const URI = "/auth/login";
+            const others = {
+                method: 'POST',
+                body: JSON.stringify({ email, password }),
+                headers: { 'Content-Type': 'application/json' },
+            };
 
-			if (data.errors) {
-				signupEmailError.textContent = data.errors.email;
-				signupPasswordError.textContent = data.errors.password;
-				signupNameError.textContent = data.errors.name;
-			}
-			if (data.email) {
-				location.assign('/');
-			}
-		})
-		.catch(err => console.error(err))
-		.finally(e => console.log("finished"));
-	})
-	
-</script>
+            fetch(URI,others)
+            .then((res) => res.json())
+            .then(data => {
+                if (data.errors) {
+                    loginEmailError.textContent = data.errors.email;
+                    loginPasswordError.textContent = data.errors.password;
+                    loginAccountStatusError.textContent = data.errors.status;
+                }
+
+                if (data.email) {
+                    location.assign('/');
+                }
+            })
+            .catch(err => console.error(err))
+            .finally(e => console.log("finished"));
+        });
+
+        signupForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+
+            // reset errors
+            signupEmailError.textContent = '';
+            signupPasswordError.textContent = '';
+            signupNameError.textContent = '';
+            
+            const email = signupForm.email.value;
+            const password = signupForm.password.value;
+            const name = signupForm.name.value;
+            
+            const URI = "/auth/signup";
+            const others = {
+                method: 'POST',
+                body: JSON.stringify({ email, password, name }),
+                headers: { 'Content-Type': 'application/json' },
+            };
+
+            fetch(URI,others)
+            .then((res) => res.json())
+            .then(data => {
+                if (data.errors) {
+                    signupEmailError.textContent = data.errors.email;
+                    signupPasswordError.textContent = data.errors.password;
+                    signupNameError.textContent = data.errors.name;
+                }
+                if (data.email) {
+                    location.assign('/');
+                }
+            })
+            .catch(err => console.error(err))
+            .finally(e => console.log("finished"));
+        });
+    </script>
 </body>
 </html>
