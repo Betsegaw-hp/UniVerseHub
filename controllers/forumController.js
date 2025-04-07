@@ -58,7 +58,7 @@ const forum_get = async (req, res) => {
 const forum_post = async (req, res) => {
 
     try {
-        const { title, body_content, category } = req.body;
+        const { title, body_content, pureTextContent, category } = req.body;
 
         const categoryDoc = await Category.findOne({ name: category, type: 'forum' });
 
@@ -70,7 +70,8 @@ const forum_post = async (req, res) => {
             title,
             content: body_content,
             category: categoryDoc._id,
-            author: res.locals.user._id
+            author: res.locals.user._id,
+            pureTextContent
         };
 
         // Create the forum post
@@ -174,7 +175,7 @@ const forum_detail_get = async (req, res) => {
 const forum_update = async (req, res) => {
 
     try {
-        const { title, body_content, category, postId } = req.body;
+        const { title, body_content, pureTextContent, category, postId } = req.body;
 
         const post = await ForumPost.findById(postId, 'author');
         if(post.author.toString() !== res.locals.user._id.toString()) {
@@ -190,6 +191,7 @@ const forum_update = async (req, res) => {
             postId ,
             {
                 title, 
+                pureTextContent,
                 content: body_content, 
                 category: categoryDoc._id
             },

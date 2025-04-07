@@ -92,7 +92,7 @@
                 display: none;
             }
         </style>    
-        <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.bubble.css" rel="stylesheet" />
 
         <!-- Include the timeLapse.js file -->
         <script src="/timeLapse.js"></script>
@@ -283,6 +283,7 @@
                             <input type="hidden" id="topic-content" name="topicContentHolder" value="<%= post.content %>" hidden aria-hidden="true"/>
                             <label for="topicContent" class="form-label">Content</label>
                             <div id="topicContentEditor" style="height: 300px;"></div>
+                            <i class="bi bi-info-circle"></i><small class="text-muted">Highlight the text you want to format</small>
                         </div>
                     </form>
                     <div id="form_alert" style="cursor:not-allowed;" class="alert alert-danger fade" role="alert">
@@ -311,10 +312,9 @@
         const general_post_alert_msg = document.querySelector("#general_post_alert_msg");
 
         const topicContentEditor = document.getElementById('topicContentEditor');
-        // const topicContent = "<%= post.content %>";
 
-        const quill = new Quill('#topicContentEditor', {
-            theme: 'snow',
+        const quill = new Quill('#topicContentEditor', {    
+            theme: 'bubble',
             modules: {
                 toolbar: [
                     [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
@@ -337,6 +337,7 @@
 
             const title = form.title.value;
             const body_content = quill.root.innerHTML;
+            const pure_body_content = quill.getText().trim();
             const category = form.category.value;
 
 
@@ -346,6 +347,7 @@
                body: JSON.stringify({
                  title: title,
                  body_content: body_content,
+                 pureTextContent: pure_body_content,
                  category: category,
                  postId: postIdParent.dataset.postid
                })

@@ -13,6 +13,9 @@ const forumPostSchema = new Schema({
         required: true,
         minlength: 10
     },
+    pureTextContent: {
+        type: String,
+    },
     author: {
         type: Schema.Types.ObjectId,
         ref: 'User',

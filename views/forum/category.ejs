@@ -25,7 +25,7 @@
             object-fit: cover;
         }
     </style>
-    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.bubble.css" rel="stylesheet" />
     <!-- Include the timeLapse.js file -->
     <script src="/timeLapse.js"></script>
 </head>
@@ -111,7 +111,7 @@
                                                     <h5 class="mb-1 capitalize"><%= post.title %></h5>
                                                     <small class="timePassed text-muted" data-date="<%= post.createdAt %>"></small>
                                                 </div>
-                                                <p class="mb-1 clamp-text"><%= post.content %></p>
+                                                <p class="mb-1 clamp-text"><%= post.pureTextContent || post.content %></p>
                                                 <div class="d-flex align-items-center mt-2">
                                                     <img src="<%= post.author.avatarUrl %>" alt="<%= post.author.name %>" class="avatar me-2">
                                                     <small class="text-muted">
@@ -231,6 +231,7 @@
                         <div class="mb-3">
                             <label for="topicContent" class="form-label">Content</label>
                             <div id="topicContentEditor" style="height: 300px;"></div>
+                            <i class="bi bi-info-circle"></i><small class="text-muted">Highlight the text you want to format</small>
                         </div>
                         <div class="mb-3">
                             <!-- <label for="topicTags" class="form-label">Tags</label>
@@ -300,7 +301,8 @@
         const topicContentEditor = document.getElementById('topicContentEditor');
 
         const quill = new Quill('#topicContentEditor', {
-            theme: 'snow',
+            placeholder: 'Write your content here...',
+            theme: 'bubble',
             modules: {
                 toolbar: [
                     [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
@@ -319,6 +321,7 @@
 
             const title = form.title.value;
             const body_content = quill.root.innerHTML;
+            const pureTextContent = quill.getText().trim();
             const category = form.dataset.category;
 
             const options = {
@@ -327,6 +330,7 @@
                body: JSON.stringify({
                  title: title,
                  body_content: body_content,
+                 pureTextContent: pureTextContent,
                  category: category
                })
             }
