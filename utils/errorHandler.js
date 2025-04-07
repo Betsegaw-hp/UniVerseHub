@@ -73,7 +73,7 @@ const handleErrors = (err) => {
     } else if (err.message.includes('Blog validation failed')) {
         Object.values(err.errors).forEach(({ properties }) => {
 
-          blog_errors[properties.path] = properties.message;
+          blog_errors[properties?.path] = properties?.message;
           errors = blog_errors;
         });
     } else if(err.message.includes('Validation failed')) {

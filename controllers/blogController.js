@@ -15,6 +15,7 @@ const blog_get = async (req, res) => {
         const rawBlogs = await Blog.find({ status: 'published'}).sort({ createdAt: -1 })
                                 .populate('author', "username email name avatarUrl")
                                 .populate("category", "name")
+                                .populate("thumbnail", "s3location, s3key, hash")
                                 .limit(limit);
         const { blogs, featuredBlogs } = rawBlogs.reduce((acc, blog) => {
             if( blog.featured) {
@@ -30,9 +31,9 @@ const blog_get = async (req, res) => {
 
         res.render('blog/index', { title : 'UniVerseHub Blog', blogs, featuredBlogs, categories, limit })
     } catch (err) {
+        console.log(err);
         const errors = handleErrors(err);
         res.status(400).json({ errors });
-        console.log(err);
     }
 
 }
@@ -56,13 +57,15 @@ const blog_detail_get = async (req, res) => {
         
         const blog = await Blog.findOne({ slug, status: 'published' })
                                 .populate('author', "username email name avatarUrl")
-                                .populate("category", "name");
+                                .populate("category", "name")
+                                .populate("thumbnail", "s3location, s3key, hash");
         if(!blog) {
             return res.redirect('../404');
         }
 
         const relatedBlogs = await getBlogsByCategory(blog.category.name, "title snippet thumbnail slug readTime createdAt");
-        
+        console.log(blog.thumbnail.location);
+
         res.render('blog/detail', { title : `${blog.title} - UniVerseHub Blog`, blog, relatedBlogs })
         } catch (err) {
             console.error(err)
@@ -93,9 +96,20 @@ const blog_create_post = async (req, res) => {
             return res.status(400).json({ errors: { category: "Category not found" } });
         }
 
-        if (!req.file) {
-            return res.status(400).json({ errors: { file: 'No file uploaded.'} });
+        if (!req.s3File) {
+            if (!req.file) {
+                return res.status(400).json({ message: 'No file uploaded or file type invalid.' });
+            } else {
+                console.error("Reached route handler, req.file exists but req.s3File is missing.");
+                return res.status(500).json({ message: 'Internal error processing file.' });
+            }
         }
+
+        console.log('File processed:');
+        console.log('S3 Key:', req.s3File.key);
+        console.log('S3 Location:', req.s3File.location);
+        console.log('Hash:', req.s3File.hash);
+        console.log('Is Duplicate:', req.s3File.isDuplicate);
 
         const seralizedTags = tags.split(',');
         const seralizedContent = contentSerializer(content);
@@ -106,16 +120,16 @@ const blog_create_post = async (req, res) => {
             category: categoryDoc._id,
             tags: seralizedTags,
             body: seralizedContent,
-            thumbnail: req.imagePath
+            thumbnail: req.s3File._id
         });
 
-        console.log("savedBlog");
+        console.log("blog saved?: ", savedBlog.status);
 
         res.status(200).json({savedBlog});
     } catch (err) {
+        console.log(err);
         const errors = handleErrors(err);
         res.status(400).json({ errors });
-        console.log(err);
     }
 }
 
@@ -125,7 +139,8 @@ const blog_update_get = async (req, res) => {
     try {
         const blog = await Blog.findOne({ slug })
                                 .populate('author', "username email name avatarUrl")
-                                .populate("category", "name");
+                                .populate("category", "name")
+                                .populate("thumbnail", "s3location, s3key, hash");
         if(!blog) {
             return res.redirect('../404');
         }
@@ -163,8 +178,9 @@ const blog_update_put = async (req, res) => {
             body: seralizedContent,
             status: 'draft'
         };
+        
 
-        if(req.imagePath) data.thumbnail = req.imagePath ;
+        if(req.s3File) data.thumbnail = req.s3File._id;
         if(slug !== originalSlug && slug !== '') data.slug = slug;
 
         // console.info("data to be drafted: ", data, originalSlug);
@@ -182,25 +198,39 @@ const blog_update_put = async (req, res) => {
         res.status(200).json({draftedBlog});
         
     } catch (err) {
+        console.log(err);
         const errors = handleErrors(err);
         res.status(400).json({ errors });
-        console.log(err);
     }
 }
 
 const image_upload_post = (req, res) => {
      // Access the uploaded file
-     const image = req.file;
+    if (!req.s3File) {
+        if (!req.file) {
+            return res.status(400).json({ message: 'No file uploaded or file type invalid.' });
+        } else {
+            console.error("Reached route handler, req.file exists but req.s3File is missing.");
+            return res.status(500).json({ message: 'Internal error processing file.' });
+        }
+    }
 
-     if (!image) {
-         return res.status(400).json({ error: 'No image uploaded' });
-     }
+    console.log('File processed:');
+    console.log('S3 Key:', req.s3File.key);
+    console.log('S3 Location:', req.s3File.location);
+    console.log('Hash:', req.s3File.hash);
+    console.log('Is Duplicate:', req.s3File.isDuplicate);
  
-     // Get the image URL
-     const imageUrl = req.imagePath ;
- 
-     // Send the URL back to the client
-     res.json({ imageUrl });
+    res.status(200).json({
+        message: req.s3File.isDuplicate ? 'Duplicate file detected. Using existing file.' : 'File uploaded successfully!',
+        fileInfo: {
+            _id: req.s3File._id,
+            key: req.s3File.key,
+            location: req.s3File.location,
+            hash: req.s3File.hash,
+            isDuplicate: req.s3File.isDuplicate,
+        }
+    });
 }
 
 const blog_slug_availablity_get = async (req, res) => {

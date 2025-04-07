@@ -1,119 +1,145 @@
+const { S3Client, PutObjectCommand, GetObjectCommand } = require('@aws-sdk/client-s3');
+const { getSignedUrl } = require('@aws-sdk/s3-request-presigner'); 
 const multer = require('multer');
-const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const ImageMetadata = require('../model/ImageMetadata');
 
-const uploadsDir = path.join(__dirname, '..' ,'public', 'uploads');
-
-
-if (!fs.existsSync(uploadsDir)) {
-    fs.mkdirSync(uploadsDir, { recursive: true });
-}
-
-// Configure multer storage
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, uploadsDir);  // Upload files to the 'uploads' folder
+const s3Client = new S3Client({
+    region: process.env.AWS_REGION,
+    credentials: {
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
     },
-    filename: function (req, file, cb) {
-        cb(null, Date.now() + '-' + file.originalname);
+});
+
+const BUCKET_NAME = process.env.S3_BUCKET_NAME;
+
+// Multer config (Uses Memory Storage)
+const memoryStorage = multer.memoryStorage();
+
+const upload = multer({
+    storage: memoryStorage, // Use memory storage
+    limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB limit
+    fileFilter: function (req, file, cb) {
+        const fileTypes = /jpeg|jpg|svg|webp|png|gif|bmp|tiff|ico/;
+        const extname = fileTypes.test(path.extname(file.originalname).toLowerCase());
+        const mimetype = fileTypes.test(file.mimetype);
+
+        if (mimetype && extname) {
+            return cb(null, true);
+        } else {
+            const error = new multer.MulterError('LIMIT_UNEXPECTED_FILE');
+            error.message = 'Invalid file type. Only ( jpeg , jpg , png , gif ) are allowed!';
+            cb(error);
+        }
     }
 });
 
 
-const upload = multer({ 
-  storage: storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB limit
-  fileFilter: function (req, file, cb) {
-      // Accept only image files
-      const fileTypes = /jpeg|jpg|png|gif/;
-      const extname = fileTypes.test(path.extname(file.originalname).toLowerCase());
-      const mimetype = fileTypes.test(file.mimetype);
-
-      if (mimetype && extname) {
-          return cb(null, true);
-      } else {
-          //a custom MulterError with a custom message
-          const error = new multer.MulterError('LIMIT_UNEXPECTED_FILE');
-          error.message = 'Invalid file type. Only ( jpeg , jpg , png ,gif ) are allowed!';
-          cb(error);
-      }
-  }
- });
-
-// Function to hash the image content
-const hashImage = (filePath) => {
-  return new Promise((resolve, reject) => {
-    const hash = crypto.createHash('md5');
-    const stream = fs.createReadStream(filePath);
-
-    stream.on('data', (data) => {
-      hash.update(data);
-    });
-
-    stream.on('end', () => {
-      resolve(hash.digest('hex'));
-    });
-
-    stream.on('error', (err) => {
-      reject(err);
-    });
-  });
+const calculateHash = (buffer) => {
+    return crypto.createHash('md5').update(buffer).digest('hex'); // Using md5 for speed, sha256 is more collision-resistant
 };
 
-
-const checkDuplicateImage = async (req, res, next) => {
-  const uploadDir = path.join(__dirname, '../public/uploads');
-  const uploadedFile = req.file; 
-  if(!uploadedFile) return next();
-
-  const uploadedFilePath = path.join(uploadDir, uploadedFile.filename);
-
-  try {
-    const uploadedFileHash = await hashImage(uploadedFilePath);
-    const existingFiles = fs.readdirSync(uploadDir);
-
-    for (let file of existingFiles) {
-      const existingFilePath = path.join(uploadDir, file);
-      
-      if (existingFilePath === uploadedFilePath || !fs.statSync(existingFilePath).isFile()) {
-        continue;
-      }
-
-      const existingFileHash = await hashImage(existingFilePath);
-
-      if (uploadedFileHash === existingFileHash) {
-        // If the file is a duplicate, delete the uploaded file and forward the existing file path
-        fs.unlinkSync(uploadedFilePath);
-
-        req.imagePath = `/uploads/${file}`;
-        
-        console.log('Duplicate image found, forwarding existing file:', req.imagePath);
-        
-        // Proceed to the next middleware/handler
+// --- Middleware for Duplicate Check and S3 Upload ---
+const checkDuplicateAndUpload = async (req, res, next) => {
+    if (!req.file) {
         return next();
-      }
     }
 
-    // If no duplicate is found, proceed with the uploaded file
-    req.imagePath = `/uploads/${uploadedFile.filename}`;
-    next();
+    const fileBuffer = req.file.buffer;
+    const fileHash = calculateHash(fileBuffer);
 
-  } catch (err) {
-    console.error('Error while checking duplicate image:', err);
-    res.status(500).json({ message: 'Error while checking duplicate image' });
-  }
+    try {
+        const existingImage = await ImageMetadata.findOne({ hash: fileHash });
+
+        if (existingImage) {
+            console.log(`Duplicate found for hash ${fileHash}. Reusing S3 key: ${existingImage.s3Key}`);
+
+            req.s3File = {
+                _id: existingImage._id,
+                key: existingImage.s3Key,
+                location: existingImage.s3Location,
+                hash: fileHash,
+                size: existingImage.size,
+                mimetype: existingImage.mimetype,
+                isDuplicate: true
+            };
+
+            return next(); 
+        } else {
+            console.log(`No duplicate found for hash ${fileHash}. Uploading to S3...`);
+
+            // Generate a unique S3 key
+            const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+            const extension = path.extname(req.file.originalname);
+            const s3Key = `uploads/${fileHash}-${uniqueSuffix}${extension}`; // Include hash in key for potential verification
+
+            // Prepare S3 upload parameters
+            const params = {
+                Bucket: BUCKET_NAME,
+                Key: s3Key,
+                Body: fileBuffer,
+                ContentType: req.file.mimetype,
+                // ACL: 'public-read', // Only if you need public access AND configured bucket for it
+                Metadata: { 
+                  'original-filename': req.file.originalname
+                }
+            };
+
+            // Create and send the PutObjectCommand
+            const command = new PutObjectCommand(params);
+            const uploadResult = await s3Client.send(command);
+            console.log(`Successfully uploaded to S3. Key: ${s3Key}, ETag: ${uploadResult.ETag}`);
+            
+            const newImageMetadata = new ImageMetadata({
+                hash: fileHash,
+                s3Key: s3Key,
+                originalFilename: req.file.originalname,
+                mimetype: req.file.mimetype,
+                size: req.file.size,
+                
+            });
+            await newImageMetadata.save();
+            console.log(`Saved metadata to DB for hash ${fileHash}`);
+          
+            // Attach NEW S3 info to request object
+            req.s3File = {
+                _id: newImageMetadata._id,
+                key: newImageMetadata.s3Key,
+                location: newImageMetadata.s3Location,
+                hash: fileHash,
+                size: newImageMetadata.size,
+                mimetype: newImageMetadata.mimetype,
+                isDuplicate: false
+            };
+
+            return next(); 
+        }
+    } catch (err) {
+        console.error("Error during duplicate check or S3 upload:", err);
+        // Pass error to the central error handler
+        // I might want more specific error handling (DB vs S3 errors)
+        err.message = `Failed during file processing: ${err.message}`; // Add context
+        return next(err);
+    }
 };
 
+
 const multerErrorHandler = (err, req, res, next) => {
-  // Handle multer errors or any other errors passed to next
-  if (err instanceof multer.MulterError) {
-      console.log(err)
-      return res.status(400).json({ errors: { msg : err.message } });
-  } else {
-      return res.status(500).json({ errors: { err }});
-  }
-}
+    if (err instanceof multer.MulterError) {
+        console.error("Multer Error:", err);
+        return res.status(400).json({ errors: { msg: err.message } });
+    } else if (err) {
+        console.error("Caught Error:", err);
+        return res.status(500).json({ errors: { msg: "Failed to process file upload." } });
+    }
+    
+    next();
+};
 
-
-module.exports = { upload, checkDuplicateImage, multerErrorHandler };
+module.exports = {
+    upload, // uses memory storage
+    checkDuplicateAndUpload, 
+    multerErrorHandler
+};

@@ -1,18 +1,18 @@
+require('dotenv').config()
+
 const express = require('express')
 const mongoose = require('mongoose')
 const morgan = require('morgan')
 const cookieParser = require('cookie-parser')
-const dotenv = require('dotenv')
 const blogRoutes = require('./routes/blogRoutes')
 const forumRoutes = require('./routes/forumRoutes')
 const authRoutes = require('./routes/authRoutes')
 const profileRoutes = require('./routes/profileRoutes')
 const homeRoutes = require('./routes/homeRoutes')
+const getPresignedUrl = require('./routes/getPresignedUrl')
 const adminRoutes = require('./routes/adminRoutes')
 const {requireAuth, checkUser, requireRole} = require('./middleware/authMiddleware');
-const path = require('path');
 
-dotenv.config();
 const app = express()
 const port = process.env.PORT || 3000;
 
@@ -52,6 +52,9 @@ app.use('/blog', requireAuth,  blogRoutes)
 
 //forum routes
 app.use('/forum', requireAuth, forumRoutes)
+
+// pre-signed URL route
+app.get('/image/:hash', requireAuth, getPresignedUrl);
 
 
 // admin routes

@@ -181,7 +181,8 @@
                     displayError(data.errors);
                 }
 
-                return data.imageUrl;
+                console.log(data);
+                return data.fileInfo.hash;
             }
 
 
@@ -195,7 +196,9 @@
                 const base64Image = base64ImageTag.match(/src="([^"]+)"/)[1];
 
                 // Upload the image and get the URL
-                const imageUrl = await uploadImage(base64Image);
+                const imagehash = await uploadImage(base64Image);
+                const imageUrl = `/image/${imagehash}`; 
+                console.log(imageUrl);
 
                 // Replace the base64 image with the image URL in the content
                 content = content.replace(base64Image, imageUrl);

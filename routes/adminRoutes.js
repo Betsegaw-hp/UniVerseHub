@@ -3,7 +3,7 @@ const router = express.Router();
 const adminController = require('../controllers/adminController');
 const blogController = require('../controllers/blogController');
 const categoryController = require('../controllers/categoryController');
-const { upload, checkDuplicateImage, multerErrorHandler } = require('../middleware/uploadMiddleware');
+const { upload, checkDuplicateAndUpload, multerErrorHandler } = require('../middleware/uploadMiddleware');
 
 const {
     admin_page_get,
@@ -46,15 +46,15 @@ router.post('/force-edit-user', force_edit_user);
 router.get('/blog', admin_blog_get);
 
 router.get('/blog/create', blog_create_get);
-router.post('/blog/create', upload.single('image') , checkDuplicateImage, blog_create_post, multerErrorHandler);
+router.post('/blog/create', upload.single('image') , checkDuplicateAndUpload, blog_create_post, multerErrorHandler);
 
 
 router.get('/blog/:slug', blog_update_get);
-router.put('/blog/:slug', upload.single('image'), checkDuplicateImage, blog_update_put, multerErrorHandler);
+router.put('/blog/:slug', upload.single('image'), checkDuplicateAndUpload, blog_update_put, multerErrorHandler);
 
 router.get('/blog/:slug/publish', blog_publish_get);
 
-router.post('/upload-image', upload.single('image'), checkDuplicateImage, image_upload_post, multerErrorHandler);
+router.post('/upload-image', upload.single('image'), checkDuplicateAndUpload, image_upload_post, multerErrorHandler);
 
 // category routes
 router.get('/category', admin_category_get);

@@ -1,5 +1,5 @@
 <% 
-    // consoles.log(relatedBlogs)
+    console.log(blog.thumbnail)
 %>
 
 <!DOCTYPE html>
@@ -48,7 +48,7 @@
 
     <main class="container">
         <article class="blog-content">
-            <img src="<%= blog.thumbnail %>" alt="Online Learning" class="blog-image">
+            <img src="/image/<%= blog.thumbnail?.hash %>" alt="Online Learning" class="blog-image">
             <div class="author-info">
                 <img src="<%= blog.author.avatarUrl %>" alt="Author Avatar" class="author-avatar">
                 <div>
@@ -79,7 +79,7 @@
                         <% if(anotherBlog._id.toString() !== blog._id.toString() ) { %>
                             <div class="col">
                                 <div class="card h-100">
-                                    <img src="<%= anotherBlog.thumbnail %>" class="card-img-top" alt="Blog post thumbnail">
+                                    <img src="/image/<%= anotherBlog.thumbnail?.hash %>" class="card-img-top" alt="Blog post thumbnail">
                                     <!-- blog used below intentionally. b/c I am not getting category from relatedBlog -->
                                     <span class="category-badge capitalize"><%= blog.category.name %></span> 
                                     <div class="card-body">

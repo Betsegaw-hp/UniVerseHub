@@ -14,7 +14,8 @@ const blogSchema = new Schema({
         required: true
     },
     thumbnail: {
-        type: String,
+        type: Schema.Types.ObjectId,
+        ref: 'ImageMetadata',
         required: true 
     },
     snippet: {

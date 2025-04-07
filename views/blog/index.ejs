@@ -35,7 +35,7 @@
                 <div class="card border-0 shadow-sm mb-4">
                     <div class="row g-0">
                       <div class="col-md-6 col-lg-5 position-relative">
-                        <img src="<%= blog.thumbnail %>" class="img-fluid rounded-start h-100 object-fit-cover" alt="Featured post image">
+                        <img src="/image/<%= blog.thumbnail?.hash %>" class="img-fluid rounded-start h-100 object-fit-cover" alt="Featured post image">
                         <div class="position-absolute top-0 start-0 m-3">
                             <span class="badge bg-info px-3 py-2"><%= blog.category.name %></span>
                         </div>
@@ -68,7 +68,7 @@
                 <% blogs.map(blog => { %>
                     <div class="col">
                         <div class="card h-100">
-                            <img src="<%= blog.thumbnail %>" class="card-img-top" alt="Blog post thumbnail">
+                            <img src="/image/<%= blog.thumbnail?.hash %>" class="card-img-top" alt="Blog post thumbnail">
                             <span class="category-badge capitalize"><%= blog.category.name %></span>
                             <div class="card-body">
                                 <h5 class="card-title capitalize clamp-text"><%= blog.title %></h5>
