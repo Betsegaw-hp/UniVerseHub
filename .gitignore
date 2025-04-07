@@ -1,7 +1,5 @@
 /node_modules
 .env
-/public/bootstrap-icons
-/public/bootstrap
 npm-debug.log
 .DS_Store
 /*.env
