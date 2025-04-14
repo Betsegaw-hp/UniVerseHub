@@ -1,5 +1,5 @@
 {
-  "name": "expres-m",
+  "name": "universehub",
   "version": "2.2.2",
   "description": "express mogodb",
   "main": "app.js",
@@ -15,6 +15,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.782.0",
     "@aws-sdk/s3-request-presigner": "^3.782.0",
+    "@mux/mux-player": "^3.3.4",
     "algoliasearch": "^5.8.1",
     "bcrypt": "^5.1.1",
     "bootstrap": "^5.3.3",
